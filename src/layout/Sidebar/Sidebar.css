@@ -1,0 +1,50 @@
+.side-menu-footer{
+    width: 100%;
+    /* background: #333; */
+    /* position: absolute;
+    bottom: 0;
+    left: 0; */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.side-menu-footer .avatar{
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 50%;
+    display: inline-block;
+}
+.side-menu-footer .avatar img{
+    max-width: 100%;
+}
+
+.side-menu-footer .user-info{
+    display: inline-block;
+    margin: 0 10px;
+    /* color: #000; */
+    position: absolute;
+    opacity: 1;
+    transition: opacity .2s ease-in;
+}
+
+.side-menu.inactive .side-menu-footer .user-info{
+    opacity: 1;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+
+.side-menu-footer .user-info h5{
+    font-size: 15px;
+}
+
+
+.side-menu-footer .user-info p{
+    font-size: 14px;
+}
+
+.pro-menu-item .active{
+    color: red;
+}

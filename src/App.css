@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap");
+
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --main-1: #FFF6D8;
+  --main-2: #FEE4C3;
+  --main-3: #000;
+}
+
+html {
+  min-height: 100vh;
+  background: var(--main-1);
+  background-size: contain;
+}
+
+
+a {
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
+}
+
+
+
+html,
+body,
+#root,
+.app,
+.content {
+  height: 100%;
+  width: 100%;
+  font-family: "Source Sans Pro", sans-serif;
+}
+
+.app {
+  display: flex;
+  position: relative;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+ .app .btn-toggle {
+	 cursor: pointer;
+	 display: none;
+	 position: absolute;
+	 left: 25px;
+	 top: 33px;
+	 z-index: 10;
+}
+ .app .sidebar-btn-wrapper {
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+}
+ .app .sidebar-btn-wrapper .sidebar-btn {
+	 padding: 1px 15px;
+	 border-radius: 40px;
+	 background: rgba(255, 255, 255, 0.05);
+	 color: #adadad;
+	 text-decoration: none;
+	 margin: 0 auto;
+	 height: 35px;
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+	 text-overflow: ellipsis;
+	 overflow: hidden;
+}
+ .app .sidebar-btn-wrapper .sidebar-btn span {
+	 margin-left: 5px;
+	 font-size: 13px;
+}
+ .app .sidebar-btn-wrapper .sidebar-btn:hover {
+	 color: #d8d8d8;
+}
+ .app .collapsed .sidebar-btn {
+	 display: inline-block;
+	 border-radius: 50%;
+	 width: 35px;
+	 height: 35px;
+	 line-height: 40px;
+	 padding: 0;
+}
+ .app main {
+	 /* padding: 24px; */
+	 flex-grow: 1;
+	 display: flex;
+	 flex-direction: column;
+	 overflow-y: auto;
+}
+ .app main header {
+	 margin-bottom: 16px;
+	 border-bottom: 1px solid #efefef;
+}
+ .app main footer {
+	 margin-top: auto;
+	 color: #888;
+	 text-align: center;
+}
+ .app main footer a {
+	 text-decoration: none;
+	 color: #888;
+}
+ .app main footer a:hover {
+	 text-decoration: underline;
+}
+ .app .block {
+	 display: flex;
+	 margin-bottom: 24px;
+	 font-size: 14px;
+	 color: #545454;
+}
+ .app .block > span {
+	 margin-left: 10px;
+}
+
+  @media screen and (max-width: 768px) {
+	.app .btn-toggle {
+      display: flex;
+	  /* z-index: 10000; */
+    }
+  }
+
+  .ant-btn-primary {
+    color: #fff;
+    background: #1677ff;
+    box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+}
