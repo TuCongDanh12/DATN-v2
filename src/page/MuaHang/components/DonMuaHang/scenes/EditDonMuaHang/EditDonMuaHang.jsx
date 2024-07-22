@@ -45,8 +45,10 @@ const DonMuaHang = ({ disabled }) => {
           supplierAddress: donmuahang?.supplier?.address,
           purchasingOfficerName: donmuahang?.purchasingOfficer?.name,
           content: donmuahang?.content,
-          ngayMua: donmuahang?.ngayMua,
-          hanGiaoHang: donmuahang?.hanGiaoHang,
+          purchasingDate: donmuahang?.purchasingDate,
+          deliveryTerm: donmuahang?.deliveryTerm,
+          discountRate: donmuahang?.discountRate,
+          discount: donmuahang?.discount
         }}
         className="mb-4"
         labelCol={{ flex: '150px' }}
@@ -105,7 +107,7 @@ const DonMuaHang = ({ disabled }) => {
           <Flex vertical gap={5} className="w-[50%]">
             <Form.Item
               label="Ngày mua"
-              name="ngayMua"
+              name="purchasingDate"
               rules={[
                 {
                   required: true,
@@ -118,7 +120,31 @@ const DonMuaHang = ({ disabled }) => {
 
             <Form.Item
               label="Hạn giao hàng"
-              name="hanGiaoHang"
+              name="deliveryTerm"
+              rules={[
+                {
+                  required: true,
+                  message: 'Trường này là bắt buộc!',
+                },
+              ]}
+            >
+              <Input disabled={disabled} />
+            </Form.Item>
+            <Form.Item
+              label="Triết khấu"
+              name="discountRate"
+              rules={[
+                {
+                  required: true,
+                  message: 'Trường này là bắt buộc!',
+                },
+              ]}
+            >
+              <Input disabled={disabled} />
+            </Form.Item>
+            <Form.Item
+              label="Giảm giá"
+              name="discount"
               rules={[
                 {
                   required: true,
@@ -156,8 +182,8 @@ const DonMuaHang = ({ disabled }) => {
           </div>
         </div>
       </Form>
-      <OrderTable data={productOfDonBanHangs} />
-      <OrderSummary products={productOfDonBanHangs} />
+      <OrderTable discount={donmuahang.discount} discountRate={donmuahang.discountRate} data={donmuahang.productOfDonMuaHangs} />
+      <OrderSummary discount={donmuahang.discount} discountRate={donmuahang.discountRate} data={donmuahang.productOfDonMuaHangs}  />
       <OrderActions disabled={disabled} />
     </div>
   );

@@ -3,29 +3,11 @@ import { Tabs, Form, Input, DatePicker } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import muahangService from '../../../../../../services/muahang.service';
 import OrderTable from './OrderTable';
-import OrderSummary from '../../../../../../component/orderSumary';
+import OrderSummary from '../../../../../../component/orderSumary'
 import OrderActions from '../../../../../../component/actionButton';
 import moment from 'moment';
 
 const { TabPane } = Tabs;
-
-const dataSourceTest = [
-  {
-    key: '1',
-    maHang: '1',
-    tenHang: 'Product A',
-    dvt: 'Kg',
-    soLuong: 10,
-    soLuongDaBan: 4,
-    donGia: '1.200 ₫',
-    thanhTien: '12.000 ₫',
-    phanTramChietKhau: 0,
-    tienChietKhau: '0 ₫',
-    phanTramThueGTGT: 8,
-    tienThueGTGT: '960 ₫',
-  },
-  // Add more data rows here if needed
-];
 
 const DonMuaHang = ({ disabled }) => {
   const [donmuahang, setDonmuahang] = useState(null);
@@ -35,7 +17,7 @@ const DonMuaHang = ({ disabled }) => {
     ngayGiaoHang: moment(),
     hanThanhToan: moment(), // Initialize with today's date
   });
-  const [productData, setProductData] = useState(dataSourceTest); // Using the fake API data
+  const [productData, setProductData] = useState(null);
   const params = useParams();
   const navigate = useNavigate();
   const id = params.id;
@@ -48,8 +30,13 @@ const DonMuaHang = ({ disabled }) => {
     try {
       const response = await muahangService.getDonMuaHang({ id });
       const data = response.data.result.data;
+      console.log('don mua hang', data);
       setDonmuahang(data);
-      setProductData(data.products || dataSourceTest); // Ensure it's an array
+      setProductData(data.productOfDonMuaHangs.map(item => ({
+        ...item,
+        key: item.id,
+        originalCount: item.count,
+      })));
       setFormData({
         ngayHoachToan: moment(),
         ngayGiaoHang: moment(),
@@ -62,13 +49,10 @@ const DonMuaHang = ({ disabled }) => {
 
   const handleSave = (row) => {
     const newData = [...productData];
-    const index = newData.findIndex((item) => row.key === item.key);
+    const index = newData.findIndex((item) => item.id === row.id);
     if (index > -1) {
       const item = newData[index];
       newData.splice(index, 1, { ...item, ...row });
-      setProductData(newData);
-    } else {
-      newData.push(row);
       setProductData(newData);
     }
   };
@@ -77,7 +61,7 @@ const DonMuaHang = ({ disabled }) => {
 
   return (
     <div className="m-6">
-        <h1 className='text-2xl font-bold'>Lập chứng từ mua hàng</h1>
+      <h1 className="text-2xl font-bold">Lập chứng từ mua hàng</h1>
       <Tabs defaultActiveKey="1">
         <TabPane tab="Phiếu Thu" key="1">
           <Form
@@ -149,7 +133,7 @@ const DonMuaHang = ({ disabled }) => {
                   label="Ngày hoạch toán"
                   name="ngayHoachToan"
                 >
-                  <DatePicker value={formData.ngayHoachToan} disabled />
+                  <DatePicker className="w-full" value={formData.ngayHoachToan} disabled />
                 </Form.Item>
 
                 <Form.Item
@@ -163,6 +147,7 @@ const DonMuaHang = ({ disabled }) => {
                   ]}
                 >
                   <DatePicker
+                    className="w-full"
                     value={formData.ngayGiaoHang}
                     onChange={(date) => setFormData({ ...formData, ngayGiaoHang: date })}
                   />
@@ -171,8 +156,17 @@ const DonMuaHang = ({ disabled }) => {
             </div>
           </Form>
 
-          <OrderTable dataSource={productData} handleSave={handleSave} />
-          <OrderSummary products={productData} />
+          <OrderTable
+            discount={donmuahang.discount}
+            discountRate={donmuahang.discountRate}
+            dataSource={productData}
+            handleSave={handleSave}
+          />
+          <OrderSummary
+            discount={donmuahang.discount}
+            discountRate={donmuahang.discountRate}
+            data={productData}
+          />
           <OrderActions disabled={disabled} />
         </TabPane>
         <TabPane tab="Hóa đơn" key="2">
@@ -185,6 +179,8 @@ const DonMuaHang = ({ disabled }) => {
               content: donmuahang?.content,
               ngayHoachToan: formData.ngayHoachToan,
               hanThanhToan: formData.hanThanhToan,
+              discount: donmuahang?.discount,
+              discountRate: donmuahang?.discountRate,
             }}
             className="mb-4"
             labelCol={{ flex: '150px' }}
@@ -245,7 +241,7 @@ const DonMuaHang = ({ disabled }) => {
                   label="Ngày hoạch toán"
                   name="ngayHoachToan"
                 >
-                  <DatePicker value={formData.ngayHoachToan} disabled />
+                  <DatePicker className="w-full" value={formData.ngayHoachToan} disabled />
                 </Form.Item>
 
                 <Form.Item
@@ -257,18 +253,53 @@ const DonMuaHang = ({ disabled }) => {
                       message: 'Trường này là bắt buộc!',
                     },
                   ]}
+                  className="w-full"
                 >
                   <DatePicker
+                    className="w-full"
                     value={formData.hanThanhToan}
                     onChange={(date) => setFormData({ ...formData, hanThanhToan: date })}
                   />
+                </Form.Item>
+                <Form.Item
+                  label="Triết khấu"
+                  name="discountRate"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Trường này là bắt buộc!',
+                    },
+                  ]}
+                >
+                  <Input disabled />
+                </Form.Item>
+                <Form.Item
+                  label="Giảm giá"
+                  name="discount"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Trường này là bắt buộc!',
+                    },
+                  ]}
+                >
+                  <Input disabled />
                 </Form.Item>
               </div>
             </div>
           </Form>
 
-          <OrderTable dataSource={productData} handleSave={handleSave} />
-          <OrderSummary products={productData} />
+          <OrderTable
+            discount={donmuahang.discount}
+            discountRate={donmuahang.discountRate}
+            dataSource={productData}
+            handleSave={handleSave}
+          />
+          <OrderSummary
+            discount={donmuahang.discount}
+            discountRate={donmuahang.discountRate}
+            data={productData}
+          />
           <OrderActions disabled={disabled} />
         </TabPane>
       </Tabs>

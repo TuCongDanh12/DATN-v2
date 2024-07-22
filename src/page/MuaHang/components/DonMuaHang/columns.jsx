@@ -67,6 +67,17 @@ const handleDropdownItemClick = (e, record, navigate, setDataSelected, setOpen) 
   }
 };
 
+const calculateTotal = (products, discountRate, discount) => {
+  const totalProductValue = products.reduce((acc, product) => acc + (product.price * product.count), 0);
+  const discountedValue = totalProductValue * (1 - discountRate / 100);
+  const finalValue = discountedValue - discount;
+  return finalValue < 0 ? 0 : finalValue;
+};
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+};
+
 const getColumns = (navigate, setDataSelected, setOpen) => [
   {
     title: "Id đơn hàng",
@@ -75,13 +86,21 @@ const getColumns = (navigate, setDataSelected, setOpen) => [
   },
   {
     title: "Ngày mua",
-    dataIndex: "ngayMua",
-    sorter: (a, b) => new Date(a.ngayMua) - new Date(b.ngayMua),
+    dataIndex: "purchasingDate",
+    sorter: (a, b) => new Date(a.purchasingDate) - new Date(b.purchasingDate),
   },
   {
     title: "Hạn giao hàng",
-    dataIndex: "hanGiaoHang",
-    sorter: (a, b) => new Date(a.hanGiaoHang) - new Date(b.hanGiaoHang),
+    dataIndex: "deliveryTerm",
+    sorter: (a, b) => {
+      const today = new Date();
+      const aDeliveryTerm = new Date(a.deliveryTerm);
+      const bDeliveryTerm = new Date(b.deliveryTerm);
+
+      if (aDeliveryTerm >= today && bDeliveryTerm < today) return -1;
+      if (aDeliveryTerm < today && bDeliveryTerm >= today) return 1;
+      return aDeliveryTerm - bDeliveryTerm;
+    },
   },
   {
     title: "Tên khách hàng",
@@ -109,6 +128,14 @@ const getColumns = (navigate, setDataSelected, setOpen) => [
     ),
     filters: Object.keys(DOCUMENT_STATUS).map(key => ({ text: documentStatusLabels[DOCUMENT_STATUS[key]], value: DOCUMENT_STATUS[key] })),
     onFilter: (value, record) => record.documentStatus === value,
+  },
+  {
+    title: "Tổng giá trị",
+    dataIndex: "totalValue",
+    render: (_, record) => {
+      const totalValue = calculateTotal(record.productOfDonMuaHangs, record.discountRate, record.discount);
+      return formatCurrency(totalValue);
+    },
   },
   {
     title: "Chức năng",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Input, Form } from 'antd';
+import { Table, Input, Form, message } from 'antd';
 
 const EditableCell = ({
   title,
@@ -28,8 +28,16 @@ const EditableCell = ({
   const save = async () => {
     try {
       const values = await form.validateFields();
-      toggleEdit();
-      handleSave({ ...record, ...values });
+      if (values[dataIndex] === undefined || values[dataIndex] === '') {
+        form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+        toggleEdit();
+      } else if (dataIndex === 'count' && values[dataIndex] > record.originalCount) {
+        message.error('Số lượng không được lớn hơn số lượng cần thiết');
+        form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+      } else {
+        toggleEdit();
+        handleSave({ ...record, ...values });
+      }
     } catch (errInfo) {
       console.log('Save failed:', errInfo);
     }
@@ -63,65 +71,74 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>;
 };
 
-const OrderTable = ({ dataSource, handleSave }) => {
+const OrderTable = ({ dataSource, handleSave, discount, discountRate }) => {
+  const calculateAmount = (record) => {
+    const thanhTien = (record.count - record.delivered) * record.price;
+    const tienChietKhau = (thanhTien * discountRate) / 100;
+    const total = thanhTien - tienChietKhau;
+
+    return {
+      thanhTien,
+      tienChietKhau,
+      total,
+    };
+  };
+
   const columns = [
     {
       title: 'Mã hàng',
-      dataIndex: 'maHang',
-      key: 'maHang',
+      dataIndex: ['product', 'id'],
+      key: 'product.id',
+      render: (_, record) => record.product.id,
     },
     {
       title: 'Tên hàng',
-      dataIndex: 'tenHang',
-      key: 'tenHang',
+      dataIndex: ['product', 'name'],
+      key: 'product.name',
+      render: (_, record) => record.product.name,
     },
     {
       title: 'ĐVT',
-      dataIndex: 'dvt',
-      key: 'dvt',
+      dataIndex: ['product', 'unit'],
+      key: 'product.unit',
+      render: (_, record) => record.product.unit,
     },
     {
       title: 'Số lượng',
-      dataIndex: 'soLuong',
-      key: 'soLuong',
+      dataIndex: 'count',
+      key: 'count',
       editable: true,
-    },
-    {
-      title: 'Số lượng đã bán',
-      dataIndex: 'soLuongDaBan',
-      key: 'soLuongDaBan',
+      render: (_, record) => record.count - record.delivered,
     },
     {
       title: 'Đơn giá',
-      dataIndex: 'donGia',
-      key: 'donGia',
+      dataIndex: 'price',
+      key: 'price',
+      render: (text) => `${text.toLocaleString('vi-VN')} ₫`,
     },
     {
       title: 'Thành tiền',
       dataIndex: 'thanhTien',
       key: 'thanhTien',
+      render: (_, record) => calculateAmount(record).thanhTien.toLocaleString('vi-VN'),
     },
     {
       title: '% chiết khấu',
-      dataIndex: 'phanTramChietKhau',
-      key: 'phanTramChietKhau',
-      editable: true,
+      dataIndex: 'discountRate',
+      key: 'discountRate',
+      render: () => discountRate,
     },
     {
       title: 'Tiền chiết khấu',
       dataIndex: 'tienChietKhau',
       key: 'tienChietKhau',
+      render: (_, record) => calculateAmount(record).tienChietKhau.toLocaleString('vi-VN'),
     },
     {
-      title: '% thuế GTGT',
-      dataIndex: 'phanTramThueGTGT',
-      key: 'phanTramThueGTGT',
-      editable: true,
-    },
-    {
-      title: 'Tiền thuế GTGT',
-      dataIndex: 'tienThueGTGT',
-      key: 'tienThueGTGT',
+      title: 'Tổng cộng',
+      dataIndex: 'total',
+      key: 'total',
+      render: (_, record) => calculateAmount(record).total.toLocaleString('vi-VN'),
     },
   ];
 
@@ -153,7 +170,7 @@ const OrderTable = ({ dataSource, handleSave }) => {
       components={components}
       rowClassName={() => 'editable-row'}
       bordered
-      dataSource={dataSource}
+      dataSource={dataSource.map(item => ({ ...item, key: item.id }))}
       columns={mappedColumns}
       pagination={false}
     />
