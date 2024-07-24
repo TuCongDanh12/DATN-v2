@@ -217,6 +217,12 @@ const updateProduct = ({ values }) => {
     );
 };
 
+const addProductForSup = ({ values }) => {
+    const { id, productIds } = values;
+    return axios.patch(`${API_URL}/supplier/${id}/add-product`, {
+        productIds,
+    });
+};
 
 
 
@@ -439,6 +445,7 @@ const doiTuongService = {
     getProduct,
     postProduct,
     updateProduct,
+    addProductForSup ,
 
     getListBankAccount,
     getBankAccount,

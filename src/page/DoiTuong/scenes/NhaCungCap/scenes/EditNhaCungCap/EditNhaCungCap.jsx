@@ -1,121 +1,36 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { Form, Input, Flex, Table, Button, Select, Typography, InputNumber } from "antd";
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Tabs, Form, Typography } from "antd";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { doiTuongSelector, getListSupplierGroup, getSupplier } from '../../../../../../store/features/doiTuongSilce';
+import SupplierForm from './SupplierForm';
+import ProductTable from './ProductTable';
+import { EditableRow, EditableCell } from './EditableRow';
 
-const EditableContext = React.createContext(null);
-const EditableRow = ({ index, ...props }) => {
-    const [form] = Form.useForm();
-    return (
-        <Form form={form} component={false}>
-            <EditableContext.Provider value={form}>
-                <tr {...props} />
-            </EditableContext.Provider>
-        </Form>
-    );
-};
-
-const EditableCell = ({
-    title,
-    editable,
-    children,
-    inputType,
-    dataIndex,
-    record,
-    handleSave,
-    ...restProps
-}) => {
-    const [editing, setEditing] = useState(false);
-    const inputRef = useRef(null);
-    const form = useContext(EditableContext);
-    useEffect(() => {
-        if (editing) {
-            inputRef.current.focus();
-        }
-    }, [editing]);
-    const toggleEdit = () => {
-        setEditing(!editing);
-        form.setFieldsValue({
-            [dataIndex]: record[dataIndex],
-        });
-    };
-    const save = async () => {
-        try {
-            const values = await form.validateFields();
-            toggleEdit();
-            handleSave({
-                ...record,
-                ...values,
-            });
-        } catch (errInfo) {
-            console.log('Save failed:', errInfo);
-        }
-    };
-    let childNode = children;
-    const inputNode = inputType === 'number' ? <InputNumber ref={inputRef} onPressEnter={save} onBlur={save} /> : <Input ref={inputRef} onPressEnter={save} onBlur={save} />;
-
-    if (editable) {
-        childNode = editing ? (
-            <Form.Item
-                name={dataIndex}
-                style={{
-                    margin: 0,
-                }}
-                rules={[
-                    {
-                        required: true,
-                        message: `Please Input ${title}!`,
-                    },
-                ]}
-            >
-                {inputNode}
-            </Form.Item>
-        ) : (
-            <div
-                className="editable-cell-value-wrap"
-                style={{
-                    paddingRight: 24,
-                }}
-                onClick={toggleEdit}
-            >
-                {children}
-            </div>
-        );
-    }
-    return <td {...restProps}>{childNode}</td>;
-};
-
+const { TabPane } = Tabs;
 
 const EditNhaCungCap = ({ disabled = false }) => {
     const dispatch = useDispatch();
     const params = useParams();
-    console.log("params", params)
-    console.log("params.id", params.id)
     const navigate = useNavigate();
     const [form] = Form.useForm();
 
-    const { listSupplierData,
-        supplierData,
-        listSupplierGroupData,
-        supplierGroupData, } = useSelector(doiTuongSelector);
-    console.log("supplierData", supplierData);
+    const { listSupplierGroupData, supplierData } = useSelector(doiTuongSelector);
 
     useEffect(() => {
         dispatch(getSupplier({ id: params.id }));
         dispatch(getListSupplierGroup());
-    }, []);
+    }, [dispatch, params.id]);
 
     useEffect(() => {
         if (supplierData) {
             form.setFieldsValue({
                 ...supplierData
             });
+            setProducts(supplierData.products || []);
         }
-    }, [supplierData]);
-
-    const nameValue = Form.useWatch('name', form);
+    }, [supplierData, form]);
 
     const [dataSource, setDataSource] = useState([
         {
@@ -129,12 +44,49 @@ const EditNhaCungCap = ({ disabled = false }) => {
     ]);
 
     const [count, setCount] = useState(1);
+    const [products, setProducts] = useState([]);
 
     const handleDelete = (key) => {
         const newData = dataSource.filter((item) => item.key !== key);
         setDataSource(newData);
     };
-    const defaultColumns = [
+
+    const handleAdd = () => {
+        const newData = {
+            'key': count,
+            'tenchietkhau': '.',
+            'songayduocno': '.',
+            'songayhuongchietkhau': '.',
+            'phantramchietkhau': '.',
+            'noidung': '.',
+        };
+        setDataSource([...dataSource, newData]);
+        setCount(count + 1);
+    };
+
+    const handleSave = (row) => {
+        const newData = [...dataSource];
+        const index = newData.findIndex((item) => row.key === item.key);
+        const item = newData[index];
+        newData.splice(index, 1, {
+            ...item,
+            ...row,
+        });
+        setDataSource(newData);
+    };
+
+    const handleAddProducts = (selectedProducts) => {
+        setProducts([...products, ...selectedProducts]);
+    };
+
+    const components = {
+        body: {
+            row: EditableRow,
+            cell: EditableCell,
+        },
+    };
+
+    const columns = [
         {
             title: 'Tên chiết khấu',
             dataIndex: 'tenchietkhau',
@@ -172,40 +124,7 @@ const EditNhaCungCap = ({ disabled = false }) => {
                     </Typography.Link>
                 ) : null,
         },
-    ];
-
-    const handleAdd = () => {
-        const newData = {
-            'key': count,
-            'tenchietkhau': '.',
-            'songayduocno': '.',
-            'songayhuongchietkhau': '.',
-            'phantramchietkhau': '.',
-            'noidung': '.',
-        };
-        setDataSource([...dataSource, newData]);
-        setCount(count + 1);
-    };
-
-    const handleSave = (row) => {
-        const newData = [...dataSource];
-        const index = newData.findIndex((item) => row.key === item.key);
-        const item = newData[index];
-        newData.splice(index, 1, {
-            ...item,
-            ...row,
-        });
-        setDataSource(newData);
-    };
-
-    const components = {
-        body: {
-            row: EditableRow,
-            cell: EditableCell,
-        },
-    };
-
-    const columns = defaultColumns.map((col) => {
+    ].map((col) => {
         if (!col.editable) {
             return col;
         }
@@ -222,244 +141,36 @@ const EditNhaCungCap = ({ disabled = false }) => {
         };
     });
 
-    const onFinish = (values) => {
-        console.log('Received values of form: ', values);
-        console.log(dataSource);
-    };
-
     return (
         <div className="m-6">
             <h1 className="font-bold text-[32px] mb-8">
-                Nhà cung cấp {nameValue || supplierData.name}
+                Nhà cung cấp {supplierData?.name}
             </h1>
-            <Form
-                form={form}
-                // labelCol={{ span: 10 }}
-                className='mb-4'
-                labelCol={{
-                    flex: '150px',
-                }}
-                labelAlign="left"
-                labelWrap
-                onFinish={onFinish}
-            >
-                <Flex gap={100} justify='center' className='w-[100%] align-left'>
-                    <Flex vertical gap={5} className='w-[50%]'>
-                        <Form.Item
-                            label="Nhóm nhà cung cấp"
-                            name='supplierGroup'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Select
-                                disabled={disabled}
-                            >
-                                {
-                                    listSupplierGroupData.map(item => <Select.Option value={item.id} key={item.id}>{item.name}</Select.Option>)
-                                }
-                            </Select>
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Tên nhà cung cấp"
-                            name='name'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Input
-                                disabled={disabled}
-
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Địa chỉ"
-                            name='address'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Input
-                                disabled={disabled}
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Số điện thoại"
-                            name='phoneNumber'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Input
-                                disabled={disabled}
-
-                            />
-                        </Form.Item>
-
-
-                        <Form.Item
-                            label="Email"
-                            name='email'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder="abc@gmail.com"
-                                disabled={disabled}
-
-                            />
-                        </Form.Item>
-                    </Flex>
-
-                    <Flex vertical gap={5} className='w-[50%]'>
-                    <Form.Item
-                            label="Tên người liên hệ"
-                            name='representative'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Input
-                                disabled={disabled}
-
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            label="Ngân hàng"
-                            name='bankName'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Input
-                                disabled={disabled}
-
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Chủ tài khoản"
-                            name='accountName'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Input
-                                disabled={disabled}
-
-                            />
-                        </Form.Item>
-
-
-                        <Form.Item
-                            label="Số tài khoản"
-                            name='accountNumber'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Trường này là bắt buộc!',
-                                },
-                            ]}
-                        >
-                            <Input
-                                disabled={disabled}
-
-                            />
-                        </Form.Item>
-
-
-                        <Form.Item
-                            label="Mô tả"
-                            name='description'
-                        >
-                            <Input
-                                disabled={disabled}
-
-                            />
-                        </Form.Item>
-                    </Flex>
-
-                </Flex>
-
-
-                <div>
-                    <Button
-                        className='!bg-[#7A77DF] font-bold text-white flex items-center gap-1 mb-4'
-                        onClick={handleAdd}
+            <Tabs defaultActiveKey="1">
+                <TabPane tab="Chung" key="1">
+                    <SupplierForm
+                        form={form}
+                        listSupplierGroupData={listSupplierGroupData}
+                        supplierData={supplierData}
                         disabled={disabled}
-                    >
-                        Thêm 1 dòng
-                    </Button>
-
-                    <Table
-                        components={components}
-                        rowClassName={() => 'editable-row'}
-                        bordered
+                        handleAdd={handleAdd}
                         dataSource={dataSource}
+                        components={components}
                         columns={columns}
-                        pagination={false}
+                        navigate={navigate}
                     />
-                </div>
+                </TabPane>
 
-                {disabled ?
-                    <div className='w-full flex justify-end mt-6 mb-0'>
-                        <Button
-                            className='bg-[#FF7742] font-bold text-white'
-                            type='link'
-                            onClick={() => navigate(-1)}
-                        >
-                            Thoát
-                        </Button>
-                    </div> :
-                    <Form.Item className='flex justify-end gap-2 mt-6 mb-0'>
-
-                        <Button
-                            className='bg-[#FF7742] font-bold text-white mr-2'
-                            htmlType="reset"
-                            onClick={() => navigate(-1)}
-                        >
-                            Hủy
-                        </Button>
-                        <Button
-                            className='!bg-[#67CDBB] font-bold text-white'
-                            htmlType="submit"
-                        // onClick={() => navigate(-1)}
-                        >
-                            Xác nhận
-                        </Button>
-                    </Form.Item>
-                }
-            </Form>
+                <TabPane tab="Sản phẩm" key="2">
+                    <ProductTable
+                        products={products}
+                        onAddProducts={handleAddProducts}
+                        supplierId={params.id}
+                    />
+                </TabPane>
+            </Tabs>
         </div>
-    )
+    );
 }
 
-export default EditNhaCungCap
+export default EditNhaCungCap;
