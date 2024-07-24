@@ -3,7 +3,7 @@ import { Table, message as msg, notification } from "antd";
 import muahangService from './../../../../services/muahang.service';
 import getColumns from './columns'; // Import từ file columns.js
 
-const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationPram, setPaginationParam, searchParams }) => {
+const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, setPaginationParam, searchParams }) => {
   const [listdonmuahang, setListdonmuahang] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
@@ -22,7 +22,7 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationPram, s
     const requestParams = {
       currentPage: 1,
       pageSize: 1000, // Lấy toàn bộ dữ liệu để lọc cục bộ
-      sorts: paginationPram.sorts || 'id%3AASC',
+      sorts: paginationParam.sorts || 'id%3AASC',
     };
 
     try {
@@ -75,7 +75,7 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationPram, s
 
   const onChange = (pagination, filters, sorter) => {
     const newPagination = {
-      ...paginationPram,
+      ...paginationParam,
       current: pagination.current,
       pageSize: pagination.pageSize,
       sorts: sorter.field ? `${sorter.field}%3A${sorter.order === "descend" ? 'DESC' : 'ASC'}` : 'id%3AASC',
@@ -100,12 +100,12 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationPram, s
         rowSelection={{ type: "checkbox", ...rowSelection }}
         columns={getColumns(navigate, setDataSelected, setOpen)}
         dataSource={filteredData.slice(
-          (paginationPram.current - 1) * paginationPram.pageSize,
-          paginationPram.current * paginationPram.pageSize
+          (paginationParam.current - 1) * paginationParam.pageSize,
+          paginationParam.current * paginationParam.pageSize
         )}
         pagination={{
-          current: paginationPram.current,
-          pageSize: paginationPram.pageSize,
+          current: paginationParam.current,
+          pageSize: paginationParam.pageSize,
           total: filteredData.length,
           position: ['bottomRight'],
           showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,

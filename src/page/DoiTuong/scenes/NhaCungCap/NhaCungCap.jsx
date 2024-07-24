@@ -18,11 +18,8 @@ import { TfiReload } from "react-icons/tfi";
 import { Add } from "@mui/icons-material";
 import { MdOutlineSearch } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  clearState,
-  doiTuongSelector,
-  getListSupplier,
-} from "../../../../store/features/doiTuongSilce";
+import { clearState, doiTuongSelector, getListSupplier } from "../../../../store/features/doiTuongSilce";
+import copy from 'copy-to-clipboard';
 
 const NhaCungCap = () => {
   const dispatch = useDispatch();
@@ -36,9 +33,11 @@ const NhaCungCap = () => {
   const [api, contextHolder] = notification.useNotification();
   const [supplierData, setSupplierData] = useState([]);
   const [searchText, setSearchText] = useState("");
+  
   const handleSearch = (value) => {
     setSearchText(value);
   };
+
   const {
     listSupplierData,
     isSuccessGetListSupplier,
@@ -82,7 +81,6 @@ const NhaCungCap = () => {
   }, [isSuccessGetListSupplier, isSuccessPostSupplier, isError]);
 
   useEffect(() => {
-    console.log("DAY NE", searchText)
     if (searchText.trim() === "") {
       if (
         !listSupplierData ||
@@ -98,7 +96,8 @@ const NhaCungCap = () => {
       });
       setSupplierData(filteredData);
     }
-  }, [searchText, supplierData]);
+  }, [searchText, listSupplierData]);
+  
   const items = [
     {
       key: "xem",
@@ -115,8 +114,6 @@ const NhaCungCap = () => {
   ];
 
   const handleDropdownItemClick = (e, record) => {
-    console.log("e.key", e.key);
-    console.log("record", record);
     if (e.key === "xoa") {
       setDataSelected(record);
       setOpen(true);
@@ -129,14 +126,21 @@ const NhaCungCap = () => {
     setOpen(false);
   };
 
+  const copyToClipboard = (text) => {
+    copy(text);
+    messageApi.success("Sao chép ID thành công!");
+  };
+
   const columns = [
     {
       title: "ID nhà cung cấp",
       dataIndex: "id",
       key: "id",
       sorter: (a, b) => a.id - b.id,
-      // sortOrder: sortedInfo.columnKey === "id" ? sortedInfo.order : null,
       ellipsis: true,
+      render: (text) => (
+        <a onClick={() => copyToClipboard(text)}>{text}</a>
+      ),
     },
     {
       title: "Nhà cung cấp",
@@ -196,7 +200,6 @@ const NhaCungCap = () => {
   };
 
   const onChange = (pagination, filters, sorter, extra) => {
-    // console.log('onChange params', pagination, filters, sorter, extra);
     console.log("onChange params pagination", pagination);
     console.log("onChange params filters", filters);
     console.log("onChange params sorter", sorter);

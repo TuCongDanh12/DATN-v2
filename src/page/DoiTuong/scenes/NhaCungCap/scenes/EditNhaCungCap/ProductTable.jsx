@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Checkbox, message, Input, Select } from 'antd';
 import doiTuongService from '../../../../../../services/doiTuong.service';
+import copy from 'copy-to-clipboard';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -72,14 +73,17 @@ const ProductTable = ({ products, onAddProducts, supplierId }) => {
                 product.name.toLowerCase().includes(text.toLowerCase())
             );
         }
-        // console.log(group)
         if (group) {
-            // console.log('filter', filtered)
             filtered = filtered.filter(product => 
-                product.productGroup.id=== group
+                product.productGroup.id === group
             );
         }
         setFilteredProducts(filtered);
+    };
+
+    const copyToClipboard = (text) => {
+        copy(text);
+        message.success("Sao chép ID thành công!");
     };
 
     const columns = [
@@ -88,6 +92,9 @@ const ProductTable = ({ products, onAddProducts, supplierId }) => {
             dataIndex: 'id',
             key: 'id',
             sorter: (a, b) => a.id - b.id,
+            render: (text) => (
+                <a onClick={() => copyToClipboard(text)}>{text}</a>
+            ),
         },
         {
             title: 'Tên sản phẩm',
@@ -111,6 +118,9 @@ const ProductTable = ({ products, onAddProducts, supplierId }) => {
             title: 'ID sản phẩm',
             dataIndex: 'id',
             key: 'id',
+            render: (text) => (
+                <a onClick={() => copyToClipboard(text)}>{text}</a>
+            ),
         },
         {
             title: 'Tên sản phẩm',
