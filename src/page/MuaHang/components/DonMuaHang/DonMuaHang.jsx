@@ -123,7 +123,7 @@ const DonMuaHang = () => {
         documentStatus: mapDocumentStatus(dataTongQuan[1][3]),
         paymentStatus: mapPaymentStatus(dataTongQuan[1][4]),
         deliveryTerm:parseExcelDate(dataTongQuan[1][0]),
-        content: dataTongQuan[1][4],
+        content: dataTongQuan[1][5],
         purchasingOfficerId: Number(dataTongQuan[1][6]),
         supplierId: Number(dataTongQuan[1][7]),
       };
