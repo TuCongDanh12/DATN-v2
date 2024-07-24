@@ -22,8 +22,11 @@ import {
   clearState,
   doiTuongSelector,
   getListProduct,
+  getListProductGroup, // Thêm action này
 } from "../../../../store/features/doiTuongSilce";
 import { VND } from "../../../../utils/func";
+
+const { Option } = Select;
 
 const SanPham = () => {
   const dispatch = useDispatch();
@@ -31,6 +34,7 @@ const SanPham = () => {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const [dataSelected, setDataSelected] = useState({});
+  const [selectedProductGroup, setSelectedProductGroup] = useState(null); // Thêm state để lưu `productGroup` được chọn
 
   const [messageApi, contextHolderMes] = msg.useMessage();
 
@@ -44,25 +48,27 @@ const SanPham = () => {
   const handleSearch = (value) => {
     setSearchText(value);
   };
+
   const {
     listProductData,
+    listProductGroupData, // Thêm state để lưu danh sách `productGroup`
     isSuccessGetListProduct,
     isSuccessPostProduct,
     isError,
     message,
-    isSuccessUpdateProduct
+    isSuccessUpdateProduct,
   } = useSelector(doiTuongSelector);
 
   useEffect(() => {
     dispatch(getListProduct());
-  }, []);
+    dispatch(getListProductGroup()); // Lấy danh sách `productGroup`
+  }, [dispatch]);
 
   useEffect(() => {
     if (listProductData) {
       setProductData(listProductData);
     }
   }, [listProductData]);
-
 
   useEffect(() => {
     if (isSuccessPostProduct) {
@@ -73,26 +79,16 @@ const SanPham = () => {
       });
       dispatch(getListProduct());
       dispatch(clearState());
-    }
-    else if (isSuccessUpdateProduct) {
+    } else if (isSuccessUpdateProduct) {
       api.success({
-        message: 'Cập nhật dữ liệu thành công!',
-        placement: 'bottomLeft',
-        duration: 2
+        message: "Cập nhật dữ liệu thành công!",
+        placement: "bottomLeft",
+        duration: 2,
       });
       dispatch(getListProduct());
 
-      // dispatch(getListCustomerGroup());
       dispatch(clearState());
-    }
-    else if (isSuccessGetListProduct) {
-      // messageApi.open({
-      //     key: 'updatable',
-      //     type: 'success',
-      //     content: 'Tải dữ liệu thành công!',
-      //     duration: 2,
-      // });
-
+    } else if (isSuccessGetListProduct) {
       dispatch(clearState());
     }
     if (isError) {
@@ -104,25 +100,32 @@ const SanPham = () => {
 
       dispatch(clearState());
     }
-  }, [isSuccessGetListProduct, isSuccessPostProduct, isError, message, isSuccessUpdateProduct]);
+  }, [
+    isSuccessGetListProduct,
+    isSuccessPostProduct,
+    isError,
+    message,
+    isSuccessUpdateProduct,
+    api,
+    dispatch,
+  ]);
 
   useEffect(() => {
-    if (searchText.trim() === "") {
-      if (
-        !listProductData ||
-        (Array.isArray(listProductData) && !listProductData.length)
-      ) {
-        setProductData([]);
-      } else {
-        setProductData(listProductData);
-      }
-    } else {
-      const filteredData = listProductData.filter((data) => {
+    let filteredData = listProductData;
+
+    if (searchText.trim() !== "") {
+      filteredData = filteredData.filter((data) => {
         return data.name.toLowerCase().includes(searchText.toLowerCase());
       });
-      setProductData(filteredData);
     }
-  }, [searchText, productData]);
+    if (selectedProductGroup) {
+      filteredData = filteredData.filter((data) => {
+        return data.productGroupInfo.id === selectedProductGroup;
+      });
+    }
+
+    setProductData(filteredData);
+  }, [searchText, selectedProductGroup, listProductData]);
 
   const items = [
     {
@@ -133,15 +136,9 @@ const SanPham = () => {
       key: "chinh-sua",
       label: <Link className="!text-black">Chỉnh sửa</Link>,
     },
-    // {
-    //   key: "xoa",
-    //   label: <Link className="!text-black">Xóa</Link>,
-    // },
   ];
 
   const handleDropdownItemClick = (e, record) => {
-    console.log("e.key", e.key);
-    console.log("record", record);
     if (e.key === "xoa") {
       setDataSelected(record);
       setOpen(true);
@@ -152,6 +149,10 @@ const SanPham = () => {
 
   const handleCancel = () => {
     setOpen(false);
+  };
+
+  const handleProductGroupChange = (value) => {
+    setSelectedProductGroup(value);
   };
 
   const columns = [
@@ -173,20 +174,11 @@ const SanPham = () => {
       ellipsis: true,
     },
     {
-      title: "Giá mua",
-      dataIndex: "priceReceived",
-      key: "priceReceived",
-      sorter: (a, b) => a.priceReceived - b.priceReceived,
-      render: (val, record) => VND.format(val),
-      sortOrder:
-        sortedInfo.columnKey === "priceReceived" ? sortedInfo.order : null,
-    },
-    {
       title: "Giá bán",
       dataIndex: "priceDelivery",
       key: "priceDelivery",
       sorter: (a, b) => a.priceDelivery - b.priceDelivery,
-      render: (val, record) => VND.format(val),
+      render: (val) => VND.format(val),
       sortOrder:
         sortedInfo.columnKey === "priceDelivery" ? sortedInfo.order : null,
     },
@@ -194,7 +186,7 @@ const SanPham = () => {
       title: "Đơn vị tính",
       dataIndex: "unit",
       key: "unit",
-      render: (val, record) => {
+      render: (val) => {
         switch (val) {
           case "CAI":
             return "Cái";
@@ -227,86 +219,38 @@ const SanPham = () => {
         }
       },
       filters: [
-        {
-          value: "CAI",
-          text: "Cái",
-        },
-        {
-          value: "CAY",
-          text: "Cây",
-        },
-        {
-          value: "CHAI",
-          text: "Chai",
-        },
-        {
-          value: "CHUC",
-          text: "Chục",
-        },
-        {
-          value: "CUON",
-          text: "Cuộn",
-        },
-        {
-          value: "GOI",
-          text: "Gói",
-        },
-        {
-          value: "HOP",
-          text: "Hộp",
-        },
-        {
-          value: "HU",
-          text: "Hủ",
-        },
-        {
-          value: "KG",
-          text: "Kg",
-        },
-        {
-          value: "LOC",
-          text: "Lốc",
-        },
-        {
-          value: "LON",
-          text: "Lon",
-        },
-        {
-          value: "THUNG",
-          text: "Thùng",
-        },
-        {
-          value: "VIEN",
-          text: "Viên",
-        },
-        {
-          value: "LON",
-          text: "Lon",
-        },
+        { value: "CAI", text: "Cái" },
+        { value: "CAY", text: "Cây" },
+        { value: "CHAI", text: "Chai" },
+        { value: "CHUC", text: "Chục" },
+        { value: "CUON", text: "Cuộn" },
+        { value: "GOI", text: "Gói" },
+        { value: "HOP", text: "Hộp" },
+        { value: "HU", text: "Hủ" },
+        { value: "KG", text: "Kg" },
+        { value: "LOC", text: "Lốc" },
+        { value: "LON", text: "Lon" },
+        { value: "THUNG", text: "Thùng" },
+        { value: "VIEN", text: "Viên" },
+        { value: "LON", text: "Lon" },
       ],
       onFilter: (value, record) => record.unit.indexOf(value) === 0,
       filteredValue: filteredInfo.unit || null,
     },
-    // {
-    //     title: "% thuế GTGT",
-    //     dataIndex: "tax",
-    //     // sorter: (a, b) => a.name.localeCompare(b.name),
-    // },
     {
       title: "Số dư",
       dataIndex: "category",
       key: "category",
       sorter: (a, b) => a.category - b.category,
       sortOrder: sortedInfo.columnKey === "category" ? sortedInfo.order : null,
-      // sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: "Tổng hàng trong kho",
       dataIndex: "tonghangtrongkho",
       key: "tonghangtrongkho",
       sorter: (a, b) => a.tonghangtrongkho - b.tonghangtrongkho,
-      sortOrder: sortedInfo.columnKey === "tonghangtrongkho" ? sortedInfo.order : null,
-      // sorter: (a, b) => a.name.localeCompare(b.name),
+      sortOrder:
+        sortedInfo.columnKey === "tonghangtrongkho" ? sortedInfo.order : null,
       ellipsis: true,
     },
     {
@@ -392,10 +336,22 @@ const SanPham = () => {
             </Button>
           </Form>
 
+          <Select
+            className="w-[200px] ml-2"
+            placeholder="Chọn nhóm sản phẩm"
+            onChange={handleProductGroupChange}
+            allowClear
+          >
+            {listProductGroupData?.map((group) => (
+              <Option key={group.id} value={group.id}>
+                {group.name}
+              </Option>
+            ))}
+          </Select>
+
           {contextHolderMes}
           {contextHolder}
 
-          {/* <SiMicrosoftexcel size={30} className='p-2 bg-white border border-black cursor-pointer' /> */}
           <TfiReload
             title="Cập nhật dữ liệu"
             size={30}
@@ -410,6 +366,7 @@ const SanPham = () => {
               form.resetFields();
               clearAll();
               setSearchText("");
+              setSelectedProductGroup(null);
             }}
           />
         </div>
@@ -449,7 +406,6 @@ const SanPham = () => {
             <Button
               className="!bg-[#67CDBB] font-bold text-white"
               onClick={() => {
-                //dispatch(deleteNhaCungCap({id:dataSelected.key}));
                 setDataSelected({});
                 setOpen(false);
               }}
@@ -461,16 +417,11 @@ const SanPham = () => {
       </div>
 
       <Table
-        // rowSelection={{
-        //     type: "checkbox",
-        //     ...rowSelection,
-        // }}
         columns={columns}
         dataSource={productData}
         pagination={{
           total: listProductData.length,
           defaultPageSize: 20,
-          // pageSize: 20,
           defaultCurrent: 1,
           position: ["bottomRight"],
           showTotal: (total, range) =>
