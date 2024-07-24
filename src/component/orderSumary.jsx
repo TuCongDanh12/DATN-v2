@@ -10,7 +10,7 @@ const OrderSummary = ({ discount, discountRate, data }) => {
 
   const totalAmount = calculateTotal(data);
   const discountAmount = totalAmount * (discountRate / 100);
-  const finalAmount = totalAmount - discountAmount - discount;
+  const finalAmount = (totalAmount - discountAmount - discount) > 0 ? totalAmount - discountAmount - discount : 0;
 
 
 

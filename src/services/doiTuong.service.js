@@ -268,6 +268,14 @@ const getListAccountant = () => {
         });
 };
 
+const getListWarehouseKeeper = () => {
+    return axios.get(`${API_URL}/employee/warehouse-keeper`,
+        {
+            headers: authHeader()
+        });
+};
+
+
 
 
 
@@ -438,7 +446,7 @@ const doiTuongService = {
     updateBankAccount,
 
     getListAccountant,
-
+    getListWarehouseKeeper,
     getListSalesperson,
 
     getDieuKhoanThanhToanCustomer,

@@ -107,17 +107,17 @@ const getColumns = (navigate, setDataSelected, setOpen) => [
     dataIndex: ["supplier", "name"], // Access nested property
     sorter: (a, b) => a.supplier.name.localeCompare(b.supplier.name),
   },
-  {
-    title: "Trạng thái vận chuyển",
-    dataIndex: "deliveryStatus",
-    render: (text) => (
-      <Tag color={deliveryStatusColors[text]}>
-        {deliveryStatusLabels[text]}
-      </Tag>
-    ),
-    filters: Object.keys(DELIVERY_STATUS).map(key => ({ text: deliveryStatusLabels[DELIVERY_STATUS[key]], value: DELIVERY_STATUS[key] })),
-    onFilter: (value, record) => record.deliveryStatus === value,
-  },
+  // {
+  //   title: "Trạng thái vận chuyển",
+  //   dataIndex: "deliveryStatus",
+  //   render: (text) => (
+  //     <Tag color={deliveryStatusColors[text]}>
+  //       {deliveryStatusLabels[text]}
+  //     </Tag>
+  //   ),
+  //   filters: Object.keys(DELIVERY_STATUS).map(key => ({ text: deliveryStatusLabels[DELIVERY_STATUS[key]], value: DELIVERY_STATUS[key] })),
+  //   onFilter: (value, record) => record.deliveryStatus === value,
+  // },
   {
     title: "Trạng thái chứng từ",
     dataIndex: "documentStatus",

@@ -95,13 +95,13 @@ const DonMuaHang = () => {
 
     for (const [index, row] of data.entries()) {
       const formattedData = {
-        ngayMua: formatExcelDate(row[0]), // Assuming 'Ngày mua' is in the first column
-        hanGiaoHang: formatExcelDate(row[1]), // Assuming 'Hạn giao hàng' is in the second column
-        content: row[2], // Assuming 'Nội dung' is in the third column
-        deliveryStatus: mapDeliveryStatus(row[3]), // Assuming 'Trạng thái vận chuyển' is in the fourth column
-        documentStatus: mapDocumentStatus(row[4]), // Assuming 'Trạng thái chứng từ' is in the fifth column
-        purchasingOfficerId: row[5], // Assuming 'purchasingOfficerId' is in the sixth column
-        supplierId: row[6] // Assuming 'supplierId' is in the seventh column
+        ngayMua: formatExcelDate(row[0]), 
+        hanGiaoHang: formatExcelDate(row[1]), 
+        content: row[2],
+        deliveryStatus: mapDeliveryStatus(row[3]), 
+        documentStatus: mapDocumentStatus(row[4]),
+        purchasingOfficerId: row[5], 
+        supplierId: row[6] 
       };
 
       try {

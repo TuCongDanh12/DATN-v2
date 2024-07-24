@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Form } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-const OrderActions = ({ disabled }) => {
+const OrderActions = ({ disabled, loading, onClick }) => {
   const navigate = useNavigate();
 
   return (
@@ -18,7 +18,12 @@ const OrderActions = ({ disabled }) => {
           <Button className="bg-[#FF7742] font-bold text-white mr-2" htmlType="reset" onClick={() => navigate(-1)}>
             Hủy
           </Button>
-          <Button className="!bg-[#67CDBB] font-bold text-white" htmlType="submit">
+          <Button 
+            className="!bg-[#67CDBB] font-bold text-white" 
+            htmlType="button" 
+            onClick={onClick} 
+            loading={loading}
+          >
             Xác nhận
           </Button>
         </Form.Item>

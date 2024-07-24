@@ -27,9 +27,24 @@ const getDonMuaHang = ({id} ) => {
           headers: authHeader()
       });
 };
+
+const postChungTuMua = async (values) => {
+  try {
+    console.log('Data sent to API:', values);
+    const response = await axios.post(`${API_URL}/ctmua`, values, {
+      headers: authHeader(),
+    });
+    return response;
+  } catch (error) {
+    console.error('API call error:', error);
+    throw error;
+  }
+};
+
 const muahangService = {
   getListDonMuahang,
   getDonMuaHang,
+  postChungTuMua 
 };
 
 export default muahangService;
