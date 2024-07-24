@@ -2,8 +2,6 @@ import React from 'react';
 import { Form, Input, Select, Flex, Button, Table} from "antd";
 
 const SupplierForm = ({ form, listSupplierGroupData, supplierData, disabled, handleAdd, dataSource, components, columns, navigate }) => {
-    const nameValue = Form.useWatch('name', form);
-
     return (
         <div>
             <Form
