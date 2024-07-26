@@ -143,7 +143,7 @@ const DonMuaHang = () => {
       const combinedData = {
         ...parsedDataTongQuan,
         discount: discount || 0,
-        discountRate: discountRate || 0,
+        discountRate: (discountRate) || 0,
         products: products,
       };
   

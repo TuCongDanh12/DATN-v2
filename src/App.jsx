@@ -28,6 +28,7 @@ import XemHoaDonBanHang from "./page/BanHang/scenes/HoaDonBanHang/scenes/XemHoaD
 import DonMuaHang from './page/MuaHang/components/DonMuaHang/DonMuaHang';
 import ListChungtu from './component/Table/table-chungtu';
 import MuahangChungtu from "./component/Chungtu/Muahang/chungtu";
+import Chungtu from "./page/MuaHang/components/ChungTuMuaHang";
 import TablePhieuChi from './component/Table/table-phieuchi';
 import Login from "./page/Login/Login";
 import Signup from "./page/Signup/Signup";
@@ -76,6 +77,7 @@ import ReportCTDT from "./page/BaoCao/scenes/BaoCaoDaLuu/components/ReportCTDT/R
 import ReportTHDT from "./page/BaoCao/scenes/BaoCaoDaLuu/components/ReportTHDT/ReportTHDT";
 import ThemDonDatHang from "./page/BanHang/scenes/DonDatHang/scenes/ThemDonDatHang/ThemDonDatHang";
 import DoanhThuSanPham from "./page/BaoCao/scenes/DoanhThuSanPham/DoanhThuSanPham";
+import XemChungTuMua from "./page/MuaHang/components/ChungTuMuaHang/scenes/XemChungTuBanHang/XemChungTuBanHang";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -170,7 +172,7 @@ function App() {
                   <Route path="don-mua-hang" element={<DonMuaHang />} />
                   <Route
                     path="chung-tu-mua-hang"
-                    element={<ListChungtu />}
+                    element={<Chungtu />}
                   ></Route>
                   <Route
                     path="chung-tu-mua-hang/id"
@@ -182,6 +184,7 @@ function App() {
                 </Route>
                 <Route path="mua-hang/don-mua-hang/xem/:id" element={<EditDonMuaHang disabled={true} />} />
                 <Route path="mua-hang/chung-tu-mua-hang/them/:id" element={<ThemChungTuMuaHang />} />
+                <Route path="mua-hang/chung-tu-mua-hang/xem/:id" element={<XemChungTuMua disabled={true} />} />
                 <Route path="/ban-hang" element={<BanHang />}>
                   <Route path="quy-trinh" element={<QuyTrinhBanHang />} />
                   <Route path="don-dat-hang" element={<DonDatHang />} />

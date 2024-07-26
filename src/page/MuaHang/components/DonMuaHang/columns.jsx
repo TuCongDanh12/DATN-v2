@@ -2,17 +2,17 @@ import React from 'react';
 import { Space, Dropdown, Tag } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 
-const PAYMENT_STATUS = {
-  NOT_PAID: 'NOT_PAID',
-  BEING_PAID: 'BEING_PAID',
-  PAID: 'PAID',
-};
+// const PAYMENT_STATUS = {
+//   NOT_PAID: 'NOT_PAID',
+//   BEING_PAID: 'BEING_PAID',
+//   PAID: 'PAID',
+// };
 
-const DELIVERY_STATUS = {
-  NOT_DELIVERED: 'NOT_DELIVERED',
-  DELIVERING: 'DELIVERING',
-  DELIVERED: 'DELIVERED',
-};
+// const DELIVERY_STATUS = {
+//   NOT_DELIVERED: 'NOT_DELIVERED',
+//   DELIVERING: 'DELIVERING',
+//   DELIVERED: 'DELIVERED',
+// };
 
 const DOCUMENT_STATUS = {
   UNDOCUMENTED: 'UNDOCUMENTED',
@@ -20,17 +20,17 @@ const DOCUMENT_STATUS = {
   DOCUMENTED: 'DOCUMENTED',
 };
 
-const paymentStatusColors = {
-  NOT_PAID: 'red',
-  BEING_PAID: 'yellow',
-  PAID: 'green',
-};
+// const paymentStatusColors = {
+//   NOT_PAID: 'red',
+//   BEING_PAID: 'yellow',
+//   PAID: 'green',
+// };
 
-const deliveryStatusColors = {
-  NOT_DELIVERED: 'red',
-  DELIVERING: 'yellow',
-  DELIVERED: 'green',
-};
+// const deliveryStatusColors = {
+//   NOT_DELIVERED: 'red',
+//   DELIVERING: 'yellow',
+//   DELIVERED: 'green',
+// };
 
 const documentStatusColors = {
   UNDOCUMENTED: 'red',
@@ -38,17 +38,17 @@ const documentStatusColors = {
   DOCUMENTED: 'green',
 };
 
-const paymentStatusLabels = {
-  NOT_PAID: 'Chưa trả',
-  BEING_PAID: 'Đang trả 1 phần',
-  PAID: 'Đã trả',
-};
+// const paymentStatusLabels = {
+//   NOT_PAID: 'Chưa trả',
+//   BEING_PAID: 'Đang trả 1 phần',
+//   PAID: 'Đã trả',
+// };
 
-const deliveryStatusLabels = {
-  NOT_DELIVERED: 'Chưa giao',
-  DELIVERING: 'Đang giao',
-  DELIVERED: 'Đã giao',
-};
+// const deliveryStatusLabels = {
+//   NOT_DELIVERED: 'Chưa giao',
+//   DELIVERING: 'Đang giao',
+//   DELIVERED: 'Đã giao',
+// };
 
 const documentStatusLabels = {
   UNDOCUMENTED: 'Chưa lập chứng từ',
@@ -146,7 +146,7 @@ const getColumns = (navigate, setDataSelected, setOpen) => [
         { key: "xem", label: (<span className="!text-black">Xem</span>) }
       ];
       
-      if (record.documentStatus === DOCUMENT_STATUS.UNDOCUMENTED) {
+      if (record.documentStatus !== DOCUMENT_STATUS.DOCUMENTED) {
         menuItems.push(
           { key: "lap-chung-tu", label: (<span className="!text-black">Lập chứng từ</span>) }
         );

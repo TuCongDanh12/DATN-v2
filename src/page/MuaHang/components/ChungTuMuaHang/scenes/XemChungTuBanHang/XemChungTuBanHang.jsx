@@ -1,128 +1,62 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs, Form, Input, DatePicker, Select, Button, notification } from 'antd';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Tabs, Form, Input, DatePicker, Select } from 'antd';
+import { useParams } from 'react-router-dom';
 import muahangService from '../../../../../../services/muahang.service';
-import doiTuongService from '../../../../../../services/doiTuong.service';
 import OrderTable from './OrderTable';
-import OrderSummary from '../../../../../../component/orderSumary';
-import OrderActions from '../../../../../../component/actionButton';
+import OrderSummary from './OrderSummary';
 import moment from 'moment';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
 
-const DonMuaHang = ({ disabled }) => {
-  const [donmuahang, setDonmuahang] = useState(null);
+const XemChungTuMua = ({ disabled = true }) => {
+  const [chungtumua, setChungtumua] = useState(null);
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    ngayHoachToan: moment(),
-    ngayGiaoHang: moment(),
-    hanThanhToan: moment(), // Initialize with today's date
-  });
-  const [productData, setProductData] = useState(null);
-  const [listNguoiquankho, setListNguoiquankho] = useState([]);
+  const [productData, setProductData] = useState([]);
   const params = useParams();
-  const navigate = useNavigate();
   const id = params.id;
 
   useEffect(() => {
-    fetchDonMuahang(id);
-    fetchNguoiquankho();
+    fetchChungTuMua(id);
   }, [id]);
 
-  const fetchDonMuahang = async (id) => {
+  const fetchChungTuMua = async (id) => {
     try {
-      const response = await muahangService.getDonMuaHang({ id });
+      const response = await muahangService.getChungTuMua({ id });
       const data = response.data.result.data;
-      console.log('Don mua hang', data);
-      setDonmuahang(data);
-      setProductData(data.productOfDonMuaHangs.map(item => ({
-        ...item,
-        key: item.id,
-        originalCount: item.count,
-      })));
-      setFormData({
-        ngayHoachToan: moment(),
-        ngayGiaoHang: moment(),
-        hanThanhToan: moment(), // Initialize with today's date
-      });
+      console.log('Chứng từ mua hàng', data);
+      console.log('San pham',data.productOfCtmua)
+      setChungtumua(data);
+      setProductData(
+        data.productOfCtmua?.map(item => ({
+          ...item,
+          key: item.id,
+          originalCount: item.count,
+        })) || []
+      );
     } catch (error) {
       console.log('There was an error!', error);
     }
   };
 
-  const fetchNguoiquankho = async () => {
-    try {
-      const response = await doiTuongService.getListWarehouseKeeper();
-      setListNguoiquankho(response.data.result.data);
-    } catch (error) {
-      console.log('There was an error!', error);
-    }
-  };
-
-  const handleSave = (row) => {
-    const newData = [...productData];
-    const index = newData.findIndex((item) => item.id === row.id);
-    if (index > -1) {
-      const item = newData[index];
-      newData.splice(index, 1, { ...item, ...row });
-      setProductData(newData);
-    }
-  };
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      const values = await form.validateFields();
-      const data = {
-        deliveryDate: values.ngayGiaoHang.format('YYYY-MM-DD'),
-        warehouseKeeperId: values.warehouseKeeperId,
-        content: values.content,
-        shipper: values.shipper,
-        paymentTerm: values.hanThanhToan.format('YYYY-MM-DD'),
-        donMuaHangId: Number(id),
-        products: productData.map(product => ({
-          productId: product.product.id,
-          count: Number(product.count),
-        })),
-      };
-      console.log('Output data:', data);
-      await muahangService.postChungTuMua(data);
-      notification.success({
-        message: 'Thành công',
-        description: 'Lưu chứng từ mua hàng thành công!',
-      });
-      navigate(-1)
-      // Handle success response if needed
-    } catch (errorInfo) {
-      console.log('Validate Failed or Submission Error:', errorInfo);
-      notification.error({
-        message: 'Lỗi',
-        description: 'Có lỗi xảy ra khi lưu chứng từ mua hàng!',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!donmuahang) return <div>Loading...</div>;
+  if (!chungtumua) return <div>Loading...</div>;
 
   return (
     <div className="m-6">
-      <h1 className="text-2xl font-bold">Lập chứng từ mua hàng</h1>
+      <h1 className="text-2xl font-bold">Xem chứng từ mua hàng {id}</h1>
       <Tabs defaultActiveKey="1">
         <TabPane tab="Phiếu Nhập" key="1">
           <Form
             form={form}
             initialValues={{
-              supplierAccountName: donmuahang?.supplier?.accountName,
-              supplierAddress: donmuahang?.supplier?.address,
-              purchasingOfficerName: donmuahang?.purchasingOfficer?.name,
-              content: donmuahang?.content,
-              ngayHoachToan: formData.ngayHoachToan,
-              ngayGiaoHang: formData.ngayGiaoHang,
-              hanThanhToan: formData.hanThanhToan,
+              supplierAccountName: chungtumua?.donMuaHang?.supplier?.accountName,
+              supplierAddress: chungtumua?.donMuaHang?.supplier?.address,
+              content: chungtumua?.content,
+              warehouseKeeperId:chungtumua?.warehouseKeeper?.name,
+              shipper:chungtumua?.shipper,
+              ngayGiaoHang:moment(chungtumua?.deliveryDate),
+              hanThanhToan:moment(chungtumua?.paymentTerm),
+              ngayHoachToan:moment(chungtumua?.createdAt)
             }}
             className="mb-4"
             labelCol={{ flex: '150px' }}
@@ -157,7 +91,7 @@ const DonMuaHang = ({ disabled }) => {
                   <Input disabled />
                 </Form.Item>
 
-                <Form.Item
+                {/* <Form.Item
                   label="Nhân viên mua hàng"
                   name="purchasingOfficerName"
                   rules={[
@@ -167,14 +101,14 @@ const DonMuaHang = ({ disabled }) => {
                     },
                   ]}
                 >
-                  <Input disabled />
-                </Form.Item>
+                  <Input disabled value={chungtumua?.donMuahang?.purchasingOfficer?.name} />
+                </Form.Item> */}
 
                 <Form.Item
                   label="Nội dung"
                   name="content"
                 >
-                  <Input disabled={disabled} />
+                  <Input disabled />
                 </Form.Item>
 
                 <Form.Item
@@ -187,13 +121,7 @@ const DonMuaHang = ({ disabled }) => {
                     },
                   ]}
                 >
-                  <Select disabled={disabled}>
-                    {listNguoiquankho.map((keeper) => (
-                      <Option key={keeper.id} value={keeper.id}>
-                        {keeper.name}
-                      </Option>
-                    ))}
-                  </Select>
+                  <Input disabled value={chungtumua?.warehouseKeeper?.name} />
                 </Form.Item>
               </div>
 
@@ -202,7 +130,11 @@ const DonMuaHang = ({ disabled }) => {
                   label="Ngày hoạch toán"
                   name="ngayHoachToan"
                 >
-                  <DatePicker className="w-full" value={formData.ngayHoachToan} disabled />
+                  <DatePicker
+                    className="w-full"
+                    value={moment(chungtumua.createdAt)}
+                    disabled
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -217,8 +149,8 @@ const DonMuaHang = ({ disabled }) => {
                 >
                   <DatePicker
                     className="w-full"
-                    value={formData.ngayGiaoHang}
-                    onChange={(date) => setFormData({ ...formData, ngayGiaoHang: date })}
+                    value={moment(chungtumua.deliveryDate)}
+                    disabled
                   />
                 </Form.Item>
 
@@ -234,45 +166,40 @@ const DonMuaHang = ({ disabled }) => {
                 >
                   <DatePicker
                     className="w-full"
-                    value={formData.hanThanhToan}
-                    onChange={(date) => setFormData({ ...formData, hanThanhToan: date })}
+                    value={moment(chungtumua.paymentTerm)}
+                    disabled
                   />
                 </Form.Item>
                 <Form.Item
                   label="Shipper"
                   name="shipper"
                 >
-                  <Input disabled={disabled} />
+                  <Input disabled value={chungtumua.shipper} />
                 </Form.Item>
               </div>
             </div>
           </Form>
 
           <OrderTable
-            discount={donmuahang.discount}
-            discountRate={donmuahang.discountRate}
-            dataSource={productData}
-            handleSave={handleSave}
+
+            dataSource={chungtumua}
+            handleSave={() => {}}
+            editable={false} // Pass editable prop
           />
-          <OrderSummary
-            discount={donmuahang.discount}
-            discountRate={donmuahang.discountRate}
-            data={productData}
-          />
-          <OrderActions disabled={disabled} loading={loading} onClick={handleSubmit} />
+            <OrderSummary
+            totalDiscountValue={chungtumua?.totalDiscountValue}
+            totalProductValue={chungtumua?.totalProductValue}
+            />
         </TabPane>
         <TabPane tab="Hóa đơn" key="2">
           <Form
             form={form}
             initialValues={{
-              supplierAccountName: donmuahang?.supplier?.accountName,
-              supplierAddress: donmuahang?.supplier?.address,
-              purchasingOfficerName: donmuahang?.purchasingOfficer?.name,
-              content: donmuahang?.content,
-              ngayHoachToan: formData.ngayHoachToan,
-              hanThanhToan: formData.hanThanhToan,
-              discount: donmuahang?.discount,
-              discountRate: donmuahang?.discountRate,
+              supplierAccountName: chungtumua?.donMuahang?.supplier?.accountName,
+              supplierAddress: chungtumua?.donMuahang?.supplier?.address,
+              content: chungtumua?.content,
+              discount: chungtumua?.donMuaHang?.discount,
+              discountRate: chungtumua?.donMuaHang?.discountRate,
             }}
             className="mb-4"
             labelCol={{ flex: '150px' }}
@@ -307,7 +234,7 @@ const DonMuaHang = ({ disabled }) => {
                   <Input disabled />
                 </Form.Item>
 
-                <Form.Item
+                {/* <Form.Item
                   label="Nhân viên mua hàng"
                   name="purchasingOfficerName"
                   rules={[
@@ -317,14 +244,14 @@ const DonMuaHang = ({ disabled }) => {
                     },
                   ]}
                 >
-                  <Input disabled />
-                </Form.Item>
+                  <Input disabled value={chungtumua?.donMuahang?.purchasingOfficer?.name} />
+                </Form.Item> */}
 
                 <Form.Item
                   label="Nội dung"
                   name="content"
                 >
-                  <Input disabled={disabled} />
+                  <Input disabled />
                 </Form.Item>
               </div>
 
@@ -333,7 +260,11 @@ const DonMuaHang = ({ disabled }) => {
                   label="Ngày hoạch toán"
                   name="ngayHoachToan"
                 >
-                  <DatePicker className="w-full" value={formData.ngayHoachToan} disabled />
+                  <DatePicker
+                    className="w-full"
+                    value={moment(chungtumua.createdAt)}
+                    disabled
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -348,8 +279,8 @@ const DonMuaHang = ({ disabled }) => {
                 >
                   <DatePicker
                     className="w-full"
-                    value={formData.hanThanhToan}
-                    onChange={(date) => setFormData({ ...formData, hanThanhToan: date })}
+                    value={moment(chungtumua.paymentTerm)}
+                    disabled
                   />
                 </Form.Item>
                 
@@ -363,7 +294,7 @@ const DonMuaHang = ({ disabled }) => {
                     },
                   ]}
                 >
-                  <Input disabled />
+                  <Input disabled  />
                 </Form.Item>
 
                 <Form.Item
@@ -376,29 +307,29 @@ const DonMuaHang = ({ disabled }) => {
                     },
                   ]}
                 >
-                  <Input disabled />
+                  <Input disabled  />
                 </Form.Item>
-               
               </div>
             </div>
           </Form>
 
           <OrderTable
-            discount={donmuahang.discount}
-            discountRate={donmuahang.discountRate}
-            dataSource={productData}
-            handleSave={handleSave}
+            discount={chungtumua.discount}
+            discountRate={chungtumua.discountRate}
+            dataSource={chungtumua}
+            handleSave={() => {}}
+            editable={false} // Pass editable prop
           />
           <OrderSummary
-            discount={donmuahang.discount}
-            discountRate={donmuahang.discountRate}
-            data={productData}
+            totalDiscountValue={chungtumua?.totalDiscountValue}
+            totalProductValue={chungtumua?.totalProductValue
+            }
+
           />
-          <OrderActions disabled={disabled} loading={loading} onClick={handleSubmit} />
         </TabPane>
       </Tabs>
     </div>
   );
 };
 
-export default DonMuaHang;
+export default XemChungTuMua;

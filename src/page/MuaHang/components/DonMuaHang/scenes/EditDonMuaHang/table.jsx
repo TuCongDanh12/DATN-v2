@@ -44,11 +44,11 @@ const OrderTable = ({ data, discountRate, discount }) => {
       dataIndex: 'soLuong',
       key: 'soLuong',
     },
-    {
-      title: 'Số lượng đã nhận',
-      dataIndex: 'soLuongDaBan',
-      key: 'soLuongDaBan',
-    },
+    // {
+    //   title: 'Số lượng đã nhận',
+    //   dataIndex: 'soLuongDaBan',
+    //   key: 'soLuongDaBan',
+    // },
     {
       title: 'Đơn giá',
       dataIndex: 'donGia',

@@ -1,13 +1,34 @@
-import React from 'react'
-import TableChungtu from '../../../../component/Table/table-chungtu'
-// import MuahangChungtu from '../../../../component/Chungtu/Muahang/chungtu'
+import React, { useState } from 'react';
+import ChungTuMuaTable from './table';
+import { DatePicker, Input } from 'antd';
+
+const { RangePicker } = DatePicker;
+
 const Chungtu = () => {
+  const [filter, setFilter] = useState('');
+  const [dateRange, setDateRange] = useState([]);
+
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
+  };
+
   return (
     <div>
-      {/* <TableMuahang/> */}
-      <TableChungtu/>
+      <div className='m-5 flex gap-4'>
+        <RangePicker onChange={handleDateRangeChange} />
+        <Input
+          className='rounded-tr-none rounded-br-none max-w-[500px]'
+          placeholder="Tìm kiếm tên khách hàng"
+          onChange={handleFilterChange}
+        />
+      </div>
+      <ChungTuMuaTable filter={filter} dateRange={dateRange} />
     </div>
-  )
-}
+  );
+};
 
-export default Chungtu
+export default Chungtu;

@@ -41,10 +41,28 @@ const postChungTuMua = async (values) => {
   }
 };
 
+
+
+const getListChungTuMua = () => {
+  return axios.get(`${API_URL}/ctmua`,
+      {
+          headers: authHeader()
+      });
+};
+
+const getChungTuMua = ({ id }) => {
+  return axios.get(`${API_URL}/ctmua/${id}`,
+      {
+          headers: authHeader()
+      });
+};
+
 const muahangService = {
   getListDonMuahang,
   getDonMuaHang,
-  postChungTuMua 
+  postChungTuMua,
+  getListChungTuMua,
+  getChungTuMua
 };
 
 export default muahangService;
