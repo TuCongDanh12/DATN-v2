@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { Tabs, Form, Input, DatePicker, Select } from 'antd';
-import { useParams } from 'react-router-dom';
+// XemChungTuMua.js
+import React, { useEffect, useState, useRef } from 'react';
+import { Tabs, Form, Input, DatePicker, Button } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
 import muahangService from '../../../../../../services/muahang.service';
 import OrderTable from './OrderTable';
 import OrderSummary from './OrderSummary';
+import InPhieuNhap from '../../../../../../component/InPhieuNhap/InPhieuNhap';
 import moment from 'moment';
 
 const { TabPane } = Tabs;
-const { Option } = Select;
 
 const XemChungTuMua = ({ disabled = true }) => {
   const [chungtumua, setChungtumua] = useState(null);
   const [form] = Form.useForm();
   const [productData, setProductData] = useState([]);
   const params = useParams();
+  const navigate = useNavigate();
   const id = params.id;
+
+  const printRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+  });
 
   useEffect(() => {
     fetchChungTuMua(id);
@@ -25,7 +34,7 @@ const XemChungTuMua = ({ disabled = true }) => {
       const response = await muahangService.getChungTuMua({ id });
       const data = response.data.result.data;
       console.log('Chứng từ mua hàng', data);
-      console.log('San pham',data.productOfCtmua)
+      console.log('San pham', data.productOfCtmua);
       setChungtumua(data);
       setProductData(
         data.productOfCtmua?.map(item => ({
@@ -52,11 +61,11 @@ const XemChungTuMua = ({ disabled = true }) => {
               supplierAccountName: chungtumua?.donMuaHang?.supplier?.accountName,
               supplierAddress: chungtumua?.donMuaHang?.supplier?.address,
               content: chungtumua?.content,
-              warehouseKeeperId:chungtumua?.warehouseKeeper?.name,
-              shipper:chungtumua?.shipper,
-              ngayGiaoHang:moment(chungtumua?.deliveryDate),
-              hanThanhToan:moment(chungtumua?.paymentTerm),
-              ngayHoachToan:moment(chungtumua?.createdAt)
+              warehouseKeeperId: chungtumua?.warehouseKeeper?.name,
+              shipper: chungtumua?.shipper,
+              ngayGiaoHang: moment(chungtumua?.deliveryDate),
+              hanThanhToan: moment(chungtumua?.paymentTerm),
+              ngayHoachToan: moment(chungtumua?.createdAt),
             }}
             className="mb-4"
             labelCol={{ flex: '150px' }}
@@ -90,19 +99,6 @@ const XemChungTuMua = ({ disabled = true }) => {
                 >
                   <Input disabled />
                 </Form.Item>
-
-                {/* <Form.Item
-                  label="Nhân viên mua hàng"
-                  name="purchasingOfficerName"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Trường này là bắt buộc!',
-                    },
-                  ]}
-                >
-                  <Input disabled value={chungtumua?.donMuahang?.purchasingOfficer?.name} />
-                </Form.Item> */}
 
                 <Form.Item
                   label="Nội dung"
@@ -181,22 +177,38 @@ const XemChungTuMua = ({ disabled = true }) => {
           </Form>
 
           <OrderTable
-
             dataSource={chungtumua}
             handleSave={() => {}}
             editable={false} // Pass editable prop
           />
-            <OrderSummary
+          <OrderSummary
             totalDiscountValue={chungtumua?.totalDiscountValue}
             totalProductValue={chungtumua?.totalProductValue}
-            />
+          />
+          <div className="w-full flex justify-end mt-6 mb-0">
+            <Button
+              className="bg-[#46FF42] font-bold text-white mr-2"
+              type="link"
+              onClick={handlePrint}
+            >
+              In phiếu nhập
+            </Button>
+
+            <Button
+              className="bg-[#FF7742] font-bold text-white"
+              type="link"
+              onClick={() => navigate(-1)}
+            >
+              Thoát
+            </Button>
+          </div>
         </TabPane>
         <TabPane tab="Hóa đơn" key="2">
           <Form
             form={form}
             initialValues={{
-              supplierAccountName: chungtumua?.donMuahang?.supplier?.accountName,
-              supplierAddress: chungtumua?.donMuahang?.supplier?.address,
+              supplierAccountName: chungtumua?.donMuaHang?.supplier?.accountName,
+              supplierAddress: chungtumua?.donMuaHang?.supplier?.address,
               content: chungtumua?.content,
               discount: chungtumua?.donMuaHang?.discount,
               discountRate: chungtumua?.donMuaHang?.discountRate,
@@ -234,19 +246,6 @@ const XemChungTuMua = ({ disabled = true }) => {
                   <Input disabled />
                 </Form.Item>
 
-                {/* <Form.Item
-                  label="Nhân viên mua hàng"
-                  name="purchasingOfficerName"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Trường này là bắt buộc!',
-                    },
-                  ]}
-                >
-                  <Input disabled value={chungtumua?.donMuahang?.purchasingOfficer?.name} />
-                </Form.Item> */}
-
                 <Form.Item
                   label="Nội dung"
                   name="content"
@@ -283,7 +282,7 @@ const XemChungTuMua = ({ disabled = true }) => {
                     disabled
                   />
                 </Form.Item>
-                
+
                 <Form.Item
                   label="Triết khấu"
                   name="discountRate"
@@ -294,7 +293,7 @@ const XemChungTuMua = ({ disabled = true }) => {
                     },
                   ]}
                 >
-                  <Input disabled  />
+                  <Input disabled />
                 </Form.Item>
 
                 <Form.Item
@@ -307,7 +306,7 @@ const XemChungTuMua = ({ disabled = true }) => {
                     },
                   ]}
                 >
-                  <Input disabled  />
+                  <Input disabled />
                 </Form.Item>
               </div>
             </div>
@@ -322,12 +321,31 @@ const XemChungTuMua = ({ disabled = true }) => {
           />
           <OrderSummary
             totalDiscountValue={chungtumua?.totalDiscountValue}
-            totalProductValue={chungtumua?.totalProductValue
-            }
-
+            totalProductValue={chungtumua?.totalProductValue}
           />
+          <div className="w-full flex justify-end mt-6 mb-0">
+            <Button
+              className="bg-[#46FF42] font-bold text-white mr-2"
+              type="link"
+              onClick={handlePrint}
+            >
+              In phiếu nhập
+            </Button>
+
+            <Button
+              className="bg-[#FF7742] font-bold text-white"
+              type="link"
+              onClick={() => navigate(-1)}
+            >
+              Thoát
+            </Button>
+          </div>
         </TabPane>
       </Tabs>
+
+      <div style={{ display: 'none' }}>
+        <InPhieuNhap ref={printRef} chungtumua={chungtumua} />
+      </div>
     </div>
   );
 };
