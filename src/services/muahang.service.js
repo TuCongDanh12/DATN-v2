@@ -57,12 +57,32 @@ const getChungTuMua = ({ id }) => {
       });
 };
 
+
+const postPhieuChiTienGui = (values) => {
+  return axios.post(`${API_URL}/phieu-chi-tien-gui`,
+      values
+      ,
+      {
+          headers: authHeader()
+      });
+};
+
+const postPhieuChiTienMat = (values) => {
+  return axios.post(`${API_URL}/phieu-chi-tien-mat`,
+      values
+      ,
+      {
+          headers: authHeader()
+      });
+};
 const muahangService = {
   getListDonMuahang,
   getDonMuaHang,
   postChungTuMua,
   getListChungTuMua,
-  getChungTuMua
+  getChungTuMua,
+  postPhieuChiTienGui,
+  postPhieuChiTienMat
 };
 
 export default muahangService;

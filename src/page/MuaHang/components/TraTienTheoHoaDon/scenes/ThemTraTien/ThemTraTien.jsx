@@ -8,6 +8,7 @@ import {
   Select,
   DatePicker,
   Typography,
+  message, // Import message
 } from "antd";
 import { VND } from "../../../../../../utils/func";
 import { useNavigate, useParams } from "react-router-dom";
@@ -26,17 +27,16 @@ const ThemTraTien = ({ disabled = false }) => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [sortedInfo, setSortedInfo] = useState({});
-  const [paymentValues, setPaymentValues] = useState({}); // Để lưu trữ các giá trị thanh toán
+  const [paymentValues, setPaymentValues] = useState({}); 
   const [listChungtumua, setListChungtumua] = useState([]);
   const [listpurchasing, getListpurchasing] = useState([]);
   const [listBankAccount, getListBankAccount] = useState([]);
+  const [loading, setLoading] = useState(false); 
 
-  // Hàm xử lý khi người dùng thay đổi giá trị thanh toán
   const handlePaymentChange = (id, value) => {
     setPaymentValues((prev) => ({ ...prev, [id]: value }));
   };
 
-  // Khai báo columns sau khi handlePaymentChange đã được khai báo
   const columns = useColumns(sortedInfo, handlePaymentChange);
 
   useEffect(() => {
@@ -50,15 +50,16 @@ const ThemTraTien = ({ disabled = false }) => {
       const supplier = listChungtumua[0]?.donMuaHang?.supplier;
 
       form.setFieldsValue({
-        namecCustomer: supplier?.accountName,
+        nameCustomer: supplier?.accountName,
         address: supplier?.address,
         createdAt: dayjs(),
         receiveDate: dayjs(),
-        // bankAccountId: supplier?.accountNumber,
         bankName: supplier?.bankName,
         branch: supplier?.branch,
         accountName: supplier?.accountName,
         content: `Chi trả cho nhà cung cấp ${supplier?.accountName}`,
+        accountNumber: supplier?.accountNumber,
+        receiver:'Người nhận',
       });
     }
   }, [listChungtumua]);
@@ -68,7 +69,6 @@ const ThemTraTien = ({ disabled = false }) => {
       const response = await doiTuongService.getListPurchasingOfficer();
       const data = response.data.result.data;
       getListpurchasing(data);
-      // console.log('Người thanh toán',data)
     } catch (error) {
       console.log("There was an error!", error);
     }
@@ -79,7 +79,6 @@ const ThemTraTien = ({ disabled = false }) => {
       const response = await doiTuongService.getListBankAccount();
       const data = response.data.result.data;
       getListBankAccount(data);
-      // console.log('Danh sách tài khoản ngân hàng', data);
     } catch (error) {
       console.log("There was an error!", error);
     }
@@ -97,7 +96,6 @@ const ThemTraTien = ({ disabled = false }) => {
           item.finalValue > 0
       );
       setListChungtumua(filteredData);
-      console.log("List Chung tu mua", filteredData);
     } catch (error) {
       console.log("There was an error!", error);
     }
@@ -124,9 +122,47 @@ const ThemTraTien = ({ disabled = false }) => {
 
   const { totalFinalValue, totalChuaChi, totalSoThanhToan } = calculateTotals();
 
-  const onFinish = (values) => {
-    // Xử lý khi submit form
-  };
+  const onFinish = async (values) => {
+    setLoading(true);
+    const supplierId = listChungtumua[0]?.donMuaHang?.supplier?.id;
+
+    const paymentDate = values.receiveDate
+      ? dayjs(values.receiveDate).format('YYYY-MM-DD')
+      : null;
+
+    const chungTu = listChungtumua.map((item) => ({
+      money: paymentValues[item.id] || 0,
+      content: "Nội dung",
+      ctmuaId: item.id,
+    }));
+
+    const resultObject = {
+      paymentDate,
+      content: values.content,
+      receiver: values?.receiver || 'Người nhận', // lấy giá trị receiver từ form
+      supplierId,
+      purchasingOfficerId: values.purchasingOfficerId,
+      bankAccountId: values.bankAccountId, // Điều này sẽ chỉ cần thiết cho phương thức "TRANSFER"
+      chungTu,
+    };
+
+    try {
+        if (values.paymentMethod === "TRANSFER") {
+            await muahangService.postPhieuChiTienGui(resultObject);
+        } else if (values.paymentMethod === "CASH") {
+            // console.log(resultObject)
+            await muahangService.postPhieuChiTienMat(resultObject);
+        }
+        message.success("Tạo thành công"); // Hiển thị thông báo thành công
+        navigate(-1); // Điều hướng sau khi thành công
+    } catch (error) {
+        console.log("There was an error!", error);
+        message.error("Có lỗi xảy ra, vui lòng thử lại.");
+    } finally {
+        setLoading(false);
+    }
+};
+
 
   return (
     <div className="m-6">
@@ -144,7 +180,7 @@ const ThemTraTien = ({ disabled = false }) => {
       >
         <Flex gap={100} justify="center" className="w-[100%]">
           <Flex vertical gap={5} className="w-[50%]">
-            {Form.useWatch("paymentMethod", form) === "TRANSFER" && (
+           
               <>
                 <Form.Item
                   label="Tài khoản thanh toán"
@@ -163,10 +199,10 @@ const ThemTraTien = ({ disabled = false }) => {
                   </Select>
                 </Form.Item>
               </>
-            )}
+          
             <Form.Item
-              label="Tên khách hàng"
-              name="namecCustomer"
+              label="Nhà cung cấp"
+              name="nameCustomer"
               rules={[{ required: true, message: "Trường này là bắt buộc!" }]}
             >
               <Input disabled={true} />
@@ -192,7 +228,7 @@ const ThemTraTien = ({ disabled = false }) => {
               <>
                 <Form.Item
                   label="Số tài khoản"
-                  name="bankAccountId"
+                  name="accountNumber"
                   rules={[
                     { required: true, message: "Trường này là bắt buộc!" },
                   ]}
@@ -213,10 +249,10 @@ const ThemTraTien = ({ disabled = false }) => {
             {Form.useWatch("paymentMethod", form) === "CASH" && (
               <Form.Item
                 label="Người nhận"
-                name="submitter"
+                name="receiver"
                 rules={[{ required: true, message: "Trường này là bắt buộc!" }]}
               >
-                <Input disabled={disabled} />
+                <Input disabled={disabled} placeholder="Nhập người nhận" />
               </Form.Item>
             )}
           </Flex>
@@ -241,23 +277,23 @@ const ThemTraTien = ({ disabled = false }) => {
                 >
                   <Input disabled />
                 </Form.Item>
-                <Form.Item
-                  label="Nhân viên thực hiện"
-                  name="purchasingOfficer"
-                  rules={[
-                    { required: true, message: "Trường này là bắt buộc!" },
-                  ]}
-                >
-                  <Select disabled={disabled} placeholder="Chọn nhân viên">
-                    {listpurchasing.map((officer) => (
-                      <Select.Option key={officer.id} value={officer.name}>
-                        {officer.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
               </>
             )}
+            <Form.Item
+              label="Nhân viên thực hiện"
+              name="purchasingOfficerId"
+              rules={[
+                { required: true, message: "Trường này là bắt buộc!" },
+              ]}
+            >
+              <Select disabled={disabled} placeholder="Chọn nhân viên">
+                {listpurchasing.map((officer) => (
+                  <Select.Option key={officer.id} value={officer.id}>
+                    {officer.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
             <Form.Item
               label="Nội dung"
               name="content"
@@ -273,7 +309,7 @@ const ThemTraTien = ({ disabled = false }) => {
               <DatePicker className="!w-full" disabled={true} />
             </Form.Item>
             <Form.Item
-              label="Ngày chứng từ"
+              label="Ngày chi trả"
               name="receiveDate"
               rules={[{ required: true, message: "Trường này là bắt buộc!" }]}
             >
@@ -338,6 +374,7 @@ const ThemTraTien = ({ disabled = false }) => {
             <Button
               className="!bg-[#67CDBB] font-bold text-white"
               htmlType="submit"
+              loading={loading} // Hiển thị spinner khi đang tải
             >
               Xác nhận
             </Button>
