@@ -5,8 +5,9 @@ import { TbFileExport } from "react-icons/tb";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
 import { clearState, doiTuongSelector, getListProductGroup, getSupplier, postBankAccount, postProduct, postSupplier } from '../../../../../../store/features/doiTuongSilce';
-
+import doiTuongService from '../../../../../../services/doiTuong.service';
 const EditableContext = React.createContext(null);
+
 const EditableRow = ({ index, ...props }) => {
     const [form] = Form.useForm();
     return (
@@ -88,23 +89,42 @@ const EditableCell = ({
     return <td {...restProps}>{childNode}</td>;
 };
 
-
 const ThemTaiKhoanNganHang = ({ disabled = true }) => {
     const dispatch = useDispatch();
-
     const navigate = useNavigate();
     const [form] = Form.useForm();
-
-    const { listSupplierData,
-        supplierData,
-        listProductGroupData,
-        supplierGroupData,
-        isSuccess
-    } = useSelector(doiTuongSelector);
+    const [listSupplier, setListSupplier] = useState([]);
+    const { listProductGroupData, isSuccess } = useSelector(doiTuongSelector);
 
     useEffect(() => {
+        fetchListSupplier();
         dispatch(getListProductGroup());
     }, []);
+
+    const fetchListSupplier = async() => {
+        try {
+            const response = await doiTuongService.getListSupplier();
+            const data = response.data.result.data;
+            console.log('Nhà cung cấp', data);
+            setListSupplier(data);
+        } catch (error) {
+            console.log('There was an error!', error);
+        }
+    }
+
+    const banks = [
+        { value: 'Vietcombank', label: 'Ngân hàng TMCP Ngoại Thương Việt Nam (Vietcombank)' },
+        { value: 'VietinBank', label: 'Ngân hàng TMCP Công Thương Việt Nam (VietinBank)' },
+        { value: 'BIDV', label: 'Ngân hàng TMCP Đầu Tư và Phát Triển Việt Nam (BIDV)' },
+        { value: 'Techcombank', label: 'Ngân hàng TMCP Kỹ Thương Việt Nam (Techcombank)' },
+        { value: 'Sacombank', label: 'Ngân hàng TMCP Sài Gòn Thương Tín (Sacombank)' },
+        { value: 'MBBank', label: 'Ngân hàng TMCP Quân Đội (MB Bank)' },
+        { value: 'ACB', label: 'Ngân hàng TMCP Á Châu (ACB)' },
+        { value: 'SCB', label: 'Ngân hàng TMCP Sài Gòn (SCB)' },
+        { value: 'VIB', label: 'Ngân hàng TMCP Quốc Tế Việt Nam (VIB)' },
+        { value: 'TPBank', label: 'Ngân hàng TMCP Tiên Phong (TPBank)' },
+        // Thêm các ngân hàng khác nếu cần
+    ];
 
     const nameValue = Form.useWatch('name', form);
 
@@ -121,11 +141,11 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
 
     const [count, setCount] = useState(1);
 
-
     const handleDelete = (key) => {
         const newData = dataSource.filter((item) => item.key !== key);
         setDataSource(newData);
     };
+
     const defaultColumns = [
         {
             title: 'Tên chiết khấu',
@@ -230,7 +250,6 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
             </h1>
             <Form
                 form={form}
-                // labelCol={{ span: 10 }}
                 className='mb-4'
                 labelCol={{
                     flex: '150px',
@@ -238,9 +257,7 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
                 labelAlign="left"
                 labelWrap
                 onFinish={onFinish}
-                //using init set value 
                 initialValues={{
-                    // 'dia-chi': 'default value'
                 }}
             >
                 <Flex gap={100} justify='center' className='w-[100%] align-left'>
@@ -257,7 +274,6 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
                         >
                             <Input
                                 disabled={disabled}
-
                             />
                         </Form.Item>
 
@@ -271,9 +287,10 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
                                 },
                             ]}
                         >
-                            <Input
+                            <Select
                                 disabled={disabled}
-
+                                options={banks}
+                                placeholder="Chọn ngân hàng"
                             />
                         </Form.Item>
 
@@ -289,16 +306,12 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
                         >
                             <Input
                                 disabled={disabled}
-
                             />
                         </Form.Item>
-
-
                     </Flex>
                     
-
                     <Flex vertical gap={5} className='w-[50%]'>
-                    <Form.Item
+                        <Form.Item
                             label="Chủ tài khoản"
                             name='accountName'
                             rules={[
@@ -310,7 +323,6 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
                         >
                             <Input
                                 disabled={disabled}
-
                             />
                         </Form.Item>
 
@@ -320,35 +332,10 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
                         >
                             <Input
                                 disabled={disabled}
-
                             />
                         </Form.Item>
-
-
                     </Flex>
-
                 </Flex>
-
-
-                {/* <div>
-                    <Button
-                        className='!bg-[#7A77DF] font-bold text-white flex items-center gap-1 mb-4'
-                        onClick={handleAdd}
-                        disabled={disabled}
-                    >
-                        Thêm 1 dòng
-                    </Button>
-
-                    <Table
-                        components={components}
-                        rowClassName={() => 'editable-row'}
-                        bordered
-                        dataSource={dataSource}
-                        columns={columns}
-                        pagination={false}
-                    />
-                </div> */}
-
                 {disabled ?
                     <div className='w-full flex justify-end mt-6 mb-0'>
                         <Button
@@ -360,7 +347,6 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
                         </Button>
                     </div> :
                     <Form.Item className='flex justify-end gap-2 mt-6 mb-0'>
-
                         <Button
                             className='bg-[#FF7742] font-bold text-white mr-2'
                             htmlType="reset"
@@ -371,36 +357,14 @@ const ThemTaiKhoanNganHang = ({ disabled = true }) => {
                         <Button
                             className='!bg-[#67CDBB] font-bold text-white'
                             htmlType="submit"
-                        // onClick={() => navigate(-1)}
                         >
                             Xác nhận
                         </Button>
                     </Form.Item>
                 }
-
-
             </Form>
-
-            {/* <div className='w-full flex justify-end gap-5'>
-                    <Button
-                        className='bg-[#FF7742] font-bold text-white'
-                        type='link'
-                        onClick={() => navigate(-1)}
-                    >
-                        Thoát
-                    </Button>
-                    <Button
-                        className='!bg-[#67CDBB] font-bold text-white'
-                        type='link'
-                        onClick={() => navigate(-1)}
-                    >
-                        Xác nhận
-                    </Button>
-            </div> */}
-
-
         </div>
     )
 }
 
-export default ThemTaiKhoanNganHang
+export default ThemTaiKhoanNganHang;

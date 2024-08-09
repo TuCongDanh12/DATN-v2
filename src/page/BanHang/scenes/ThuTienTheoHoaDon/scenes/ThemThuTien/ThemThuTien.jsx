@@ -9,8 +9,7 @@ import { VND } from '../../../../../../utils/func';
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import moment from 'moment';
-import InPhieuThu from '../../../../../../component/InPhieuThu/InPhieuThu';
-import { useReactToPrint } from 'react-to-print';
+
 const { Text } = Typography;
 
 const dateFormat = "YYYY-MM-DD";

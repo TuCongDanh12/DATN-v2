@@ -274,6 +274,13 @@ const getListAccountant = () => {
         });
 };
 
+const getListPurchasingOfficer = () => {
+    return axios.get(`${API_URL}/employee/purchasing-officer`,
+        {
+            headers: authHeader()
+        });
+};
+
 const getListWarehouseKeeper = () => {
     return axios.get(`${API_URL}/employee/warehouse-keeper`,
         {
@@ -455,6 +462,7 @@ const doiTuongService = {
     getListAccountant,
     getListWarehouseKeeper,
     getListSalesperson,
+    getListPurchasingOfficer,
 
     getDieuKhoanThanhToanCustomer,
     getListDieuKhoanThanhToan,

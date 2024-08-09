@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useLocation} from "react-router-dom";
 import "./App.css";
 import Sidebar from "./layout/Sidebar/Sidebar";
 import { useEffect, useState } from "react";
@@ -26,7 +26,6 @@ import XemChungTuBanHang from "./page/BanHang/scenes/ChungTuBanHang/scenes/XemCh
 import XemHoaDonBanHang from "./page/BanHang/scenes/HoaDonBanHang/scenes/XemHoaDonBanHang/XemHoaDonBanHang";
 
 import DonMuaHang from './page/MuaHang/components/DonMuaHang/DonMuaHang';
-import ListChungtu from './component/Table/table-chungtu';
 import MuahangChungtu from "./component/Chungtu/Muahang/chungtu";
 import Chungtu from "./page/MuaHang/components/ChungTuMuaHang";
 import TablePhieuChi from './component/Table/table-phieuchi';
@@ -62,7 +61,6 @@ import TongHopNoPhaiThu from "./page/CongNo/scenes/TongHopNoPhaiThu/TongHopNoPha
 import ChiTietNoPhaiThu from "./page/CongNo/scenes/ChiTietNoPhaiThu/ChiTietNoPhaiThu";
 import TaiKhoanNganHang from "./page/DoiTuong/scenes/TaiKhoanNganHang/TaiKhoanNganHang";
 import Profile from "./page/Profile/Profile";
-import InHoaDonBanHang from "./component/InHoaDonBanHang/InHoaDonBanHang";
 import ThemTaiKhoanNganHang from "./page/DoiTuong/scenes/TaiKhoanNganHang/scenes/ThemTaiKhoanNganHang/ThemTaiKhoanNganHang";
 import EditTaiKhoanNganHang from "./page/DoiTuong/scenes/TaiKhoanNganHang/scenes/EditTaiKhoanNganHang/EditTaiKhoanNganHang";
 import XemPhieuThuTienMat from './page/BanHang/scenes/ThuTienTheoHoaDon/scenes/XemPhieuThuTienMat/XemPhieuThuTienMat';
@@ -78,6 +76,7 @@ import ReportTHDT from "./page/BaoCao/scenes/BaoCaoDaLuu/components/ReportTHDT/R
 import ThemDonDatHang from "./page/BanHang/scenes/DonDatHang/scenes/ThemDonDatHang/ThemDonDatHang";
 import DoanhThuSanPham from "./page/BaoCao/scenes/DoanhThuSanPham/DoanhThuSanPham";
 import XemChungTuMua from "./page/MuaHang/components/ChungTuMuaHang/scenes/XemChungTuBanHang/XemChungTuBanHang";
+import ThemTraTien from "./page/MuaHang/components/TraTienTheoHoaDon/scenes/ThemTraTien/ThemTraTien";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -185,6 +184,8 @@ function App() {
                 <Route path="mua-hang/don-mua-hang/xem/:id" element={<EditDonMuaHang disabled={true} />} />
                 <Route path="mua-hang/chung-tu-mua-hang/them/:id" element={<ThemChungTuMuaHang />} />
                 <Route path="mua-hang/chung-tu-mua-hang/xem/:id" element={<XemChungTuMua disabled={true} />} />
+                <Route path="mua-hang/chung-tu-mua-hang/tra-tien/:id" element={<ThemTraTien />} />
+
                 <Route path="/ban-hang" element={<BanHang />}>
                   <Route path="quy-trinh" element={<QuyTrinhBanHang />} />
                   <Route path="don-dat-hang" element={<DonDatHang />} />

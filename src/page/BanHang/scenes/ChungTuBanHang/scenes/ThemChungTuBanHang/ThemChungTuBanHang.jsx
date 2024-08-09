@@ -149,10 +149,11 @@ const ThemChungTuBanHang = ({ disabled = false }) => {
                     // soluongdaxuat: 1,
                     price: product.price,
                     phantramcktm: donBanHangData?.discountRate,
-                    tiencktm: product.count * product.price * (donBanHangData?.discountRate / 100),
+                    tiencktm: Number(product.count * product.price * (donBanHangData?.discountRate / 100)),
                     thanhtien: product.price * product.count,
                     phantramthuegtgt: product.product.productGroup.tax,
-                    tienthuegtgt: product.count * product.price * (1 - donBanHangData?.discountRate / 100) * (product.product.productGroup.tax / 100)
+                    tienthuegtgt: Math.floor(product.count * product.price * (1 - donBanHangData?.discountRate / 100) * (product.product.productGroup.tax / 100))
+
                 }
             })
 
@@ -308,7 +309,8 @@ const ThemChungTuBanHang = ({ disabled = false }) => {
         console.log("row", row);
         row.thanhtien = row.price * row.count;
         row.tiencktm = row.price * row.count * (row.phantramcktm / 100);
-        row.tienthuegtgt = (row.thanhtien - row.tiencktm) * (row.phantramthuegtgt / 100);
+        row.tienthuegtgt = Math.floor((row.thanhtien - row.tiencktm) * (row.phantramthuegtgt / 100));
+        // console.log('tien',row.tienthuegtgt)
         const newData = [...productOfDonBanHangs];
         const index = newData.findIndex((item) => row.key === item.key);
         const item = newData[index];
@@ -347,8 +349,8 @@ const ThemChungTuBanHang = ({ disabled = false }) => {
     const onFinish = (values) => {
         // values.createdAt = `${values.createdAt.$y}-${values.createdAt.$M + 1}-${values.createdAt.$D}`;
         // values.deliveryDate = `${values.deliveryDate.$y}-${values.deliveryDate.$M + 1}-${values.deliveryDate.$D}`;
-        console.log('Received values of form: ', values);
-        console.log(productOfDonBanHangs);
+        // console.log('Received values of form: ', values);
+        // console.log(productOfDonBanHangs);
 
         function formatDate(date) {
             var d = new Date(date),
@@ -365,11 +367,11 @@ const ThemChungTuBanHang = ({ disabled = false }) => {
         }
 
         let dataConvert = {
-            "deliveryDate": formatDate(values.deliveryDate.$d),
+            "deliveryDate": formatDate('2024-09-14'),
             "warehouseKeeperId": values.warehouseKeeperId,
             "content": values.content,
             "receiver": values.receiver,
-            "paymentTerm": formatDate(values.paymentTerm.$d),
+            "paymentTerm": formatDate('2024-09-14'),
             "donBanHangId": donBanHangData.id,
             "products": productOfDonBanHangs.map(product => {
                 return {
