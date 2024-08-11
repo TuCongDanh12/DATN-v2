@@ -75,6 +75,33 @@ const postPhieuChiTienMat = (values) => {
           headers: authHeader()
       });
 };
+
+const getListPhieuChiTienGui = () => {
+  return axios.get(`${API_URL}/phieu-chi-tien-gui`,
+      {
+          headers: authHeader()
+      });
+};
+
+const getListPhieuChiTienMat = () => {
+  return axios.get(`${API_URL}/phieu-chi-tien-mat`,
+      {
+          headers: authHeader()
+      });
+};
+
+const getPhieuChiTienGui = (id) => {
+  return axios.get(`${API_URL}/phieu-chi-tien-gui/${id}`,
+      {
+          headers: authHeader()
+      });
+};
+const getPhieuChiTienMat = (id) => {
+  return axios.get(`${API_URL}/phieu-chi-tien-mat/${id}`,
+      {
+          headers: authHeader()
+      });
+};
 const muahangService = {
   getListDonMuahang,
   getDonMuaHang,
@@ -82,7 +109,11 @@ const muahangService = {
   getListChungTuMua,
   getChungTuMua,
   postPhieuChiTienGui,
-  postPhieuChiTienMat
+  postPhieuChiTienMat,
+  getListPhieuChiTienMat,
+  getListPhieuChiTienGui,
+  getPhieuChiTienGui,
+  getPhieuChiTienMat
 };
 
 export default muahangService;

@@ -28,7 +28,7 @@ import XemHoaDonBanHang from "./page/BanHang/scenes/HoaDonBanHang/scenes/XemHoaD
 import DonMuaHang from './page/MuaHang/components/DonMuaHang/DonMuaHang';
 import MuahangChungtu from "./component/Chungtu/Muahang/chungtu";
 import Chungtu from "./page/MuaHang/components/ChungTuMuaHang";
-import TablePhieuChi from './component/Table/table-phieuchi';
+// import TablePhieuChi from './component/Table/table-phieuchi';
 import Login from "./page/Login/Login";
 import Signup from "./page/Signup/Signup";
 import DoiTuong from "./page/DoiTuong/DoiTuong";
@@ -77,6 +77,9 @@ import ThemDonDatHang from "./page/BanHang/scenes/DonDatHang/scenes/ThemDonDatHa
 import DoanhThuSanPham from "./page/BaoCao/scenes/DoanhThuSanPham/DoanhThuSanPham";
 import XemChungTuMua from "./page/MuaHang/components/ChungTuMuaHang/scenes/XemChungTuBanHang/XemChungTuBanHang";
 import ThemTraTien from "./page/MuaHang/components/TraTienTheoHoaDon/scenes/ThemTraTien/ThemTraTien";
+import PhieuChi from "./page/MuaHang/components/PhieuChi/PhieuChi";
+import XemPhieuChiTienMat from "./page/MuaHang/components/PhieuChi/XemPhieuChiTienMat/XemPhieuChiTienMat";
+import XemPhieuChiTienGui from "./page/MuaHang/components/PhieuChi/XemPhieuChiTienGui/XemPhieuChiTienGui";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -178,13 +181,18 @@ function App() {
                     element={<MuahangChungtu />}
                   />
 
-                  <Route path="phieu-chi" element={<TablePhieuChi />} />
+                  <Route path="phieu-chi" element={<PhieuChi/>} />
                   {/* <Route path="tra-tien" element={<Tratien />} /> */}
                 </Route>
                 <Route path="mua-hang/don-mua-hang/xem/:id" element={<EditDonMuaHang disabled={true} />} />
                 <Route path="mua-hang/chung-tu-mua-hang/them/:id" element={<ThemChungTuMuaHang />} />
                 <Route path="mua-hang/chung-tu-mua-hang/xem/:id" element={<XemChungTuMua disabled={true} />} />
                 <Route path="mua-hang/chung-tu-mua-hang/tra-tien/:id" element={<ThemTraTien />} />
+                <Route path="mua-hang/phieu-chi/tienmat/:id" element={<XemPhieuChiTienMat />} />
+                <Route path="mua-hang/phieu-chi/tiengui/:id" element={<XemPhieuChiTienGui />} />
+
+
+
 
                 <Route path="/ban-hang" element={<BanHang />}>
                   <Route path="quy-trinh" element={<QuyTrinhBanHang />} />
