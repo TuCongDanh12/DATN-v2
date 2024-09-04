@@ -80,6 +80,8 @@ import ThemTraTien from "./page/MuaHang/components/TraTienTheoHoaDon/scenes/Them
 import PhieuChi from "./page/MuaHang/components/PhieuChi/PhieuChi";
 import XemPhieuChiTienMat from "./page/MuaHang/components/PhieuChi/XemPhieuChiTienMat/XemPhieuChiTienMat";
 import XemPhieuChiTienGui from "./page/MuaHang/components/PhieuChi/XemPhieuChiTienGui/XemPhieuChiTienGui";
+import BaoCaoMuaHang from "./page/BaoCao/scenes/BaoCaoMuaHang/BaoCaoMuaHang";
+import ChiTietBaoCaoMuaHang from "./page/BaoCao/scenes/BaoCaoMuaHang/ChiTietBaoCao/ChiTietBaoCao";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -239,10 +241,14 @@ function App() {
                   <Route path="chi-tiet-doanh-thu-nhan-vien" element={<ChiTietDoanhThuNhanVien />} />
                   <Route path="tong-hop-doanh-thu-nhan-vien" element={<TongHopDoanhThuNhanVien />} />
                   <Route path="doanh-thu-theo-san-pham" element={<DoanhThuSanPham />} />
+                  <Route path="bao-cao-mua-hang" element={<BaoCaoMuaHang/>} />
+                 
                   <Route path="bao-cao-da-luu" element={<BaoCaoDaLuu />} />
                   <Route path="bao-cao-da-luu/DTBH/:id" element={<ReportCTDT />} />
                   <Route path="bao-cao-da-luu/THDTBH/:id" element={<ReportTHDT />} />
                 </Route>
+
+                <Route path='bao-cao/bao-cao-mua-hang/:id' element={<ChiTietBaoCaoMuaHang/>}/>
 
                 <Route path="/thong-bao" element={<ThongBao />} />
                 <Route path="/ho-tro" element={<HoTro />} />

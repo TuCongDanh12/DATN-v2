@@ -531,11 +531,6 @@ const TongHopDoanhThuNhanVien = ({ checkbox = false }) => {
                                 },
                             ]}
                         >
-                            {/* <RangePicker
-                value={valueRangepicker}
-                format='DD-MM-YYYY'
-                className="!me-[5px]"
-              /> */}
                             <RangePicker
                                 onChange={(dates) => handleFilterday(dates)}
 
@@ -543,12 +538,7 @@ const TongHopDoanhThuNhanVien = ({ checkbox = false }) => {
 
                         </Form.Item>
                         <Form.Item name="listSalesperson" className="w-[300px] !me-0">
-                            {/* <Input
-                className="rounded-tr-none rounded-br-none"
-                placeholder="Nhập tên khách hàng"
-                value={searchText}
-                onChange={(e) => handleSearch(e.target.value)}
-              /> */}
+                           
                             <Select
                                 mode="tags"
                                 style={{
@@ -604,17 +594,7 @@ const TongHopDoanhThuNhanVien = ({ checkbox = false }) => {
                     />
                 </div>
 
-                {/* <Button
-                    className="!bg-[#7A77DF] font-bold text-white flex items-center gap-1"
-                    type="link"
-                    disabled={chungTuBan.length === 0}
-                    onClick={() => {
-                        setOpen(true);
-                    }}
-                >
-                    Lưu báo cáo
-                </Button> */}
-
+                
                 <Modal
                     title="LƯU BÁO CÁO"
                     centered

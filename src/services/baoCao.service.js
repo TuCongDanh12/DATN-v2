@@ -48,7 +48,39 @@ const getListSalesPerson = () => {
 };
 
 
+const postReportCPMHRaw = ( values ) => {
+    return axios.post(`${API_URL}/report-cpmh/raw`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
 
+const postReportCPMH = ( values ) => {
+    return axios.post(`${API_URL}/report-cpmh`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
+
+const getReportCPMH = (  ) => {
+    return axios.get(`${API_URL}/report-cpmh`,
+        {
+            headers: authHeader()
+        });
+};
+
+const getDetailReportCPMH = ( id ) => {
+    return axios.get(`${API_URL}/report-cpmh/${id}`,
+        {
+            headers: authHeader()
+        });
+};
 const baoCaoService = {
     getListReportDTBH,
     getReportDTBH,
@@ -56,6 +88,11 @@ const baoCaoService = {
     postReportDTBHRaw,
 
     getListSalesPerson,
+
+    postReportCPMHRaw,
+    postReportCPMH,
+    getReportCPMH,
+    getDetailReportCPMH,
 };
 
 export default baoCaoService;

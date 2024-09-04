@@ -40,12 +40,39 @@ const getChartProduct = ({ values }) => {
 };
 
 
+const getMuaHangChartRevenueYear = ({ values }) => {
+
+    return axios.get(`${API_URL}/ctmua/report-revenue-of-year/${values?.year}`,
+        {
+            headers: authHeader()
+        });
+};
+
+const getMuaHangChartRevenueMonth = ({ values }) => {
+
+    return axios.get(`${API_URL}/ctmua/report-revenue-of-month/${values?.year}/${values?.month}`,
+        {
+            headers: authHeader()
+        });
+};
+
+const getMuaHangChartRevenueQuarter = ({ values }) => {
+
+    return axios.get(`${API_URL}/ctmua/report-revenue-of-quarter/${values?.year}/${values?.quarter}`,
+        {
+            headers: authHeader()
+        });
+};
+
 
 const tongQuanService = {
     getChartRevenueYear,
     getChartRevenueMonth,
     getChartRevenueQuarter,
     getChartProduct,
+    getMuaHangChartRevenueQuarter,
+    getMuaHangChartRevenueMonth,
+    getMuaHangChartRevenueYear,
 };
 
 export default tongQuanService;

@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Form, Input, DatePicker, Button, Select, Table, Typography } from "antd";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  Form,
+  Input,
+  DatePicker,
+  Button,
+  Select,
+  Table,
+  Typography,
+} from "antd";
 import muahangService from "../../../../../services/muahang.service";
 import dayjs from "dayjs";
 import { VND } from "../../../../../utils/func"; // Assume this is a utility function for currency formatting
@@ -25,14 +33,14 @@ const XemPhieuChiTienMat = () => {
       const response = await muahangService.getPhieuChiTienMat(id);
       const data = response.data.result.data;
       setPhieuchi(data);
-      console.log('phieuchi',data)
+      console.log("phieuchi", data);
       form.setFieldsValue({
-        bankAccountId: data.supplier?.accountName || '',
-        nameCustomer: data.supplier?.name || '',
-        address: data.supplier?.address || '',
-        receiver: data.receiver || '',
-        purchasingOfficerId: data.purchasingOfficer?.id || '',
-        content: data.content || '',
+        bankAccountId: data.supplier?.accountName || "",
+        nameCustomer: data.supplier?.name || "",
+        address: data.supplier?.address || "",
+        receiver: data.receiver || "",
+        purchasingOfficerId: data.purchasingOfficer?.id || "",
+        content: data.content || "",
         createdAt: dayjs(data.createdAt),
         receiveDate: dayjs(data.paymentDate),
       });
@@ -43,9 +51,14 @@ const XemPhieuChiTienMat = () => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
+      title: "ID Chứng Từ",
+      dataIndex: "ctmua",
       key: "id",
+      render: (ctmua) => (
+        <Link to={`/mua-hang/chung-tu-mua-hang/xem/${ctmua.id}`}>
+          {ctmua.id}
+        </Link>
+      ),
     },
     {
       title: "Số tiền",
@@ -54,9 +67,13 @@ const XemPhieuChiTienMat = () => {
       render: (money) => VND.format(money),
     },
   ];
+  
 
   const listChungtumua = phieuchi?.chungTu || [];
-  const totalFinalValue = listChungtumua.reduce((acc, item) => acc + item.money, 0);
+  const totalFinalValue = listChungtumua.reduce(
+    (acc, item) => acc + item.money,
+    0
+  );
 
   return (
     <div className="m-6">
@@ -111,7 +128,10 @@ const XemPhieuChiTienMat = () => {
             >
               <Select placeholder="Chọn nhân viên">
                 {phieuchi?.purchasingOfficer && (
-                  <Select.Option key={phieuchi.purchasingOfficer.id} value={phieuchi.purchasingOfficer.id}>
+                  <Select.Option
+                    key={phieuchi.purchasingOfficer.id}
+                    value={phieuchi.purchasingOfficer.id}
+                  >
                     {phieuchi.purchasingOfficer.name}
                   </Select.Option>
                 )}
@@ -143,6 +163,21 @@ const XemPhieuChiTienMat = () => {
             </Form.Item>
           </div>
         </div>
+        <p>
+          Tham chiếu đến chứng từ mua:{" "}
+          {phieuchi?.chungTu?.map((item) => (
+            <a
+              href={`/mua-hang/chung-tu-mua-hang/xem/${item.ctmua.id}`}
+              key={item.ctmua.id}
+              style={{ marginRight: "10px" }}
+              className='text-blue-500'
+            >
+              {item.ctmua.id}
+            </a>
+          ))}
+        </p>
+
+        {/* {console.log('phiếu chi',phieuchi?.chungTu)} */}
         <div>
           <Table
             rowClassName={() => "editable-row"}
@@ -169,17 +204,16 @@ const XemPhieuChiTienMat = () => {
             {/* Có thể thêm phần tổng cộng tại đây nếu cần */}
           </div>
         </div>
-       
       </Form>
       <div className="w-full flex justify-end mt-6 mb-0">
-          <Button
-            className="bg-[#312d2c] font-bold text-white"
-            type="link"
-            onClick={() => navigate(-1)}
-          >
-            Thoát
-          </Button>
-        </div>
+        <Button
+          className="bg-[#312d2c] font-bold text-white"
+          type="link"
+          onClick={() => navigate(-1)}
+        >
+          Thoát
+        </Button>
+      </div>
     </div>
   );
 };

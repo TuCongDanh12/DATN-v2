@@ -1,283 +1,167 @@
 import React, { useEffect, useState } from "react";
 import {
-  BarChart,
-  Bar,
-  Rectangle,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  ComposedChart,
 } from "recharts";
-import { DownOutlined } from "@ant-design/icons";
-import { Dropdown, Space, Flex, Progress, Table, Select } from "antd";
+import { Select, Flex, Progress } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearState,
+  getChartRevenueMonth,
+  getChartRevenueQuarter,
+  getChartRevenueYear,
+  tongQuanSelector,
+} from "../../store/features/tongQuanSlice";
+import { VND, selectTime } from "../../utils/func";
+import tongQuanService from "../../services/tongQuan.service";
 import Countdocument from "../../component/Tongquan/count-document";
 import ChartNhanvien from "../../component/Chart/chartNhanvien";
 import ChartSanpham from "../../component/Chart/chartSanpham";
-import { clearState, getChartRevenueMonth, getChartRevenueMonthOld, getChartRevenueQuarter, getChartRevenueQuarterOld, getChartRevenueYear, getChartRevenueYearOld, tongQuanSelector } from "../../store/features/tongQuanSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { VND, selectTime } from "../../utils/func";
-import { congNoSelector, getListCongNo, postReportTHCN, postReportTHCNRaw } from "../../store/features/congNoSlice";
 import TinhHinhTaiChinh from "../../component/Chart/TinhHinhTaiChinh";
+import { congNoSelector } from "../../store/features/congNoSlice";
+import NoPhaiTra from "../../component/Chart/NoChuaTra";
 
 const TongQuan = () => {
   const dispatch = useDispatch();
 
-  const {
-    isSuccessGetChartRevenue,
-    isSuccessGetChartRevenueOld,
-    isSuccessGetChartProduct,
-    chartRevenueData,
-    chartRevenueDataOld,
-    chartProductData,
+  const { isSuccessGetChartRevenue, chartRevenueData } =
+    useSelector(tongQuanSelector);
 
-  } = useSelector(tongQuanSelector);
+  const { reportTHCNData } = useSelector(congNoSelector);
 
-  // useEffect(() => {
-  //   if (chartRevenueData) {
-  //     setDataVenue(chartRevenueData);
-  //   }
-  // }, [chartRevenueData]);
+  const [dataVenue, setDataVenue] = useState([]);
+  const [costData, setCostData] = useState([]);
 
-  useEffect(() => {
-    if (isSuccessGetChartRevenue && isSuccessGetChartRevenueOld) {
-      const dataConvert = [];
-
-      for (let i = 0; i < chartRevenueDataOld.length; ++i) {
-        dataConvert.push({
-          "name": chartRevenueDataOld[i].name,
-          "Doanh thu năm nay": chartRevenueData[i]["Doanh thu năm nay"],
-          "Doanh thu năm trước": chartRevenueDataOld[i]["Doanh thu năm trước"]
-          // "amt": 2400
-        })
-
+  // Function to fetch cost data using tongQuanService
+  const fetchCostData = async (year, month = null, quarter = null) => {
+    try {
+      let response;
+      if (month) {
+        response = await tongQuanService.getMuaHangChartRevenueMonth({
+          values: { year, month },
+        });
+      } else if (quarter) {
+        response = await tongQuanService.getMuaHangChartRevenueQuarter({
+          values: { year, quarter },
+        });
+      } else {
+        response = await tongQuanService.getMuaHangChartRevenueYear({
+          values: { year },
+        });
       }
-
-      //console.log("dataConvertdataConvertdataConvert", dataConvert)
-
-      setDataVenue(dataConvert);
-      dispatch(clearState());
-
-      // chartRevenueDataOld.map()
-
-      // chartRevenueData
-    }
-  }, [isSuccessGetChartRevenue, isSuccessGetChartRevenueOld]);
-
-  useEffect(() => {
-
-    dispatch(getChartRevenueYear({ values: { year: "2024" } }));
-    dispatch(getChartRevenueYearOld({ values: { year: "2023" } }));
-
-    const dataConvert = {
-      "startDate": "2020-01-01",
-      "endDate": "2025-01-01",
-      "name": "xxx",
-      "description": "xxx",
-      "customerIds": []
-    }
-
-    dispatch(postReportTHCNRaw({ values: dataConvert }));
-  }, []);
-
-  const {
-    reportTHCNData
-  } = useSelector(congNoSelector);
-
-  const [dataVenue, setDataVenue] = useState();
-
-  useEffect(() => {
-
-  }, [dataVenue]);
-
-  const handleChange = (value) => {
-    const timeRange = selectTime(value);
-
-    if (value === "thisYear" || value === "lastYear") {
-      const dataConvert = {
-        year: timeRange?.startDate.split('-')[0]
-      }
-      dispatch(getChartRevenueYear({ values: dataConvert }));
-
-      const dataConvert2 = {
-        year: timeRange?.startDate.split('-')[0] - 1
-      }
-      dispatch(getChartRevenueYearOld({ values: dataConvert2 }));
-    }
-    // else if (value === "lastYear") {
-    //   const dataConvert = {
-    //     year: timeRange?.startDate.split('-')[0]
-    //   }
-    //   dispatch(getChartRevenueYear({ values: dataConvert }));
-    // }
-    else if (value === "thisMonth" || value === "lastMonth") {
-      const dataConvert = {
-        year: timeRange?.startDate.split('-')[0],
-        month: timeRange?.startDate.split('-')[1]
-      }
-      dispatch(getChartRevenueMonth({ values: dataConvert }));
-
-      const dataConvert2 = {
-        year: timeRange?.startDate.split('-')[0] - 1,
-        month: timeRange?.startDate.split('-')[1]
-      }
-      dispatch(getChartRevenueMonthOld({ values: dataConvert2 }));
-
-    }
-    // else if (value === "lastMonth") {
-    //   const dataConvert = {
-    //     year: timeRange?.startDate.split('-')[0],
-    //     month: timeRange?.startDate.split('-')[1]
-    //   }
-    //   dispatch(getChartRevenueMonth({ values: dataConvert }));
-    // }
-    else if (value === "thisQuarter") {
-      const dataConvert = {
-        year: timeRange?.startDate.split('-')[0],
-        quarter: 2
-      }
-      dispatch(getChartRevenueQuarter({ values: dataConvert }));
-
-
-      const dataConvert2 = {
-        year: timeRange?.startDate.split('-')[0] - 1,
-        quarter: 2
-      }
-      dispatch(getChartRevenueQuarterOld({ values: dataConvert2 }));
-    }
-    else if (value === "lastQuarter") {
-      const dataConvert = {
-        year: timeRange?.startDate.split('-')[0],
-        quarter: 1
-      }
-      dispatch(getChartRevenueQuarter({ values: dataConvert }));
-
-      const dataConvert2 = {
-        year: timeRange?.startDate.split('-')[0] - 1,
-        quarter: 1
-      }
-      dispatch(getChartRevenueQuarterOld({ values: dataConvert2 }));
-    }
-    else if (value === "Q1") {
-      const dataConvert = {
-        year: timeRange?.startDate.split('-')[0],
-        quarter: 1
-      }
-      dispatch(getChartRevenueQuarter({ values: dataConvert }));
-
-      const dataConvert2 = {
-        year: timeRange?.startDate.split('-')[0] - 1,
-        quarter: 1
-      }
-      dispatch(getChartRevenueQuarterOld({ values: dataConvert2 }));
-    }
-    else if (value === "Q2") {
-      const dataConvert = {
-        year: timeRange?.startDate.split('-')[0],
-        quarter: 2
-      }
-      dispatch(getChartRevenueQuarter({ values: dataConvert }));
-
-      const dataConvert2 = {
-        year: timeRange?.startDate.split('-')[0] - 1,
-        quarter: 2
-      }
-      dispatch(getChartRevenueQuarterOld({ values: dataConvert2 }));
-    }
-    else if (value === "Q3") {
-      const dataConvert = {
-        year: timeRange?.startDate.split('-')[0],
-        quarter: 3
-      }
-      dispatch(getChartRevenueQuarter({ values: dataConvert }));
-
-      const dataConvert2 = {
-        year: timeRange?.startDate.split('-')[0] - 1,
-        quarter: 3
-      }
-      dispatch(getChartRevenueQuarterOld({ values: dataConvert2 }));
-    }
-    else if (value === "Q4") {
-      const dataConvert = {
-        year: timeRange?.startDate.split('-')[0],
-        quarter: 4
-      }
-      dispatch(getChartRevenueQuarter({ values: dataConvert }));
-
-      const dataConvert2 = {
-        year: timeRange?.startDate.split('-')[0] - 1,
-        quarter: 4
-      }
-      dispatch(getChartRevenueQuarterOld({ values: dataConvert2 }));
+      // Check the structure of the response
+      // console.log("data chi phí", response);
+      const costArray = response.data.result.data.map(item => ({
+        cost: item.finalValue
+      }));
+      // console.log("costArray", costArray);
+      setCostData(costArray); 
+    } catch (error) {
+      console.error("Error fetching cost data:", error);
     }
   };
+  
+  useEffect(() => {
+    handleChange("thisYear");
+  }, []); // Chạy một lần khi component mount
 
-
-
-  const dataxxx = [
-    {
-      "name": "Page A",
-      "uv": 4000,
-      "pv": 2400,
-      "amt": 2400
-    },
-    {
-      "name": "Page B",
-      "uv": 3000,
-      "pv": 1398,
-      "amt": 2210
-    },
-    {
-      "name": "Page C",
-      "uv": 2000,
-      "pv": 9800,
-      "amt": 2290
-    },
-    {
-      "name": "Page D",
-      "uv": 2780,
-      "pv": 3908,
-      "amt": 2000
-    },
-    {
-      "name": "Page E",
-      "uv": 1890,
-      "pv": 4800,
-      "amt": 2181
-    },
-    {
-      "name": "Page F",
-      "uv": 2390,
-      "pv": 3800,
-      "amt": 2500
-    },
-    {
-      "name": "Page G",
-      "uv": 3490,
-      "pv": 4300,
-      "amt": 2100
+  // Combining revenue and cost data
+  useEffect(() => {
+    if (isSuccessGetChartRevenue && costData.length > 0) {
+      const combinedData = chartRevenueData.map((item, index) => ({
+        name: item.name,
+        "Doanh thu": item["Doanh thu năm nay"],
+        "Chi phí": costData[index]?.cost || 0, // Assuming 'cost' is the field name in the response
+      }));
+      // console.log("biểu đồ", combinedData);
+      setDataVenue(combinedData); // Cập nhật dataVenue với combinedData mới
+      dispatch(clearState()); // Clear state after use
     }
-  ]
+  }, [isSuccessGetChartRevenue, costData, dispatch, chartRevenueData]);
+  
 
+  const handleChange = async (value) => {
+    const currentDate = new Date();
+    let year = currentDate.getFullYear(); // Năm hiện tại
+    let month = currentDate.getMonth() + 1; // Tháng hiện tại (lưu ý: getMonth() trả về giá trị từ 0-11)
+    let quarter = null;
+  
+    switch (value) {
+      case "thisYear":
+        // Năm hiện tại đã được xác định
+        await fetchCostData(year); // Fetch cost data first
+        dispatch(getChartRevenueYear({ values: { year } }));
+        break;
+  
+      case "lastYear":
+        year = year - 1; // Giảm một năm để lấy năm trước
+        await fetchCostData(year); // Fetch cost data first
+        dispatch(getChartRevenueYear({ values: { year } }));
+        break;
+  
+      case "thisMonth":
+        // Năm và tháng hiện tại đã được xác định
+        await fetchCostData(year, month); // Fetch cost data first
+        dispatch(getChartRevenueMonth({ values: { year, month } }));
+        break;
+  
+      case "lastMonth":
+        if (month === 1) {
+          month = 12; // Nếu là tháng 1, thì tháng trước là tháng 12 của năm trước
+          year = year - 1;
+        } else {
+          month = month - 1; // Tháng trước đó
+        }
+        await fetchCostData(year, month); // Fetch cost data first
+        dispatch(getChartRevenueMonth({ values: { year, month } }));
+        break;
+  
+      case "thisQuarter":
+        quarter = Math.floor((month - 1) / 3) + 1; // Tính quý hiện tại
+        await fetchCostData(year, null, quarter); // Fetch cost data first
+        dispatch(getChartRevenueQuarter({ values: { year, quarter } }));
+        break;
+  
+      case "lastQuarter":
+        quarter = Math.floor((month - 1) / 3); // Tính quý trước đó
+        if (quarter === 0) {
+          quarter = 4; // Nếu quý trước là 0 thì quay về quý 4 của năm trước
+          year = year - 1;
+        }
+        await fetchCostData(year, null, quarter); // Fetch cost data first
+        dispatch(getChartRevenueQuarter({ values: { year, quarter } }));
+        break;
+  
+      case "Q1":
+      case "Q2":
+      case "Q3":
+      case "Q4":
+        quarter = parseInt(value.replace("Q", ""), 10); // Chuyển đổi giá trị Q thành số quý
+        await fetchCostData(year, null, quarter); // Fetch cost data first
+        dispatch(getChartRevenueQuarter({ values: { year, quarter } }));
+        break;
+  
+      default:
+        console.error("Invalid option selected");
+    }
+  };
+  
   const DataFormater = (number) => {
-    // if(number > 1000000000){
-    //   return (number/1000000000).toString() + 'B';
-    // }else if(number > 1000000){
-    //   return (number/1000000).toString() + 'M';
-    // }else 
     if (number >= 1000000000) {
-      return (number / 1000000000).toString() + 'Tỷ';
+      return (number / 1000000000).toString() + "Tỷ";
     }
     if (number > 1000000) {
-      return (number / 1000000).toString() + 'Triệu';
+      return (number / 1000000).toString() + "Triệu";
     } else {
       return number.toString();
     }
-  }
+  };
 
   return (
     <div className="ml-5 mb-5 mt-5">
@@ -285,235 +169,135 @@ const TongQuan = () => {
 
       <Countdocument />
 
-
-      <Flex gap={50} className='mt-5 w-full'>
+      <Flex gap={50} className="mt-5 w-full">
         <div>
-          {/* <p className="text-xl">Doanh thu</p> */}
-          <p className="font-bold text-xl">Doanh thu</p>
-
-          {/* <Dropdown
-            menu={{
-              items,
-              selectable: true,
-              defaultSelectedKeys: [0],
-            }}
-          // trigger={["click"]}
-          >
-            <a onChange={(e) => {
-
-            }}>
-              <Space>
-                Năm nay
-                <DownOutlined />
-              </Space>
-            </a>
-          </Dropdown> */}
-
+          <p className="font-bold text-xl">Doanh thu, Chi Phí</p>
           <Select
-            defaultValue={'thisYear'}
-            style={{
-              width: 120,
-
-            }}
+            defaultValue={"thisYear"}
+            style={{ width: 120 }}
             className="bg-[#FFF6D8]"
             onChange={handleChange}
             options={[
-              {
-                value: 'thisYear',
-                label: 'Năm nay',
-              },
-              {
-                value: 'lastYear',
-                label: 'Năm trước',
-              },
-              {
-                value: 'thisMonth',
-                label: 'Tháng này',
-              },
-              {
-                value: 'lastMonth',
-                label: 'Tháng trước',
-              },
-              {
-                value: 'thisQuarter',
-                label: 'Quý này',
-              },
-              {
-                value: 'lastQuarter',
-                label: 'Quý trước',
-              },
-              {
-                value: 'Q1',
-                label: 'Quý 1',
-              },
-              {
-                value: 'Q2',
-                label: 'Quý 2',
-              },
-              {
-                value: 'Q3',
-                label: 'Quý 3',
-              },
-              {
-                value: 'Q4',
-                label: 'Quý 4',
-              },
+              { value: "thisYear", label: "Năm nay" },
+              { value: "lastYear", label: "Năm trước" },
+              { value: "thisMonth", label: "Tháng này" },
+              { value: "lastMonth", label: "Tháng trước" },
+              { value: "thisQuarter", label: "Quý này" },
+              { value: "lastQuarter", label: "Quý trước" },
+              { value: "Q1", label: "Quý 1" },
+              { value: "Q2", label: "Quý 2" },
+              { value: "Q3", label: "Quý 3" },
+              { value: "Q4", label: "Quý 4" },
             ]}
           />
 
-
           <ResponsiveContainer className="!w-[900px] !h-[300px] border border-gray-300 shadow-xl rounded-lg p-5">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                // layout="vertical"
-                width={500}
-                height={300}
-                data={dataVenue}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 30,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" type="category" />
-                <YAxis type="number" domain={[0, 2000000000]} tickFormatter={DataFormater} />
-                <Tooltip />
-                <Legend />
-                <Line dataKey="Doanh thu năm nay" stroke="#4B8AF1" activeDot={{ r: 8 }} />
-                <Line dataKey="Doanh thu năm trước" stroke="#FF0000" />
-              </LineChart>
-            </ResponsiveContainer>
-          </ResponsiveContainer>
-
-
-          {/* <ResponsiveContainer className="!w-[900px] !h-[300px] border border-gray-300 shadow-xl rounded-lg p-5">
-            <BarChart
-              width={700}
+            <LineChart
+              width={500}
               height={300}
               data={dataVenue}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 30,
-                bottom: 5,
-              }}
+              margin={{ top: 5, right: 30, left: 30, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis dataKey="Doanh thu năm nay" unit="đ" />
+              <XAxis dataKey="name" type="category" />
+              <YAxis
+                type="number"
+                domain={["auto", "auto"]}
+                tickFormatter={DataFormater}
+              />
               <Tooltip />
               <Legend />
-              <Bar
-                dataKey="Doanh thu năm nay"
-                fill="#8884d8"
-                activeBar={<Rectangle fill="pink" stroke="blue" />}
-              />
-
-            </BarChart>
-          </ResponsiveContainer> */}
+              <Line dataKey="Doanh thu" stroke="#4B8AF1" activeDot={{ r: 8 }} />
+              <Line dataKey="Chi phí" stroke="#E76F51" />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
 
-
-        <div className='border border-gray-300 shadow-md rounded-lg p-5 w-[400px]'>
+        <Flex vertical className="border border-gray-300 shadow-md rounded-lg p-5 w-[400px]">
+          <div>
           <p className="text-xl">Nợ phải thu theo hạn nợ</p>
           <p>
-            <strong className="fon-bold text-2xl">{VND.format(
-              reportTHCNData?.map(pt => pt.inOfDate).reduce((total, currentValue) => {
-                return total + currentValue;
-              }, 0)
-              +
-              reportTHCNData?.map(pt => pt.outOfDate).reduce((total, currentValue) => {
-                return total + currentValue;
-              }, 0)
-            )}</strong>
+            <strong className="fon-bold text-2xl">
+              {VND.format(
+                reportTHCNData
+                  ?.map((pt) => pt.inOfDate)
+                  .reduce((total, currentValue) => {
+                    return total + currentValue;
+                  }, 0) +
+                  reportTHCNData
+                    ?.map((pt) => pt.outOfDate)
+                    .reduce((total, currentValue) => {
+                      return total + currentValue;
+                    }, 0)
+              )}
+            </strong>
           </p>
           <p className="text-gray-500 mb-8">TỔNG</p>
           <Flex justify="space-between">
             <Flex vertical>
               <p className="text-orange-500">
-                <strong className="fon-bold text-2xl">{VND.format(
-                  reportTHCNData?.map(pt => pt.outOfDate).reduce((total, currentValue) => {
-                    return total + currentValue;
-                  }, 0)
-                )}</strong>
+                <strong className="fon-bold text-2xl">
+                  {VND.format(
+                    reportTHCNData
+                      ?.map((pt) => pt.outOfDate)
+                      .reduce((total, currentValue) => {
+                        return total + currentValue;
+                      }, 0)
+                  )}
+                </strong>
               </p>
               <p className="text-gray-500 ">QUÁ HẠN</p>
             </Flex>
             <Flex vertical align="flex-end">
               <p>
-                <strong className="fon-bold text-2xl">{VND.format(
-                  reportTHCNData?.map(pt => pt.inOfDate).reduce((total, currentValue) => {
-                    return total + currentValue;
-                  }, 0)
-                )}</strong>
+                <strong className="fon-bold text-2xl">
+                  {VND.format(
+                    reportTHCNData
+                      ?.map((pt) => pt.inOfDate)
+                      .reduce((total, currentValue) => {
+                        return total + currentValue;
+                      }, 0)
+                  )}
+                </strong>
               </p>
               <p className="text-gray-500 ">TRONG HẠN</p>
             </Flex>
           </Flex>
           <Progress
             percent={
-              ((reportTHCNData?.map(pt => pt.outOfDate).reduce((total, currentValue) => {
-                return total + currentValue;
-              }, 0)) * 100) / ((reportTHCNData?.map(pt => pt.outOfDate).reduce((total, currentValue) => {
-                return total + currentValue;
-              }, 0)) + (reportTHCNData?.map(pt => pt.inOfDate).reduce((total, currentValue) => {
-                return total + currentValue;
-              }, 0)))
+              (reportTHCNData
+                ?.map((pt) => pt.outOfDate)
+                .reduce((total, currentValue) => {
+                  return total + currentValue;
+                }, 0) *
+                100) /
+              (reportTHCNData
+                ?.map((pt) => pt.outOfDate)
+                .reduce((total, currentValue) => {
+                  return total + currentValue;
+                }, 0) +
+                reportTHCNData
+                  ?.map((pt) => pt.inOfDate)
+                  .reduce((total, currentValue) => {
+                    return total + currentValue;
+                  }, 0))
             }
             showInfo={false}
             strokeColor="#f00732"
             trailColor="blue"
           />
-        </div>
+          </div>
+           <NoPhaiTra/>
+        </Flex>
+       
       </Flex>
-      {/* <div className='mt-5'>
-        <p className="text-xl">Lợi nhuận</p>
-        <ResponsiveContainer className="!w-[800px] !h-[300px] border border-gray-300 shadow-xl rounded-lg p-5">
-          <LineChart
-            data={data}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="chiphi" stroke="#8884d8" />
-            <Line type="monotone" dataKey="doanhthu" stroke="#82ca9d" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div> */}
 
-      <Flex gap={0} className='mt-4 !max-w-[90%]'>
+      <Flex gap={0} className="mt-4 !max-w-[90%]">
         <ChartNhanvien />
         <ChartSanpham />
       </Flex>
 
       <TinhHinhTaiChinh />
-      {/* <>
-        <p className="text-xl">Hàng hóa tồn kho</p>
-        <p>
-          <strong className="fon-bold text-2xl">0</strong> đồng
-        </p>
-        <p className="text-gray-500 mb-8">TỔNG GIÁ TRỊ</p>
-        <Table
-          columns={columns}
-          dataSource={data}
-          scroll={{ y: 500 }}
-          pagination={{
-            // total: listDonBanHangData.length,
-            defaultPageSize: 4,
-
-            // // pageSize: 20,
-            // defaultCurrent: 1,
-            position: ["bottomRight"],
-
-          }}
-          className="!max-w-[500px] !bg-[#FFF6D8] border border-gray-300 shadow-2xl rounded-lg"
-        />
-      </> */}
     </div>
   );
 };

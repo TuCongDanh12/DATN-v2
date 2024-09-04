@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Flex, Select } from "antd";
 import Notification from "../../component/notification";
-import { notification } from "./../../services/notification.service";
+import { notification } from "../../services/notification.service";
 import { setNoti } from "../../store/features/tongQuanSlice";
 import { useDispatch } from "react-redux";
 
@@ -12,6 +12,7 @@ const ThongBao = () => {
   const [type, setType] = useState(null);
   const [isResolved, setIsResolved] = useState(false);
   const [isRead, setIsRead] = useState(null);
+
   const getAllNotification = async () => {
     try {
       const params = {
@@ -21,18 +22,23 @@ const ThongBao = () => {
       };
       const res = await notification.getAll(params);
       if (res.data) {
-        //console.log(res.data?.result?.data);
         setNotificationAll(res.data?.result?.data);
-        dispatch(setNoti(res.data?.result?.data?.filter(item => item?.isRead === false || item?.isResolved === false)?.length));
+        dispatch(
+          setNoti(
+            res.data?.result?.data?.filter(
+              (item) => item?.isRead === false || item?.isResolved === false
+            )?.length
+          )
+        );
       }
     } catch (err) {
-      //console.error(err);
+      console.error(err);
     }
   };
+
   useEffect(() => {
     getAllNotification();
   }, [type, isResolved, isRead]);
-
 
   return (
     <div className="ml-5 mt-5">
@@ -56,6 +62,14 @@ const ThongBao = () => {
             {
               value: "BAN_HANG",
               label: "Đơn đặt hàng",
+            },
+            // {
+            //   value: "CHI",
+            //   label: "Chi",
+            // },
+            {
+              value: "MUA_HANG",
+              label: "Mua hàng",
             },
           ]}
         />
@@ -107,7 +121,6 @@ const ThongBao = () => {
       <Flex vertical gap={20}>
         {notificationAll.map((notification, index) => {
           return (
-            // //console.log(notification.message)
             <Notification
               type={notification.type}
               id={notification.id}
