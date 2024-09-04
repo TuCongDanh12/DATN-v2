@@ -12,7 +12,7 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
 
   useEffect(() => {
     fetchListDonMuahang();
-    console.log('List mua hang',filteredData)
+    // console.log('List mua hang',filteredData)
   }, []); // Chỉ chạy một lần khi component mount
 
   useEffect(() => {

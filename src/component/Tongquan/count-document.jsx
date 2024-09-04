@@ -34,13 +34,13 @@ function Countdocument() {
 
   const initialItems = [
     {
-      name: "Số đơn hàng",
+      name: "Số đơn bán hàng",
       icon: <DiffTwoTone style={{ fontSize: "30px" }} />,
       backgroundColor: "#D4EAC7",
       number: 0,
     },
     {
-      name: "Số chứng từ",
+      name: "Số chứng từ bán",
       icon: <SnippetsTwoTone style={{ fontSize: "30px" }} />,
       backgroundColor: "#C7EAF4",
       number: 0,

@@ -44,10 +44,11 @@ const NoPhaiTra = () => {
 
   return (
     <div>
-      <p className="text-xl mt-5">Tổng nợ phải trả</p>
+      <p className="text-xl ">Tổng nợ phải trả</p>
       <strong className="fon-bold text-2xl !mb-5">
         {VND.format(noPhaiTraData.noTrongHan + noPhaiTraData.noQuaHan)}
       </strong>
+      <p className="text-gray-500 mb-8">TỔNG</p>
       <Flex className='mt-5' justify="space-between">
         <Flex vertical>
           <p className="text-orange-500">
