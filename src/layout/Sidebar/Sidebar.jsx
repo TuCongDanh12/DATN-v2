@@ -210,7 +210,7 @@ const Sidebar = ({ toggled, handleToggleSidebar, isCollapsed, handleIsCollapsed 
             /> 
 
             <Item
-              title="Nợ phải thu"
+              title="Nợ"
               to="/cong-no/chi-tiet-no-phai-thu"
               icon={<FaCoins size={20} />}
               selected={selected}

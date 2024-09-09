@@ -1,262 +1,155 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Select } from "antd";
+import { Flex } from "antd";
 import { DiffTwoTone, SnippetsTwoTone, CopyTwoTone } from "@ant-design/icons";
 import muahangService from "../../services/muahang.service";
-import { selectTime } from "../../utils/func";
 
-function CountdocumentMua() {
+// Helper function to convert timeRange to startDate and endDate
+const getTimeRangeDates = (timeRange) => {
+  const currentDate = new Date();
+  let startDate, endDate;
+
+  switch (timeRange) {
+    case "thisYear":
+      startDate = new Date(currentDate.getFullYear(), 0, 1);
+      endDate = new Date(currentDate.getFullYear(), 11, 31);
+      break;
+    case "lastYear":
+      startDate = new Date(currentDate.getFullYear() - 1, 0, 1);
+      endDate = new Date(currentDate.getFullYear() - 1, 11, 31);
+      break;
+    case "thisMonth":
+      startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      break;
+    case "lastMonth":
+      const lastMonth = currentDate.getMonth() - 1;
+      startDate = new Date(currentDate.getFullYear(), lastMonth, 1);
+      endDate = new Date(currentDate.getFullYear(), lastMonth + 1, 0);
+      break;
+    case "Q1":
+      startDate = new Date(currentDate.getFullYear(), 0, 1);
+      endDate = new Date(currentDate.getFullYear(), 2, 31);
+      break;
+    case "Q2":
+      startDate = new Date(currentDate.getFullYear(), 3, 1);
+      endDate = new Date(currentDate.getFullYear(), 5, 30);
+      break;
+    case "Q3":
+      startDate = new Date(currentDate.getFullYear(), 6, 1);
+      endDate = new Date(currentDate.getFullYear(), 8, 30);
+      break;
+    case "Q4":
+      startDate = new Date(currentDate.getFullYear(), 9, 1);
+      endDate = new Date(currentDate.getFullYear(), 11, 31);
+      break;
+    default:
+      // If no time range is selected, return current month as default
+      startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  }
+
+  return { startDate, endDate };
+};
+
+const CountdocumentMua = ({ timeRange }) => {
   const [soDonMua, setSoDonMua] = useState(0);
   const [soChungTuMua, setSoChungTuMua] = useState(0);
   const [soPhieuChi, setSoPhieuChi] = useState(0);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (timeRange) {
+      fetchData();
+    }
+  }, [timeRange]);
 
   const fetchData = async () => {
     const requestParams = {
       currentPage: 1,
-      pageSize: 1000, // Lấy toàn bộ dữ liệu để lọc cục bộ
-      sorts: 'id%3AASC',
-    };
-
-    try {
-      // Gọi API và lấy dữ liệu
-      const res1 = await muahangService.getListDonMuahang({ requestParam: requestParams });
-      const donMuaData = res1.data.result.data; // Lấy dữ liệu từ .data.result.data
-
-      const res2 = await muahangService.getListChungTuMua();
-      const chungTuMuaData = res2.data.result.data; // Lấy dữ liệu từ .data.result.data
-
-      const res3 = await muahangService.getListPhieuChiTienMat();
-      const phieuChiTienMatData = res3.data.result.data; // Lấy dữ liệu từ .data.result.data
-
-      const res4 = await muahangService.getListPhieuChiTienGui();
-      const phieuChiTienGuiData = res4.data.result.data; // Lấy dữ liệu từ .data.result.data
-
-      // Lọc dữ liệu theo thời gian
-      const timeRange = selectTime("thisMonth");
-
-      const filteredDonMua = donMuaData?.filter(
-        (don) =>
-          new Date(don?.createdAt) > new Date(timeRange.startDate) &&
-          new Date(don?.createdAt) < new Date(timeRange.endDate)
-      );
-      setSoDonMua(filteredDonMua.length);
-
-      const filteredChungTuMua = chungTuMuaData?.filter(
-        (chungTu) =>
-          new Date(chungTu?.createdAt) > new Date(timeRange.startDate) &&
-          new Date(chungTu?.createdAt) < new Date(timeRange.endDate)
-      );
-      setSoChungTuMua(filteredChungTuMua.length);
-
-      const filteredPhieuChiTienMat = phieuChiTienMatData?.filter(
-        (phieuChi) =>
-          new Date(phieuChi?.createdAt) > new Date(timeRange.startDate) &&
-          new Date(phieuChi?.createdAt) < new Date(timeRange.endDate)
-      );
-      const filteredPhieuChiTienGui = phieuChiTienGuiData?.filter(
-        (phieuChi) =>
-          new Date(phieuChi?.createdAt) > new Date(timeRange.startDate) &&
-          new Date(phieuChi?.createdAt) < new Date(timeRange.endDate)
-      );
-      setSoPhieuChi(filteredPhieuChiTienMat.length + filteredPhieuChiTienGui.length);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  const handleChangeSoDonMua = async (value) => {
-    const requestParams = {
-      currentPage: 1,
       pageSize: 1000,
-      sorts: 'id%3AASC',
+      sorts: "id%3AASC",
     };
-    try {
-      const res1 = await muahangService.getListDonMuahang({ requestParam: requestParams });
-      const donMuaData = res1.data.result.data;
-      const timeRange = selectTime(value);
 
-      const filteredDonMua = donMuaData?.filter(
-        (don) =>
-          new Date(don?.createdAt) > new Date(timeRange.startDate) &&
-          new Date(don?.createdAt) < new Date(timeRange.endDate)
+    const { startDate, endDate } = getTimeRangeDates(timeRange); // Convert timeRange to startDate and endDate
+
+    try {
+      const [
+        donMuaRes,
+        chungTuMuaRes,
+        phieuChiTienMatRes,
+        phieuChiTienGuiRes,
+      ] = await Promise.all([
+        muahangService.getListDonMuahang({ requestParam: requestParams }),
+        muahangService.getListChungTuMua(),
+        muahangService.getListPhieuChiTienMat(),
+        muahangService.getListPhieuChiTienGui(),
+      ]);
+
+      const donMuaData = donMuaRes.data.result.data;
+      const chungTuMuaData = chungTuMuaRes.data.result.data;
+      const phieuChiTienMatData = phieuChiTienMatRes.data.result.data;
+      const phieuChiTienGuiData = phieuChiTienGuiRes.data.result.data;
+
+      // Filter data based on the computed startDate and endDate
+      setSoDonMua(
+        donMuaData.filter(
+          (don) => new Date(don?.createdAt) >= startDate && new Date(don?.createdAt) <= endDate
+        ).length
       );
-      setSoDonMua(filteredDonMua.length);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
 
-  const handleChangeSoChungTuMua = async (value) => {
-    try {
-      const res2 = await muahangService.getListChungTuMua();
-      const chungTuMuaData = res2.data.result.data;
-      const timeRange = selectTime(value);
-
-      const filteredChungTuMua = chungTuMuaData?.filter(
-        (chungTu) =>
-          new Date(chungTu?.createdAt) > new Date(timeRange.startDate) &&
-          new Date(chungTu?.createdAt) < new Date(timeRange.endDate)
+      setSoChungTuMua(
+        chungTuMuaData.filter(
+          (chungTu) => new Date(chungTu?.createdAt) >= startDate && new Date(chungTu?.createdAt) <= endDate
+        ).length
       );
-      setSoChungTuMua(filteredChungTuMua.length);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
 
-  const handleChangeSoPhieuChi = async (value) => {
-    try {
-      const res3 = await muahangService.getListPhieuChiTienMat();
-      const phieuChiTienMatData = res3.data.result.data;
-      const res4 = await muahangService.getListPhieuChiTienGui();
-      const phieuChiTienGuiData = res4.data.result.data;
-
-      const timeRange = selectTime(value);
-
-      const filteredPhieuChiTienMat = phieuChiTienMatData?.filter(
+      const totalPhieuChi = [
+        ...phieuChiTienMatData,
+        ...phieuChiTienGuiData,
+      ].filter(
         (phieuChi) =>
-          new Date(phieuChi?.createdAt) > new Date(timeRange.startDate) &&
-          new Date(phieuChi?.createdAt) < new Date(timeRange.endDate)
-      );
-      const filteredPhieuChiTienGui = phieuChiTienGuiData?.filter(
-        (phieuChi) =>
-          new Date(phieuChi?.createdAt) > new Date(timeRange.startDate) &&
-          new Date(phieuChi?.createdAt) < new Date(timeRange.endDate)
-      );
-      setSoPhieuChi(filteredPhieuChiTienMat.length + filteredPhieuChiTienGui.length);
+          new Date(phieuChi?.createdAt) >= startDate &&
+          new Date(phieuChi?.createdAt) <= endDate
+      ).length;
+
+      setSoPhieuChi(totalPhieuChi);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
-  const initialItems = [
-    {
-      name: "Số đơn mua hàng",
-      icon: <DiffTwoTone style={{ fontSize: "30px" }} />,
-      backgroundColor: "#D4EAC7",
-      number: soDonMua,
-    },
-    {
-      name: "Số chứng từ mua",
-      icon: <SnippetsTwoTone style={{ fontSize: "30px" }} />,
-      backgroundColor: "#C7EAF4",
-      number: soChungTuMua,
-    },
-    {
-      name: "Số phiếu chi",
-      icon: <CopyTwoTone style={{ fontSize: "30px" }} />,
-      backgroundColor: "#F4C7E1",
-      number: soPhieuChi,
-    },
-  ];
 
   return (
     <Flex gap={50}>
-      {/* Đơn mua hàng */}
-      <Flex
-        gap={20}
-        className="p-5 rounded-md"
-        style={{ backgroundColor: initialItems[0].backgroundColor }}
-      >
-        <div>{initialItems[0].icon}</div>
+      <Flex gap={20} className="p-5 rounded-md" style={{ backgroundColor: "#D4EAC7" }}>
+        <div>
+          <DiffTwoTone style={{ fontSize: "30px" }} />
+        </div>
         <Flex vertical gap={10}>
-          <p className="text-xl font-bold">
-            {initialItems[0].name} &emsp;
-            <Select
-              defaultValue={"thisMonth"}
-              style={{ width: 120 }}
-              className="bg-[#FFF6D8]"
-              onChange={handleChangeSoDonMua}
-              options={[
-                { value: "current", label: "Hiện tại" },
-                { value: "thisYear", label: "Năm nay" },
-                { value: "lastYear", label: "Năm trước" },
-                { value: "thisMonth", label: "Tháng này" },
-                { value: "lastMonth", label: "Tháng trước" },
-                { value: "thisQuarter", label: "Quý này" },
-                { value: "lastQuarter", label: "Quý trước" },
-                { value: "Q1", label: "Quý 1" },
-                { value: "Q2", label: "Quý 2" },
-                { value: "Q3", label: "Quý 3" },
-                { value: "Q4", label: "Quý 4" },
-              ]}
-            />
-          </p>
+          <p className="text-xl font-bold">Số đơn mua hàng</p>
           <p className="text-3xl font-bold">{soDonMua}</p>
         </Flex>
       </Flex>
 
-      {/* Chứng từ mua */}
-      <Flex
-        gap={20}
-        className="p-5 rounded-md"
-        style={{ backgroundColor: initialItems[1].backgroundColor }}
-      >
-        <div>{initialItems[1].icon}</div>
+      <Flex gap={20} className="p-5 rounded-md" style={{ backgroundColor: "#C7EAF4" }}>
+        <div>
+          <SnippetsTwoTone style={{ fontSize: "30px" }} />
+        </div>
         <Flex vertical gap={10}>
-          <p className="text-xl font-bold">
-            {initialItems[1].name} &emsp;
-            <Select
-              defaultValue={"thisMonth"}
-              style={{ width: 120 }}
-              className="bg-[#FFF6D8]"
-              onChange={handleChangeSoChungTuMua}
-              options={[
-                { value: "current", label: "Hiện tại" },
-                { value: "thisYear", label: "Năm nay" },
-                { value: "lastYear", label: "Năm trước" },
-                { value: "thisMonth", label: "Tháng này" },
-                { value: "lastMonth", label: "Tháng trước" },
-                { value: "thisQuarter", label: "Quý này" },
-                { value: "lastQuarter", label: "Quý trước" },
-                { value: "Q1", label: "Quý 1" },
-                { value: "Q2", label: "Quý 2" },
-                { value: "Q3", label: "Quý 3" },
-                { value: "Q4", label: "Quý 4" },
-              ]}
-            />
-          </p>
+          <p className="text-xl font-bold">Số chứng từ mua</p>
           <p className="text-3xl font-bold">{soChungTuMua}</p>
         </Flex>
       </Flex>
 
-      {/* Phiếu chi */}
-      <Flex
-        gap={20}
-        className="p-5 rounded-md"
-        style={{ backgroundColor: initialItems[2].backgroundColor }}
-      >
-        <div>{initialItems[2].icon}</div>
+      <Flex gap={20} className="p-5 rounded-md" style={{ backgroundColor: "#F4C7E1" }}>
+        <div>
+          <CopyTwoTone style={{ fontSize: "30px" }} />
+        </div>
         <Flex vertical gap={10}>
-          <p className="text-xl font-bold">
-            {initialItems[2].name} &emsp;
-            <Select
-              defaultValue={"thisMonth"}
-              style={{ width: 120 }}
-              className="bg-[#FFF6D8]"
-              onChange={handleChangeSoPhieuChi}
-              options={[
-                { value: "current", label: "Hiện tại" },
-                { value: "thisYear", label: "Năm nay" },
-                { value: "lastYear", label: "Năm trước" },
-                { value: "thisMonth", label: "Tháng này" },
-                { value: "lastMonth", label: "Tháng trước" },
-                { value: "thisQuarter", label: "Quý này" },
-                { value: "lastQuarter", label: "Quý trước" },
-                { value: "Q1", label: "Quý 1" },
-                { value: "Q2", label: "Quý 2" },
-                { value: "Q3", label: "Quý 3" },
-                { value: "Q4", label: "Quý 4" },
-              ]}
-            />
-          </p>
+          <p className="text-xl font-bold">Số phiếu chi</p>
           <p className="text-3xl font-bold">{soPhieuChi}</p>
         </Flex>
       </Flex>
     </Flex>
   );
-}
+};
 
 export default CountdocumentMua;

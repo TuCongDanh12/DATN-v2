@@ -1,344 +1,139 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Select } from "antd";
+import { Flex } from "antd";
 import { DiffTwoTone, SnippetsTwoTone, CopyTwoTone } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { banHangSelector, getListChungTuBan, getListDonBanHang, getListPhieuThuTienGui, getListPhieuThuTienMat } from "../../store/features/banHangSlice";
-import { selectTime } from "../../utils/func";
+import {
+  banHangSelector,
+  getListChungTuBan,
+  getListDonBanHang,
+  getListPhieuThuTienGui,
+  getListPhieuThuTienMat,
+} from "../../store/features/banHangSlice";
 
+// Helper function to convert timeRange to startDate and endDate
+const getTimeRangeDates = (timeRange) => {
+  const currentDate = new Date();
+  let startDate, endDate;
 
+  switch (timeRange) {
+    case "thisYear":
+      startDate = new Date(currentDate.getFullYear(), 0, 1);
+      endDate = new Date(currentDate.getFullYear(), 11, 31);
+      break;
+    case "lastYear":
+      startDate = new Date(currentDate.getFullYear() - 1, 0, 1);
+      endDate = new Date(currentDate.getFullYear() - 1, 11, 31);
+      break;
+    case "thisMonth":
+      startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      break;
+    case "lastMonth":
+      const lastMonth = currentDate.getMonth() - 1;
+      startDate = new Date(currentDate.getFullYear(), lastMonth, 1);
+      endDate = new Date(currentDate.getFullYear(), lastMonth + 1, 0);
+      break;
+    case "Q1":
+      startDate = new Date(currentDate.getFullYear(), 0, 1);
+      endDate = new Date(currentDate.getFullYear(), 2, 31);
+      break;
+    case "Q2":
+      startDate = new Date(currentDate.getFullYear(), 3, 1);
+      endDate = new Date(currentDate.getFullYear(), 5, 30);
+      break;
+    case "Q3":
+      startDate = new Date(currentDate.getFullYear(), 6, 1);
+      endDate = new Date(currentDate.getFullYear(), 8, 30);
+      break;
+    case "Q4":
+      startDate = new Date(currentDate.getFullYear(), 9, 1);
+      endDate = new Date(currentDate.getFullYear(), 11, 31);
+      break;
+    default:
+      startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  }
 
-function Countdocument() {
+  return { startDate, endDate };
+};
+
+function Countdocument({ timeRange }) {
   const dispatch = useDispatch();
+  const { listDonBanHangData, listChungTuBanData, listPhieuThuTienMatData, listPhieuThuTienGuiData } = useSelector(banHangSelector);
+  
+  const [soDonHang, setSoDonHang] = useState(0);
+  const [soChungTu, setSoChungTu] = useState(0);
+  const [soPhieuThu, setSoPhieuThu] = useState(0);
 
   useEffect(() => {
     dispatch(getListDonBanHang());
     dispatch(getListChungTuBan());
     dispatch(getListPhieuThuTienMat());
     dispatch(getListPhieuThuTienGui());
-  }, []);
-
-  const {
-    listDonBanHangData,
-  } = useSelector(banHangSelector);
-
-  const {
-    listChungTuBanData,
-  } = useSelector(banHangSelector);
-
-  const {
-    listPhieuThuTienMatData,
-    listPhieuThuTienGuiData,
-    isSuccessGetListPhieuThuTienMat,
-    isSuccessGetListPhieuThuTienGui,
-  } = useSelector(banHangSelector);
-
-  const initialItems = [
-    {
-      name: "Số đơn bán hàng",
-      icon: <DiffTwoTone style={{ fontSize: "30px" }} />,
-      backgroundColor: "#D4EAC7",
-      number: 0,
-    },
-    {
-      name: "Số chứng từ bán",
-      icon: <SnippetsTwoTone style={{ fontSize: "30px" }} />,
-      backgroundColor: "#C7EAF4",
-      number: 0,
-    },
-    {
-      name: "Số phiếu thu",
-      icon: <CopyTwoTone style={{ fontSize: "30px" }} />,
-      backgroundColor: "#F4C7E1",
-      number: 0,
-    },
-  ];
-
+  }, [dispatch]);
 
   useEffect(() => {
+    const { startDate, endDate } = getTimeRangeDates(timeRange);
+
     if (listDonBanHangData.length) {
-      const timeRange = selectTime('thisMonth');
-      const data = listDonBanHangData?.filter(phieuThuTienMatData => new Date(phieuThuTienMatData?.createdAt) > new Date(timeRange.startDate) && new Date(phieuThuTienMatData?.createdAt) < new Date(timeRange.endDate))
+      const data = listDonBanHangData?.filter(
+        (don) =>
+          new Date(don?.createdAt) >= startDate && new Date(don?.createdAt) <= endDate
+      );
       setSoDonHang(data.length);
     }
-  }, [listDonBanHangData]);
+  }, [listDonBanHangData, timeRange]);
 
   useEffect(() => {
+    const { startDate, endDate } = getTimeRangeDates(timeRange);
+
     if (listChungTuBanData.length) {
-      // initialItems[1].number = listChungTuBanData.length;
-      const timeRange = selectTime('thisMonth');
-      const data = listChungTuBanData?.filter(phieuThuTienMatData => new Date(phieuThuTienMatData?.createdAt) > new Date(timeRange.startDate) && new Date(phieuThuTienMatData?.createdAt) < new Date(timeRange.endDate))
+      const data = listChungTuBanData?.filter(
+        (chungTu) =>
+          new Date(chungTu?.createdAt) >= startDate && new Date(chungTu?.createdAt) <= endDate
+      );
       setSoChungTu(data.length);
     }
-  }, [listChungTuBanData]);
+  }, [listChungTuBanData, timeRange]);
 
   useEffect(() => {
-    if (isSuccessGetListPhieuThuTienMat && isSuccessGetListPhieuThuTienGui) {
-      // initialItems[2].number = listPhieuThuTienMatData.length + listPhieuThuTienGuiData.length;
-      const timeRange = selectTime('thisMonth');
-      const data1 = listPhieuThuTienMatData?.filter(phieuThuTienMatData => new Date(phieuThuTienMatData?.createdAt) > new Date(timeRange.startDate) && new Date(phieuThuTienMatData?.createdAt) < new Date(timeRange.endDate))
-      const data2 = listPhieuThuTienGuiData?.filter(phieuThuTienMatData => new Date(phieuThuTienMatData?.createdAt) > new Date(timeRange.startDate) && new Date(phieuThuTienMatData?.createdAt) < new Date(timeRange.endDate))
+    const { startDate, endDate } = getTimeRangeDates(timeRange);
 
-
+    if (listPhieuThuTienMatData.length || listPhieuThuTienGuiData.length) {
+      const data1 = listPhieuThuTienMatData?.filter(
+        (phieuThu) =>
+          new Date(phieuThu?.createdAt) >= startDate && new Date(phieuThu?.createdAt) <= endDate
+      );
+      const data2 = listPhieuThuTienGuiData?.filter(
+        (phieuThu) =>
+          new Date(phieuThu?.createdAt) >= startDate && new Date(phieuThu?.createdAt) <= endDate
+      );
       setSoPhieuThu(data1.length + data2.length);
     }
-  }, [isSuccessGetListPhieuThuTienMat, isSuccessGetListPhieuThuTienGui]);
-
-
-
-  const [soDonHang, setSoDonHang] = useState(0);
-  const [soChungTu, setSoChungTu] = useState(0);
-  const [soPhieuThu, setSoPhieuThu] = useState(0);
-
-  const handleChangeSoDonHang = (value) => {
-    if (value === "current") {
-      setSoDonHang(listDonBanHangData.length);
-    }
-    else {
-      const timeRange = selectTime(value);
-      const data = listDonBanHangData?.filter(phieuThuTienMatData => new Date(phieuThuTienMatData?.createdAt) > new Date(timeRange.startDate) && new Date(phieuThuTienMatData?.createdAt) < new Date(timeRange.endDate))
-      setSoDonHang(data.length);
-    }
-
-  }
-
-  const handleChangeSoChungTu = (value) => {
-    if (value === "current") {
-      setSoChungTu(listChungTuBanData.length);
-    }
-    else {
-      const timeRange = selectTime(value);
-      const data = listChungTuBanData?.filter(phieuThuTienMatData => new Date(phieuThuTienMatData?.createdAt) > new Date(timeRange.startDate) && new Date(phieuThuTienMatData?.createdAt) < new Date(timeRange.endDate))
-      setSoChungTu(data.length);
-    }
-
-  }
-
-  const handleChangeSoPhieuThu = (value) => {
-    if (value === "current") {
-      setSoPhieuThu(listPhieuThuTienMatData.length + listPhieuThuTienGuiData.length);
-    }
-    else {
-      const timeRange = selectTime(value);
-
-      const data1 = listPhieuThuTienMatData?.filter(phieuThuTienMatData => new Date(phieuThuTienMatData?.createdAt) > new Date(timeRange.startDate) && new Date(phieuThuTienMatData?.createdAt) < new Date(timeRange.endDate))
-      const data2 = listPhieuThuTienGuiData?.filter(phieuThuTienMatData => new Date(phieuThuTienMatData?.createdAt) > new Date(timeRange.startDate) && new Date(phieuThuTienMatData?.createdAt) < new Date(timeRange.endDate))
-
-
-      setSoPhieuThu(data1.length + data2.length);
-    }
-
-  }
+  }, [listPhieuThuTienMatData, listPhieuThuTienGuiData, timeRange]);
 
   return (
     <Flex gap={50}>
-      <Flex
-        gap={20}
-        // align="center"
-        // justify="center"
-        className="p-5 rounded-md"
-        style={{ backgroundColor: initialItems[0].backgroundColor }}
-      >
-        <div>{initialItems[0].icon}</div>
+      <Flex gap={20} className="p-5 rounded-md" style={{ backgroundColor: "#D4EAC7" }}>
+        <div><DiffTwoTone style={{ fontSize: "30px" }} /></div>
         <Flex vertical gap={10}>
-          <p className="text-xl font-bold">{initialItems[0].name}  &emsp;<Select
-            defaultValue={'thisMonth'}
-            style={{
-              width: 120,
-
-            }}
-            className="bg-[#FFF6D8]"
-            onChange={handleChangeSoDonHang}
-            options={[
-              {
-                value: 'current',
-                label: 'Hiện tại',
-              },
-              {
-                value: 'thisYear',
-                label: 'Năm nay',
-              },
-              {
-                value: 'lastYear',
-                label: 'Năm trước',
-              },
-              {
-                value: 'thisMonth',
-                label: 'Tháng này',
-              },
-              {
-                value: 'lastMonth',
-                label: 'Tháng trước',
-              },
-              {
-                value: 'thisQuarter',
-                label: 'Quý này',
-              },
-              {
-                value: 'lastQuarter',
-                label: 'Quý trước',
-              },
-              {
-                value: 'Q1',
-                label: 'Quý 1',
-              },
-              {
-                value: 'Q2',
-                label: 'Quý 2',
-              },
-              {
-                value: 'Q3',
-                label: 'Quý 3',
-              },
-              {
-                value: 'Q4',
-                label: 'Quý 4',
-              },
-            ]}
-          />
-          </p>
+          <p className="text-xl font-bold">Số đơn bán hàng</p>
           <p className="text-3xl font-bold">{soDonHang}</p>
         </Flex>
       </Flex>
 
-
-
-
-      <Flex
-        gap={20}
-        // align="center"
-        // justify="center"
-        className="p-5 rounded-md"
-        style={{ backgroundColor: initialItems[1].backgroundColor }}
-      >
-        <div>{initialItems[1].icon}</div>
+      <Flex gap={20} className="p-5 rounded-md" style={{ backgroundColor: "#C7EAF4" }}>
+        <div><SnippetsTwoTone style={{ fontSize: "30px" }} /></div>
         <Flex vertical gap={10}>
-          <p className="text-xl font-bold">{initialItems[1].name}  &emsp;<Select
-            defaultValue={'thisMonth'}
-            style={{
-              width: 120,
-
-            }}
-            className="bg-[#FFF6D8]"
-            onChange={handleChangeSoChungTu}
-            options={[
-              {
-                value: 'current',
-                label: 'Hiện tại',
-              },
-              {
-                value: 'thisYear',
-                label: 'Năm nay',
-              },
-              {
-                value: 'lastYear',
-                label: 'Năm trước',
-              },
-              {
-                value: 'thisMonth',
-                label: 'Tháng này',
-              },
-              {
-                value: 'lastMonth',
-                label: 'Tháng trước',
-              },
-              {
-                value: 'thisQuarter',
-                label: 'Quý này',
-              },
-              {
-                value: 'lastQuarter',
-                label: 'Quý trước',
-              },
-              {
-                value: 'Q1',
-                label: 'Quý 1',
-              },
-              {
-                value: 'Q2',
-                label: 'Quý 2',
-              },
-              {
-                value: 'Q3',
-                label: 'Quý 3',
-              },
-              {
-                value: 'Q4',
-                label: 'Quý 4',
-              },
-            ]}
-          />
-          </p>
+          <p className="text-xl font-bold">Số chứng từ bán</p>
           <p className="text-3xl font-bold">{soChungTu}</p>
         </Flex>
       </Flex>
 
-
-
-      <Flex
-        gap={20}
-        // align="center"
-        // justify="center"
-        className="p-5 rounded-md"
-        style={{ backgroundColor: initialItems[2].backgroundColor }}
-      >
-        <div>{initialItems[2].icon}</div>
+      <Flex gap={20} className="p-5 rounded-md" style={{ backgroundColor: "#F4C7E1" }}>
+        <div><CopyTwoTone style={{ fontSize: "30px" }} /></div>
         <Flex vertical gap={10}>
-          <p className="text-xl font-bold">{initialItems[2].name}  &emsp;<Select
-            defaultValue={'thisMonth'}
-            style={{
-              width: 120,
-
-            }}
-            className="bg-[#FFF6D8]"
-            onChange={handleChangeSoPhieuThu}
-            options={[
-              {
-                value: 'current',
-                label: 'Hiện tại',
-              },
-              {
-                value: 'thisYear',
-                label: 'Năm nay',
-              },
-              {
-                value: 'lastYear',
-                label: 'Năm trước',
-              },
-              {
-                value: 'thisMonth',
-                label: 'Tháng này',
-              },
-              {
-                value: 'lastMonth',
-                label: 'Tháng trước',
-              },
-              {
-                value: 'thisQuarter',
-                label: 'Quý này',
-              },
-              {
-                value: 'lastQuarter',
-                label: 'Quý trước',
-              },
-              {
-                value: 'Q1',
-                label: 'Quý 1',
-              },
-              {
-                value: 'Q2',
-                label: 'Quý 2',
-              },
-              {
-                value: 'Q3',
-                label: 'Quý 3',
-              },
-              {
-                value: 'Q4',
-                label: 'Quý 4',
-              },
-            ]}
-          />
-          </p>
+          <p className="text-xl font-bold">Số phiếu thu</p>
           <p className="text-3xl font-bold">{soPhieuThu}</p>
         </Flex>
       </Flex>
@@ -347,73 +142,3 @@ function Countdocument() {
 }
 
 export default Countdocument;
-
-
-// {initialItems.map((item) => {
-//   return (
-//     <Flex
-//       gap={20}
-//       // align="center"
-//       // justify="center"
-//       className="p-5 rounded-md"
-//       style={{ backgroundColor: item.backgroundColor }}
-//     >
-//       <div>{item.icon}</div>
-//       <Flex vertical gap={10}>
-//         <p className="text-xl font-bold">{item.name}  &emsp;<Select
-//           defaultValue={'thisYear'}
-//           style={{
-//             width: 120,
-
-//           }}
-//           className="bg-[#FFF6D8]"
-//           // onChange={(value) => handleChange(value, initialItems.data)}
-//           options={[
-//             {
-//               value: 'thisYear',
-//               label: 'Năm nay',
-//             },
-//             {
-//               value: 'lastYear',
-//               label: 'Năm trước',
-//             },
-//             {
-//               value: 'thisMonth',
-//               label: 'Tháng này',
-//             },
-//             {
-//               value: 'lastMonth',
-//               label: 'Tháng trước',
-//             },
-//             {
-//               value: 'thisQuarter',
-//               label: 'Quý này',
-//             },
-//             {
-//               value: 'lastQuarter',
-//               label: 'Quý trước',
-//             },
-//             {
-//               value: 'Q1',
-//               label: 'Quý 1',
-//             },
-//             {
-//               value: 'Q2',
-//               label: 'Quý 2',
-//             },
-//             {
-//               value: 'Q3',
-//               label: 'Quý 3',
-//             },
-//             {
-//               value: 'Q4',
-//               label: 'Quý 4',
-//             },
-//           ]}
-//         />
-//         </p>
-//         <p className="text-3xl font-bold">{item.number}</p>
-//       </Flex>
-//     </Flex>
-//   );
-// })}

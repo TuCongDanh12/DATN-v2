@@ -64,6 +64,12 @@ const updateProfile = ({ values }) => {
   );
 };
 
+const downloadFile = () => {
+  return axios.get(`${API_URL}/auth/download`, {
+    headers: authHeader(),
+    responseType: 'blob' // Đảm bảo rằng dữ liệu trả về là blob
+  });
+}
 
 
 const authService = {
@@ -72,6 +78,7 @@ const authService = {
   logout,
   getProfile,
   updateProfile,
+  downloadFile
 };
 
 export default authService;

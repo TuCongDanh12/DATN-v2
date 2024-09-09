@@ -18,6 +18,10 @@ const MuaHang = () => {
       url: 'phieu-chi',
       content: "Phiếu chi"
     },
+    {
+      url: 'phieu-chi-khac',
+      content: "Phiếu chi khác"
+    },
 
   ]
   return (

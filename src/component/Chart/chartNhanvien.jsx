@@ -13,21 +13,7 @@ import {
   LabelList,
 } from "recharts";
 import { baoCaoSelector, postReportDTBHRaw } from "../../store/features/baoCaoSlice";
-import { Select } from "antd";
-import { selectTime } from "../../utils/func";
-
-// const data = [
-//   { name: "NV029", "Doanh thu": 18 },
-//   { name: "NV023", "Doanh thu": 16.989 },
-//   { name: "NV003", "Doanh thu": 15.37 },
-//   { name: "NV033", "Doanh thu": 14.74 },
-//   { name: "NV011", "Doanh thu": 13.967 },
-//   { name: "NV021", "Doanh thu": 13.861 },
-//   { name: "NV004", "Doanh thu": 13.212 },
-//   { name: "NV007", "Doanh thu": 12.798 },
-//   { name: "NV010", "Doanh thu": 12.729 },
-//   { name: "NV012", "Doanh thu": 12.247 },
-// ];
+// import { DataFormater, selectTime } from "../../utils/func";
 
 const colors = [
   "#00C49F",
@@ -41,173 +27,129 @@ const colors = [
   "#FF8A65",
   "#FF8A65",
 ];
+const DataFormater = (number) => {
+  // if(number > 1000000000){
+  //   return (number/1000000000).toString() + 'B';
+  // }else if(number > 1000000){
+  //   return (number/1000000).toString() + 'M';
+  // }else 
+  if (number >= 1000000000) {
+    return (number / 1000000000).toString() + 'Tỷ';
+  }
+  if (number > 1000000) {
+    return (number / 1000000).toString() + 'Triệu';
+  } else {
+    return number.toString();
+  }
+}
 
-const ChartNhanvien = () => {
+
+// Utility function to format the time range into startDate and endDate
+const getTimeRangeDates = (timeRange) => {
+  const currentDate = new Date();
+  let year = currentDate.getFullYear();
+  let month = currentDate.getMonth() + 1;
+  let startDate, endDate;
+
+  switch (timeRange) {
+    case "thisYear":
+      startDate = `${year}-01-01`;
+      endDate = `${year}-12-31`;
+      break;
+    case "lastYear":
+      year -= 1;
+      startDate = `${year}-01-01`;
+      endDate = `${year}-12-31`;
+      break;
+    case "thisMonth":
+      startDate = `${year}-${String(month).padStart(2, "0")}-01`;
+      endDate = new Date(year, month, 0).toISOString().split("T")[0]; // Last day of the month
+      break;
+    case "lastMonth":
+      if (month === 1) {
+        year -= 1;
+        month = 12;
+      } else {
+        month -= 1;
+      }
+      startDate = `${year}-${String(month).padStart(2, "0")}-01`;
+      endDate = new Date(year, month, 0).toISOString().split("T")[0];
+      break;
+    case "Q1":
+      startDate = `${year}-01-01`;
+      endDate = `${year}-03-31`;
+      break;
+    case "Q2":
+      startDate = `${year}-04-01`;
+      endDate = `${year}-06-30`;
+      break;
+    case "Q3":
+      startDate = `${year}-07-01`;
+      endDate = `${year}-09-30`;
+      break;
+    case "Q4":
+      startDate = `${year}-10-01`;
+      endDate = `${year}-12-31`;
+      break;
+    default:
+      throw new Error("Invalid time range");
+  }
+
+  return { startDate, endDate };
+};
+
+const ChartNhanvien = ({ timeRange }) => {
   const dispatch = useDispatch();
-
   const [data, setData] = useState([]);
 
   const {
-    isSuccessGetListCongNo,
-
-    isError,
-    message,
+    reportDTBHData,
     isSuccessPostReportDTBH,
-    listCongNo,
-    listReportDTBHData,
-    reportDTBHData
   } = useSelector(baoCaoSelector);
 
+  // Fetch report data when timeRange changes
   useEffect(() => {
-    const timeRange = selectTime('thisMonth');
+    if (timeRange) {
+      const { startDate, endDate } = getTimeRangeDates(timeRange);
 
-    const dataConvert = {
-      // "startDate": formatDate(values.rangePicker[0].$d),
-      // "endDate": formatDate(values.rangePicker[1].$d),
-      // "startDate": "2020-01-01",
-      // "endDate": "2025-01-01",
-      ...timeRange,
-      "name": "xxx",
-      "description": "xxx",
-      "salespersonIds": []
+      const dataConvert = {
+        startDate,
+        endDate,
+        name: `Báo cáo doanh thu nhân viên cho ${timeRange}`,
+        description: `Báo cáo doanh thu nhân viên trong khoảng ${startDate} - ${endDate}`,
+        salespersonIds: [1, 2, 3], // Example IDs, replace with actual salesperson IDs if needed
+      };
+
+      dispatch(postReportDTBHRaw({ values: dataConvert }));
     }
+  }, [timeRange, dispatch]);
 
-    console.log("dataConvert", dataConvert)
-    dispatch(postReportDTBHRaw({ values: dataConvert }));
-  }, []);
-
+  // Process report data when available
   useEffect(() => {
     if (reportDTBHData) {
-      const dataConvertCurrent = reportDTBHData?.map(salesperson => {
-        let tong = 0;
-        salesperson.ctbans?.forEach(chungTuBanData => {
-          console.log("chungTuBanData", chungTuBanData)
-          tong += chungTuBanData.totalProductValue - chungTuBanData.totalDiscountValue;
-        })
-
+      const processedData = reportDTBHData.map((salesperson) => {
+        let totalRevenue = 0;
+        salesperson.ctbans?.forEach((sale) => {
+          totalRevenue += sale.totalProductValue - sale.totalDiscountValue;
+        });
 
         return {
           id: salesperson?.salesperson?.id,
           name: salesperson?.salesperson?.name,
-          "Doanh thu": tong
-        }
-      })
+          "Doanh thu": totalRevenue,
+        };
+      });
 
-
-
-      console.log("dataConvertCurrent", dataConvertCurrent)
-
-      dataConvertCurrent.sort(function (a, b) { return b["Doanh thu"] - a["Doanh thu"] })
-
-      setData(dataConvertCurrent.slice(0, 10));
-      // setDataConvert(dataConvertCurrent);
-      // setChungTuBan(dataConvertCurrent);
-      // dispatch(clearState());
+      // Sort the data by "Doanh thu" and take the top 10
+      processedData.sort((a, b) => b["Doanh thu"] - a["Doanh thu"]);
+      setData(processedData.slice(0, 10));
     }
   }, [reportDTBHData]);
 
-  const handleChange = (value) => {
-
-    const timeRange = selectTime(value);
-
-    const dataConvert = {
-      // "startDate": formatDate(values.rangePicker[0].$d),
-      // "endDate": formatDate(values.rangePicker[1].$d),
-      // "startDate": "2020-01-01",
-      // "endDate": "2025-01-01",
-      ...timeRange,
-      "name": "xxx",
-      "description": "xxx",
-      "salespersonIds": []
-    }
-
-    console.log("dataConvert", dataConvert)
-    dispatch(postReportDTBHRaw({ values: dataConvert }));
-
-
-  };
-
-
-  const DataFormater = (number) => {
-    // if(number > 1000000000){
-    //   return (number/1000000000).toString() + 'B';
-    // }else if(number > 1000000){
-    //   return (number/1000000).toString() + 'M';
-    // }else 
-    if (number >= 1000000000) {
-      return (number / 1000000000).toString() + 'Tỷ';
-    }
-    if (number > 1000000) {
-      return (number / 1000000).toString() + 'Triệu';
-    } else {
-      return number.toString();
-    }
-  }
-
-
   return (
     <div>
-      <p className="font-bold text-xl mt-5">Biều đồ top 10 nhân viên có doanh thu cao nhất</p>
-      <Select
-        defaultValue={'thisMonth'}
-        style={{
-          width: 120,
-
-        }}
-        className="bg-[#FFF6D8]"
-        onChange={handleChange}
-        options={[
-          {
-            value: 'thisWeek',
-            label: 'Tuần này',
-          },
-          {
-            value: 'lastWeek',
-            label: 'Tuần trước',
-          },
-          {
-            value: 'thisMonth',
-            label: 'Tháng này',
-          },
-          {
-            value: 'lastMonth',
-            label: 'Tháng trước',
-          },
-          {
-            value: 'thisQuarter',
-            label: 'Quý này',
-          },
-          {
-            value: 'lastQuarter',
-            label: 'Quý trước',
-          },
-          {
-            value: 'Q1',
-            label: 'Quý 1',
-          },
-          {
-            value: 'Q2',
-            label: 'Quý 2',
-          },
-          {
-            value: 'Q3',
-            label: 'Quý 3',
-          },
-          {
-            value: 'Q4',
-            label: 'Quý 4',
-          },
-          {
-            value: 'thisYear',
-            label: 'Năm nay',
-          },
-          {
-            value: 'lastYear',
-            label: 'Năm trước',
-          },
-        ]}
-      />
-      <ResponsiveContainer width={600} height={400} className={"border border-gray-300 shadow-xl rounded-lg"}>
+      <p className="font-bold text-xl mt-5">Biểu đồ top 10 nhân viên có doanh thu cao nhất</p>
+      <ResponsiveContainer width={600} height={400} className="border border-gray-300 shadow-xl rounded-lg">
         <BarChart
           layout="vertical"
           width={500}
@@ -216,8 +158,8 @@ const ChartNhanvien = () => {
           margin={{ top: 20, right: 70, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="number"  tickFormatter={DataFormater} />
-          <YAxis type="category" dataKey="name"  />
+          <XAxis type="number" tickFormatter={DataFormater} />
+          <YAxis type="category" dataKey="name" />
           <Tooltip />
           <Legend />
           <Bar dataKey="Doanh thu">

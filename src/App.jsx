@@ -82,6 +82,9 @@ import XemPhieuChiTienMat from "./page/MuaHang/components/PhieuChi/XemPhieuChiTi
 import XemPhieuChiTienGui from "./page/MuaHang/components/PhieuChi/XemPhieuChiTienGui/XemPhieuChiTienGui";
 import BaoCaoMuaHang from "./page/BaoCao/scenes/BaoCaoMuaHang/BaoCaoMuaHang";
 import ChiTietBaoCaoMuaHang from "./page/BaoCao/scenes/BaoCaoMuaHang/ChiTietBaoCao/ChiTietBaoCao";
+import PhieuChiKhac from "./page/MuaHang/components/PhieuChiKhac/PhieuChiKhac";
+import BaoCaoNoPhaiTra from "./page/BaoCao/scenes/BaoCaoNoPhaiTra/BaoCaoNoPhaiTra";
+import ChiTietBaoCaoNoPhaiTra from "./page/BaoCao/scenes/BaoCaoNoPhaiTra/ChiTietBaoCaoNoPhaiTra/ChiTietBaoCaoNoPhaiTra";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -184,6 +187,7 @@ function App() {
                   />
 
                   <Route path="phieu-chi" element={<PhieuChi/>} />
+                  <Route path="phieu-chi-khac" element={<PhieuChiKhac/>} />
                   {/* <Route path="tra-tien" element={<Tratien />} /> */}
                 </Route>
                 <Route path="mua-hang/don-mua-hang/xem/:id" element={<EditDonMuaHang disabled={true} />} />
@@ -232,10 +236,12 @@ function App() {
                   <Route path="tong-hop-no-phai-thu" element={<TongHopNoPhaiThu />} />
                   <Route path="chi-tiet-no-phai-thu" element={<ChiTietNoPhaiThu />} />
                   <Route path="bao-cao-da-luu" element={<BaoCaoCongNo />} />
+                  <Route path="bao-cao-no-phai-tra" element={<BaoCaoNoPhaiTra />} />
+                  
                   <Route path="bao-cao-da-luu/DCCN/:id" element={<ReportDCCN />} />
                   <Route path="bao-cao-da-luu/THCN/:id" element={<ReportTHCN />} />
                 </Route>
-
+                <Route path="/cong-no/bao-cao-no-phai-tra/:id" element={<ChiTietBaoCaoNoPhaiTra/>} />
 
                 <Route path="/bao-cao" element={<BaoCao />}>
                   <Route path="chi-tiet-doanh-thu-nhan-vien" element={<ChiTietDoanhThuNhanVien />} />

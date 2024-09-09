@@ -9,6 +9,7 @@ import * as XLSX from 'xlsx';
 import axios from 'axios';
 import moment from 'moment';
 import DonMuaHangTable from './table'; // Đảm bảo rằng bạn đã tạo và import thành phần này
+import authService from '../../../../services/auth.service';
 
 const { RangePicker } = DatePicker;
 
@@ -33,6 +34,37 @@ const DonMuaHang = () => {
 
   const [messageApi, contextHolderMes] = msg.useMessage();
   const [api, contextHolder] = notification.useNotification();
+
+  const DownloadFile = async () => {
+    try {
+      const res = await authService.downloadFile(); // Không cần truyền responseType ở đây vì nó đã được thêm ở hàm trên
+  
+      // Kiểm tra xem phản hồi có phải là blob không
+      console.log(res);
+  
+      // Tạo Blob từ dữ liệu phản hồi
+      const blob = new Blob([res.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // MIME type cho file Excel
+      });
+  
+      // Tạo URL tạm thời từ Blob
+      const downloadUrl = window.URL.createObjectURL(blob);
+  
+      // Tạo thẻ a để tải xuống file
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', 'file.xlsx'); // Đặt tên cho file
+      document.body.appendChild(link);
+      link.click();
+  
+      // Dọn dẹp URL tạm thời sau khi tải xong
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      // Xử lý lỗi
+      console.error('Error downloading the file', error);
+    }
+  };
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -233,6 +265,7 @@ const DonMuaHang = () => {
             onChange={readUploadFile}
           />
           <TfiReload title="Cập nhật dữ liệu" size={30} className='p-2 bg-white border border-black cursor-pointer' onClick={handleReload} />
+          <Button onClick={DownloadFile}>Tải về file mẫu</Button>
         </div>
       </div>
 
