@@ -45,7 +45,7 @@ const NoPhaiTra = () => {
   return (
     <div>
       <p className="text-xl ">Tổng nợ phải trả</p>
-      <strong className="fon-bold text-2xl !mb-5">
+      <strong className="font-bold text-2xl ">
         {VND.format(noPhaiTraData.noTrongHan + noPhaiTraData.noQuaHan)}
       </strong>
       <p className="text-gray-500 mb-8">TỔNG</p>

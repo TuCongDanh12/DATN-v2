@@ -19,7 +19,7 @@ import "./Sidebar.css";
 import { LiaObjectGroup } from "react-icons/lia";
 import { RiLogoutCircleFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
-import { authenticationSelector, getProfile } from "../../store/features/authenticationSlice";
+import { authenticationSelector } from "../../store/features/authenticationSlice";
 import { Badge } from "antd";
 import { notification } from "../../services/notification.service";
 import { setNoti, tongQuanSelector } from "../../store/features/tongQuanSlice";
@@ -46,29 +46,17 @@ const Sidebar = ({ toggled, handleToggleSidebar, isCollapsed, handleIsCollapsed 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Tổng quan");
+  const [showSettings, setShowSettings] = useState(false);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getProfile());
-  }, []);
-
-  const {
-    profile
-
-  } = useSelector(authenticationSelector);
-
-
-
-  const {
-    noti
-
-  } = useSelector(tongQuanSelector);
-
+  const { profile } = useSelector(authenticationSelector);
+  const { noti } = useSelector(tongQuanSelector);
 
   const [notificationAll2, setNotificationAll] = useState([]);
   const [type2, setType2] = useState(null);
   const [isResolved2, setIsResolved2] = useState(false);
   const [isRead2, setIsRead2] = useState(null);
+
   const getAllNotification2 = async () => {
     try {
       const params = {
@@ -78,18 +66,23 @@ const Sidebar = ({ toggled, handleToggleSidebar, isCollapsed, handleIsCollapsed 
       };
       const res = await notification.getAll(params);
       if (res.data) {
-        //console.log(res.data?.result?.data);
         setNotificationAll(res.data?.result?.data);
         dispatch(setNoti(res.data?.result?.data?.filter(item => item?.isRead === false || item?.isResolved === false)?.length));
       }
     } catch (err) {
-      //console.error(err);
+      console.error(err);
     }
   };
 
   useEffect(() => {
     getAllNotification2();
   }, [type2, isResolved2, isRead2]);
+
+  // Check localStorage for admin value
+  useEffect(() => {
+    const admin = JSON.parse(localStorage.getItem("admin"));
+    setShowSettings(admin === true);
+  }, []);
 
   return (
     <Box
@@ -107,12 +100,9 @@ const Sidebar = ({ toggled, handleToggleSidebar, isCollapsed, handleIsCollapsed 
           color: "#868dfb !important",
         },
         "& .pro-menu-item.active": {
-          // color: "#6870fa !important",
           bgcolor: "#FFF6D8 !important",
         },
         "& .pro-menu-item": {
-          // margin: "0 5px !important",
-          // borderRadius: "8px !important",
         },
         "& .pro-menu-item.active .pro-item-content>p": {
           fontWeight: 'bold',
@@ -122,11 +112,7 @@ const Sidebar = ({ toggled, handleToggleSidebar, isCollapsed, handleIsCollapsed 
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed}
-        toggled={toggled}
-        onToggle={handleToggleSidebar}
-        breakPoint="md"
-      >
+      <ProSidebar collapsed={isCollapsed} toggled={toggled} onToggle={handleToggleSidebar} breakPoint="md">
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem
@@ -138,12 +124,7 @@ const Sidebar = ({ toggled, handleToggleSidebar, isCollapsed, handleIsCollapsed 
             }}
           >
             {!isCollapsed && (
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                ml="15px"
-              >
+              <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
                 <Typography variant="h3" color={colors.grey[100]}>
                   <FaCoins /> Big Ledger
                 </Typography>
@@ -155,115 +136,34 @@ const Sidebar = ({ toggled, handleToggleSidebar, isCollapsed, handleIsCollapsed 
           </MenuItem>
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
+            <Typography variant="h6" color={colors.grey[300]} sx={{ m: "15px 0 5px 20px" }}>
               Chung
             </Typography>
 
-            <Item
-              title="Tổng quan"
-              to="/tong-quan"
-              icon={<MdOutlineDashboard size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            <Item title="Tổng quan" to="/tong-quan" icon={<MdOutlineDashboard size={20} />} selected={selected} setSelected={setSelected} />
+            <Item title="Đối tượng" to="/doi-tuong/nhom-khach-hang" icon={<LiaObjectGroup size={20} />} selected={selected} setSelected={setSelected} />
+            <Item title="Mua hàng" to="/mua-hang/don-mua-hang" icon={<SellIcon size={20} />} selected={selected} setSelected={setSelected} />
+            <Item title="Bán hàng" to="/ban-hang/don-dat-hang" icon={<ShoppingCart size={20} />} selected={selected} setSelected={setSelected} />
+            <Item title="Tiền mặt" to="/tien-mat" icon={<ReceiptOutlinedIcon size={20} />} selected={selected} setSelected={setSelected} />
+            <Item title="Tiền gửi" to="/tien-gui" icon={<AccountBalanceIcon size={20} />} selected={selected} setSelected={setSelected} />
+            <Item title="Nợ" to="/cong-no/chi-tiet-no-phai-thu" icon={<FaCoins size={20} />} selected={selected} setSelected={setSelected} />
+            <Item title="Báo cáo" to="/bao-cao/chi-tiet-doanh-thu-nhan-vien" icon={<AssessmentIcon size={20} />} selected={selected} setSelected={setSelected} />
 
-            <Item
-              title="Đối tượng"
-              to="/doi-tuong/nhom-khach-hang"
-              icon={<LiaObjectGroup size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Item
-              title="Mua hàng"
-              to="/mua-hang/don-mua-hang"
-              icon={<SellIcon size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Bán hàng"
-              to="/ban-hang/don-dat-hang"
-              icon={<ShoppingCart size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-             <Item
-              title="Tiền mặt"
-              to="/tien-mat"
-              icon={<ReceiptOutlinedIcon size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Item
-              title="Tiền gửi"
-              to="/tien-gui"
-              icon={<AccountBalanceIcon size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            /> 
-
-            <Item
-              title="Nợ"
-              to="/cong-no/chi-tiet-no-phai-thu"
-              icon={<FaCoins size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Báo cáo"
-              to="/bao-cao/chi-tiet-doanh-thu-nhan-vien"
-              icon={<AssessmentIcon size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
+            <Typography variant="h6" color={colors.grey[300]} sx={{ m: "15px 0 5px 20px" }}>
               Hỗ trợ
             </Typography>
-            <Item
-              title="Thông báo"
-              to="/thong-bao"
-              icon={<Badge size="small" count={noti}><IoMdNotificationsOutline size={20} /> </Badge>}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            <Item title="Thông báo" to="/thong-bao" icon={<Badge size="small" count={noti}><IoMdNotificationsOutline size={20} /></Badge>} selected={selected} setSelected={setSelected} />
+            <Item title="Hỗ trợ" to="/ho-tro" icon={<HelpOutlineOutlinedIcon size={20} />} selected={selected} setSelected={setSelected} />
+            <Item title="Đăng xuất" to="/dang-nhap" icon={<RiLogoutCircleFill size={20} />} selected={selected} setSelected={setSelected} />
 
-            <Item
-              title="Hỗ trợ"
-              to="/ho-tro"
-              icon={<HelpOutlineOutlinedIcon size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Đăng xuất"
-              to="/dang-nhap"
-              icon={<RiLogoutCircleFill size={20} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            {showSettings && (
+              <Item title="Cài đặt" to="/cai-dat/thong-tin-cong-ty" icon={<SettingsOutlinedIcon size={20} />} selected={selected} setSelected={setSelected} />
+            )}
           </Box>
         </Menu>
 
         <SidebarFooter>
-          <Link
-            to="/profile"
-            title="Profile"
-            selected={selected}
-            onClick={() => setSelected("Profile")}
-            setSelected={setSelected}
-          >
+          <Link to="/profile" title="Profile" onClick={() => setSelected("Profile")}>
             <Box paddingLeft={isCollapsed ? undefined : "10%"}>
               <div className="side-menu-footer">
                 <div className="avatar">
@@ -276,40 +176,11 @@ const Sidebar = ({ toggled, handleToggleSidebar, isCollapsed, handleIsCollapsed 
                   <Typography variant="h5" color={colors.grey[100]} hidden={isCollapsed}>
                     {profile?.email}
                   </Typography>
-
                 </div>
               </div>
             </Box>
           </Link>
         </SidebarFooter>
-
-
-        {/* {!isCollapsed && (
-            <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
-              </Box>
-              <Box textAlign="center">
-                <Typography
-                  variant="h2"
-                  color={colors.grey[100]}
-                  fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
-                >
-                  Ed Roh
-                </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
-                  VP Fancy Admin
-                </Typography>
-              </Box>
-            </Box>
-          )} */}
       </ProSidebar>
     </Box>
   );

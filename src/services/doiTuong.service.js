@@ -423,7 +423,26 @@ const deleteCktm = ({ values }) => {
     );
 };
 
+const postEmployee= ( values ) => {
+    return axios.post(`${API_URL}/employee/other`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
 
+
+const postAccountant= ( values ) => {
+    return axios.post(`${API_URL}/employee/user`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
 const doiTuongService = {
     getListSupplier,
     getSupplier,
@@ -463,6 +482,9 @@ const doiTuongService = {
     getListWarehouseKeeper,
     getListSalesperson,
     getListPurchasingOfficer,
+
+    postEmployee,
+    postAccountant,
 
     getDieuKhoanThanhToanCustomer,
     getListDieuKhoanThanhToan,

@@ -61,7 +61,6 @@ const TinhHinhTaiChinhMua = ({ timeRange }) => {
   const [doanhThu, setDoanhThu] = useState(0);
   const [ctmua, setCtmua] = useState([]);
 
-
   useEffect(() => {
     const getCtmua = async () => {
       try {
@@ -80,15 +79,19 @@ const TinhHinhTaiChinhMua = ({ timeRange }) => {
       try {
         const { startDate, endDate } = getDateRangeFromTimeRange(timeRange);
 
-        // const responseTienGui = await muahangService.getListPhieuChiTienGuiByDate({ startDate, endDate });
-        // console.log('Phiếu chi tiền gửi', responseTienGui?.data?.result?.data);
-        // setBank(responseTienGui?.data?.result?.data || 0);
+        // Tính tổng tiền gửi
+        const responseTienGui = await muahangService.getListPhieuChiTienGuiByDate({ startDate, endDate });
+        console.log('Phiếu chi tiền gửi', responseTienGui?.data?.result?.data);
+        const totalBank = responseTienGui?.data?.result?.data.reduce((acc, item) => acc + item.chungTu.reduce((sum, ct) => sum + ct.money, 0), 0);
+        setBank(totalBank || 0);
 
-        // const responseTienMat = await muahangService.getListPhieuChiTienMatByDate({ startDate, endDate });
+        // Tính tổng tiền mặt
+        const responseTienMat = await muahangService.getListPhieuChiTienMatByDate({ startDate, endDate });
         // console.log('Phiếu chi tiền mặt', responseTienMat?.data?.result?.data);
-        // setCash(responseTienMat?.data?.result?.data || 0);
+        const totalCash = responseTienMat?.data?.result?.data.reduce((acc, item) => acc + item.chungTu.reduce((sum, ct) => sum + ct.money, 0), 0);
+        setCash(totalCash || 0);
 
-        // Tính toán số nợ quá hạn và trong hạn
+        // Tính tổng nợ phải thu
         const noPhaiThuData = ctmua.reduce(
           (acc, item) => {
             const paymentTerm = new Date(item.paymentTerm);
@@ -107,7 +110,10 @@ const TinhHinhTaiChinhMua = ({ timeRange }) => {
 
         setNoPhaiThuTrongHan(noPhaiThuData.trongHan);
         setNoPhaiThuQuaHan(noPhaiThuData.quaHan);
-        
+
+        // Tính tổng doanh thu (Chi phí)
+        setDoanhThu(totalCash + totalBank); // Doanh thu có thể là tổng chi phí hoặc tổng tiền đã trả
+
       } catch (error) {
         console.error('Lỗi khi gọi API:', error);
       }

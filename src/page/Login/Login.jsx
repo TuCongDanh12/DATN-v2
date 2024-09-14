@@ -8,7 +8,7 @@ import { FaCoins } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { authenticationSelector, clearState, loginUser, setIsLogin } from '../../store/features/authenticationSlice';
 import { notification } from 'antd';
-
+import authService from '../../services/auth.service';
 const validationSchema = z
     .object({
         email: z.string().min(1, { message: "Trường này là bắt buộc" }).email("Email không hợp lệ!"),
@@ -42,30 +42,67 @@ const Login = () => {
     const [api, contextHolder] = notification.useNotification();
 
 
-    useEffect(() => {
-        if (isSuccess) {
-            navigate('/tong-quan');
-            dispatch(clearState());
-        }
-        else if (isError) {
+    // useEffect(() => {
+    //     if (isSuccess) {
+    //         navigate('/tong-quan');
+    //         dispatch(clearState());
+    //     }
+    //     else if (isError) {
+    //         api.error({
+    //             message: message,
+    //             placement: "bottomLeft",
+    //             duration: 2,
+    //         });
+
+    //         dispatch(clearState());
+    //     }
+    // }, [isSuccess,
+    //     isError,
+    //     message,]);
+    const onSubmit = async (data) => {
+        console.log(data);
+        const { email, password } = data;
+    
+        try {
+            // Gọi API để đăng nhập
+            await dispatch(loginUser({ email, password }));
+    
+            // Lấy thông tin profile người dùng sau khi đăng nhập
+            const profile = await authService.getProfile();
+            console.log('Profile', profile.data.result.data);
+    
+            // Kiểm tra dữ liệu profile và lưu vào localStorage
+            if (profile?.data?.result?.data) {
+                const isAdmin = profile.data.result.data.isAdmin;
+                console.log('Is Admin Value:', isAdmin);
+                localStorage.setItem("admin", JSON.stringify(isAdmin));
+                console.log('Admin value stored in localStorage:', localStorage.getItem("admin"));
+                if (profile) {
+                    navigate('/tong-quan');
+                    dispatch(clearState());
+                } else if (isError) {
+                    api.error({
+                        message: message,
+                        placement: "bottomLeft",
+                        duration: 2,
+                    });
+                    dispatch(clearState());
+                }
+            }
+    
+            // Kiểm tra trạng thái của việc đăng nhập và điều hướng
+        
+        } catch (error) {
+            console.error('Error during login or profile fetching:', error);
             api.error({
-                message: message,
+                message: 'Có lỗi xảy ra, vui lòng thử lại!',
                 placement: "bottomLeft",
                 duration: 2,
             });
-
-            dispatch(clearState());
         }
-    }, [isSuccess,
-        isError,
-        message,]);
-
-    const onSubmit = (data) => {
-        console.log(data)
-          const { email, password } = data;
-          dispatch(loginUser({ email, password }));
-        // navigate('/tong-quan');
     };
+    
+    
     return (
         <div className="login-container">
             {contextHolder}

@@ -50,8 +50,10 @@ const getProfile = () => {
   return axios.get(`${API_URL}/auth/me`,
       {
         headers: authHeader()
-      });
+      })
+    
 };
+
 
 const updateProfile = ({ values }) => {
   return axios.patch(`${API_URL}/auth/me`,

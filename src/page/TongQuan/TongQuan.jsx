@@ -221,7 +221,7 @@ const TongQuan = () => {
             <div>
               <p className="text-xl">Tổng nợ phải thu</p>
               <p>
-                <strong className="fon-bold text-2xl">
+                <strong className="font-bold text-2xl ">
                   {VND.format(
                     reportTHCNData
                       ?.map((pt) => pt.inOfDate)

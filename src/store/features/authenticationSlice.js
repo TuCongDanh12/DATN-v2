@@ -64,10 +64,10 @@ export const getProfile = createAsyncThunk(
   async (thunkAPI) => {
     try {
       const response = await authService.getProfile();
-      console.log("response", response);
+      // console.log("response", response);
       return response.data;
     } catch (error) {
-      console.log("error", error);
+      // console.log("error", error);
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
@@ -179,7 +179,7 @@ export const authenticationSlice = createSlice({
       console.log("getProfile.fulfilled", action.payload)
       state.isFetching = false;
       // state.isSuccessGetDonBanHang = true;
-      state.profile = action.payload.result.data;
+      // state.profile = action.payload.result.data;
 
       //   state.message = action.payload.message;
     })
