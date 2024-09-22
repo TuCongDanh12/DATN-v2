@@ -88,6 +88,8 @@ import ChiTietBaoCaoNoPhaiTra from "./page/BaoCao/scenes/BaoCaoNoPhaiTra/ChiTiet
 import ThongTinCongTy from "./page/CaiDat/scenes/ThongTinCongTy";
 import ThemNhanVien from "./page/CaiDat/scenes/ThemNhanVien";
 import ThongBaoDenHan from "./page/CaiDat/scenes/ThongBaoDenHan";
+import BaoCaoChiPhi from "./page/BaoCao/scenes/BaoCaoChiPhi/BaoCaoChiPhi";
+import ChiTietBaoCaoChiPhi from "./page/BaoCao/scenes/BaoCaoChiPhi/ChiTietBaoCaoChiPhi/ChiTietBaoCaoChiPhi";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -389,6 +391,7 @@ function App() {
                     element={<DoanhThuSanPham />}
                   />
                   <Route path="bao-cao-mua-hang" element={<BaoCaoMuaHang />} />
+                  <Route path="bao-cao-chi-phi" element={<BaoCaoChiPhi />} />
 
                   <Route path="bao-cao-da-luu" element={<BaoCaoDaLuu />} />
                   <Route
@@ -404,6 +407,11 @@ function App() {
                 <Route
                   path="bao-cao/bao-cao-mua-hang/:id"
                   element={<ChiTietBaoCaoMuaHang />}
+                />
+
+<Route
+                  path="bao-cao/bao-cao-chi-phi/:id"
+                  element={<ChiTietBaoCaoChiPhi />}
                 />
 
                 <Route path="/thong-bao" element={<ThongBao />} />

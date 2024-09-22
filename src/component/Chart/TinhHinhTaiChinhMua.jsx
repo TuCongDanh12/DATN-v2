@@ -60,12 +60,13 @@ const TinhHinhTaiChinhMua = ({ timeRange }) => {
   const [noPhaiThuQuaHan, setNoPhaiThuQuaHan] = useState(0);
   const [doanhThu, setDoanhThu] = useState(0);
   const [ctmua, setCtmua] = useState([]);
+  const [acc,setAcc] = useState(0)
 
   useEffect(() => {
     const getCtmua = async () => {
       try {
         const res = await muahangService.getListChungTuMua();
-        console.log('ctmua', res.data.result.data);
+        // console.log('ctmua', res.data.result.data);
         setCtmua(res.data.result.data);
       } catch (error) {
         console.error('Lỗi khi gọi API:', error);
@@ -81,7 +82,7 @@ const TinhHinhTaiChinhMua = ({ timeRange }) => {
 
         // Tính tổng tiền gửi
         const responseTienGui = await muahangService.getListPhieuChiTienGuiByDate({ startDate, endDate });
-        console.log('Phiếu chi tiền gửi', responseTienGui?.data?.result?.data);
+        // console.log('Phiếu chi tiền gửi', responseTienGui?.data?.result?.data);
         const totalBank = responseTienGui?.data?.result?.data.reduce((acc, item) => acc + item.chungTu.reduce((sum, ct) => sum + ct.money, 0), 0);
         setBank(totalBank || 0);
 
@@ -102,7 +103,7 @@ const TinhHinhTaiChinhMua = ({ timeRange }) => {
             } else if (paymentTerm > endDateObject) {
               acc.trongHan += item.finalValue - item.paidValue;
             }
-
+            setAcc(acc)
             return acc;
           },
           { quaHan: 0, trongHan: 0 }
@@ -112,7 +113,7 @@ const TinhHinhTaiChinhMua = ({ timeRange }) => {
         setNoPhaiThuQuaHan(noPhaiThuData.quaHan);
 
         // Tính tổng doanh thu (Chi phí)
-        setDoanhThu(totalCash + totalBank); // Doanh thu có thể là tổng chi phí hoặc tổng tiền đã trả
+        setDoanhThu(totalCash + totalBank + acc); // Doanh thu có thể là tổng chi phí hoặc tổng tiền đã trả
 
       } catch (error) {
         console.error('Lỗi khi gọi API:', error);

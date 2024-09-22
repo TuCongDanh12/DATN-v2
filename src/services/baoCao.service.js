@@ -116,6 +116,38 @@ const postReportNoPhaiTraRaw = ( values ) => {
             headers: authHeader()
         });
 };
+
+const postReportChiPhiRaw = ( values ) => {
+    return axios.post(`${API_URL}/report-cost/raw`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
+const postReportChiPhi = ( values ) => {
+    return axios.post(`${API_URL}/report-cost`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
+const getDetailChiPhi = ( id ) => {
+    return axios.get(`${API_URL}/report-cost/${id}`,
+        {
+            headers: authHeader()
+        });
+};
+
+const getReportChiPhi = (  ) => {
+    return axios.get(`${API_URL}/report-cost`,
+        {
+            headers: authHeader()
+        });
+};
 const baoCaoService = {
     getListReportDTBH,
     getReportDTBH,
@@ -131,7 +163,12 @@ const baoCaoService = {
     getDetailReportNoPhaiTra,
     getReportNoPhaiTra,
     postReportNoPhaiTra,
-    postReportNoPhaiTraRaw
+    postReportNoPhaiTraRaw,
+
+    getReportChiPhi,
+    getDetailChiPhi,
+    postReportChiPhi,
+    postReportChiPhiRaw
 };
 
 export default baoCaoService;

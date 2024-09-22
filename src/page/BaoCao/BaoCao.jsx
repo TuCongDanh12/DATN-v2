@@ -25,6 +25,10 @@ const BaoCao = () => {
         url: 'bao-cao-mua-hang',
         content: "Báo cáo mua hàng"
       },
+      {
+        url: 'bao-cao-chi-phi',
+        content: "Báo cáo chi phí"
+      },
       // {
       //   url: 'bao-cao-da-luu',
       //   content: "Báo cáo đã lưu"
