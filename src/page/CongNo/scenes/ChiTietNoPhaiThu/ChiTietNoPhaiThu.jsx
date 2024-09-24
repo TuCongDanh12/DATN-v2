@@ -599,7 +599,7 @@ const ChiTietNoPhaiThu = ({ checkbox = false }) => {
               width: 120,
 
             }}
-            className="bg-[#FFF6D8]"
+            className="!bg-[#FFF6D8]"
             onChange={handleChange}
             options={[
               {

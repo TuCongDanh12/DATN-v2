@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Table } from 'antd';
+import authService from '../../services/auth.service';
 function formatDate(date) {
     var d = new Date(date),
         month = '' + (d.getMonth() + 1),
@@ -103,6 +104,19 @@ function to_vietnamese(number) {
 }
 
 const InPhieuNhap = React.forwardRef(({ chungtumua }, ref) => {
+    const [infoCompany, setInfoCompany] = useState(null)
+    useEffect(()=>{
+      const getInfo = async() =>{
+        try {
+          const res = await authService.getProfile()
+          console.log('Công ty', res.data.result.data)
+          setInfoCompany(res.data.result.data)
+        } catch (error) {
+          
+        }
+      }
+      getInfo()
+    },[])
     const total = chungtumua?.totalProductValue- chungtumua?.totalDiscountValue
     const columns = [
         {

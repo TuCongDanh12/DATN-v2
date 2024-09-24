@@ -558,7 +558,7 @@ const HoaDonBanHang = ({ checkbox = false }) => {
 
           <div className="flex justify-end gap-2 mb-0">
             <Button
-              className="bg-[#FF7742] font-bold text-white mr-2"
+              className="!bg-[#FF7742] font-bold text-white mr-2"
               onClick={() => {
                 setDataSelected({});
                 setOpen(false);

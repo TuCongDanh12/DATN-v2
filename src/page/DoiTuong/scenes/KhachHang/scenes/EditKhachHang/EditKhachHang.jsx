@@ -905,7 +905,7 @@ const EditKhachHang = ({ disabled = false }) => {
 
                             <div className="flex justify-end gap-2 mb-0">
                                 <Button
-                                    className="bg-[#FF7742] font-bold text-white mr-2"
+                                    className="!bg-[#FF7742] font-bold text-white mr-2"
                                     onClick={() => {
                                         setDataSelected({});
                                         setOpenDeleteDieuKhoanThanhToan(false);
@@ -949,7 +949,7 @@ const EditKhachHang = ({ disabled = false }) => {
 
                             <div className="flex justify-end gap-2 mb-0">
                                 <Button
-                                    className="bg-[#FF7742] font-bold text-white mr-2"
+                                    className="!bg-[#FF7742] font-bold text-white mr-2"
                                     onClick={() => {
                                         setDataSelected({});
                                         setOpenDeleteChietKhauThuongMai(false);

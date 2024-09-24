@@ -67,7 +67,7 @@ function NotificationComponent(props) {
 
   // Determine background color based on the message content
   const backgroundColor = props.message.toLowerCase().includes("quá hạn")
-    ? "bg-[#FF6B6B]"
+    ? "!bg-[#FF6B6B]"
     : "bg-pink-100";
 
   return (

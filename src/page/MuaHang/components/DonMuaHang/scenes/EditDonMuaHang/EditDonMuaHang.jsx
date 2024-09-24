@@ -159,16 +159,16 @@ const DonMuaHang = ({ disabled }) => {
 
         <div className="flex justify-start">
           <div className="min-w-[300px] mb-8">
-            {donmuahang?.ctban?.length !== 0 && (
+            {donmuahang?.ctmuas?.length !== 0 && (
               <div className="flex">
-                <p>Tham chiếu đến chứng từ bán hàng:</p>
+                <p>Tham chiếu đến chứng từ mua hàng:</p>
                 <p>
-                  {donmuahang?.ctban?.map((ct) => (
+                  {donmuahang?.ctmuas?.map((ct) => (
                     <span
                       key={ct.id}
                       className="px-2 text-[#1DA1F2] font-medium cursor-pointer"
                       onClick={() =>
-                        navigate(`/ban-hang/chung-tu-ban-hang/xem/${ct.id}`, {
+                        navigate(`/mua-hang/chung-tu-mua-hang/xem/${ct.id}`, {
                           state: { id: ct.id },
                         })
                       }

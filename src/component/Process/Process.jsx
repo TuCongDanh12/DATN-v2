@@ -13,7 +13,7 @@ const Process = ({ mainContent, process }) => {
         <div className="py-2 font-bold">{mainContent}</div>
         <hr className="w-[95%] process-main" />
         <div className="w-full my-auto flex justify-center items-center flex-col max-[700px]:rotate-90 max-[700px]:-translate-x-12">
-          <div className="bg-[#FFCD29] h-4 w-[80%] max-[700px]:w-[400px]"></div>
+          <div className="!bg-[#FFCD29] h-4 w-[80%] max-[700px]:w-[400px]"></div>
           <div className="flex translate-y-[-1rem] w-[80%] justify-evenly max-[700px]:w-[400px]">
             {
               process.map((item, index) =>

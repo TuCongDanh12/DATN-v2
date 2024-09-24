@@ -207,7 +207,7 @@ const XemPhieuChiTienMat = () => {
       </Form>
       <div className="w-full flex justify-end mt-6 mb-0">
         <Button
-          className="bg-[#312d2c] font-bold text-white"
+          className="!bg-[#312d2c] font-bold text-white"
           type="link"
           onClick={() => navigate(-1)}
         >

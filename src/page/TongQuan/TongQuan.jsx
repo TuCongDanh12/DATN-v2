@@ -208,7 +208,7 @@ const TongQuan = () => {
       <Select
         defaultValue={"thisYear"}
         style={{ width: 120 }}
-        className="bg-[#FFF6D8] mb-5"
+        className="!bg-[#FFF6D8] mb-5"
         onChange={handleTimeRangeChange}
         options={[
           { value: "thisYear", label: "Năm nay" },

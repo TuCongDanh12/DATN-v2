@@ -121,7 +121,7 @@ const ChartSanpham = () => {
         style={{
           width: 120,
         }}
-        className="bg-[#FFF6D8]  ml-10"
+        className="!bg-[#FFF6D8]  ml-10"
         onChange={handleChange}
         options={[
           {

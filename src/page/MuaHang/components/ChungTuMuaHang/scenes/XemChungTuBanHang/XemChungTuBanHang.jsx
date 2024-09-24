@@ -187,7 +187,7 @@ const XemChungTuMua = ({ disabled = true }) => {
           />
           <div className="w-full flex justify-end mt-6 mb-0">
             <Button
-              className="bg-[#46FF42] font-bold text-white mr-2"
+              className="!bg-[#46FF42] font-bold text-white mr-2"
               type="link"
               onClick={handlePrint}
             >
@@ -195,7 +195,7 @@ const XemChungTuMua = ({ disabled = true }) => {
             </Button>
 
             <Button
-              className="bg-[#FF7742] font-bold text-white"
+              className="!bg-[#FF7742] font-bold text-white"
               type="link"
               onClick={() => navigate(-1)}
             >
@@ -325,7 +325,7 @@ const XemChungTuMua = ({ disabled = true }) => {
           />
           <div className="w-full flex justify-end mt-6 mb-0">
             <Button
-              className="bg-[#46FF42] font-bold text-white mr-2"
+              className="!bg-[#46FF42] font-bold text-white mr-2"
               type="link"
               onClick={handlePrint}
             >
@@ -333,7 +333,7 @@ const XemChungTuMua = ({ disabled = true }) => {
             </Button>
 
             <Button
-              className="bg-[#FF7742] font-bold text-white"
+              className="!bg-[#FF7742] font-bold text-white"
               type="link"
               onClick={() => navigate(-1)}
             >
