@@ -107,7 +107,7 @@ const ModalPhieuChiKhac = ({ onSuccess }) => {
 
     try {
       const res = await muahangService.postPhieuChiKhac(formData);
-      if (res && res.status === 200) {
+      if (res && res.status === 201) {
         message.success('Tạo phiếu chi thành công!');
         onSuccess(); // Gọi callback để đóng modal và cập nhật bảng
       } else {
