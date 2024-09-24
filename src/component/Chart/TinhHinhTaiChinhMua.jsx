@@ -103,7 +103,7 @@ const TinhHinhTaiChinhMua = ({ timeRange }) => {
             } else if (paymentTerm > endDateObject) {
               acc.trongHan += item.finalValue - item.paidValue;
             }
-            setAcc(acc)
+            setAcc(acc.quaHan+acc.trongHan)
             return acc;
           },
           { quaHan: 0, trongHan: 0 }

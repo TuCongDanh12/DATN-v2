@@ -22,8 +22,6 @@ import { VND } from "../../utils/func";
 import tongQuanService from "../../services/tongQuan.service";
 import Countdocument from "../../component/Tongquan/count-document";
 import CountdocumentMua from "../../component/Tongquan/count-document-mua";
-import ChartNhanvien from "../../component/Chart/chartNhanvien";
-import ChartSanpham from "../../component/Chart/chartSanpham";
 import TinhHinhTaiChinh from "../../component/Chart/TinhHinhTaiChinh";
 import TinhHinhTaiChinhMua from "../../component/Chart/TinhHinhTaiChinhMua";
 import { congNoSelector } from "../../store/features/congNoSlice";
@@ -41,13 +39,12 @@ const TongQuan = () => {
   const [hideCostThisPeriod, setHideCostThisPeriod] = useState(false);
   const [hideCostLastPeriod, setHideCostLastPeriod] = useState(false);
 
+  // Function to fetch cost data based on year, month or quarter
   const fetchCostData = async (year, month = null, quarter = null) => {
     try {
       let responseThisPeriod, responseLastPeriod;
       if (month) {
-        responseThisPeriod = await tongQuanService.getMuaHangChartRevenueMonth({
-          values: { year, month },
-        });
+        responseThisPeriod = await tongQuanService.getMuaHangChartRevenueMonth({ values: { year, month } });
         responseLastPeriod = await tongQuanService.getMuaHangChartRevenueMonth({
           values: { year: month === 1 ? year - 1 : year, month: month === 1 ? 12 : month - 1 },
         });
@@ -70,6 +67,7 @@ const TongQuan = () => {
     }
   };
 
+  // Handle time range selection and fetch necessary data
   const handleTimeRangeChange = async (value) => {
     setTimeRange(value);
     const currentDate = new Date();
@@ -147,14 +145,62 @@ const TongQuan = () => {
 
   const DataFormater = (number) => {
     if (number >= 1000000000) {
-      return (number / 1000000000).toString() + "Tỷ";
+      return (number / 1000000000).toString() + " Tỷ";
     }
     if (number > 1000000) {
-      return (number / 1000000).toString() + "Triệu";
+      return (number / 1000000).toString() + " Triệu";
     } else {
       return number.toString();
     }
   };
+
+  const getCostLabels = () => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+  
+    switch (timeRange) {
+      case "thisYear":
+        return {
+          current: `Chi phí năm ${year}`,
+          previous: `Chi phí năm ${year - 1}`,
+        };
+      case "thisMonth":
+        return {
+          current: `Chi phí tháng ${month}/${year}`,
+          previous: `Chi phí tháng ${month - 1 || 12}/${month === 1 ? year - 1 : year}`,
+        };
+      case "lastMonth":
+        return {
+          current: `Chi phí tháng ${month - 1 || 12}/${month === 1 ? year - 1 : year}`,
+          previous: `Chi phí tháng ${month - 2 || 12}/${month === 1 ? year - 1 : year}`,
+        };
+      case "thisQuarter":
+      case "lastQuarter":
+        const quarter = Math.floor((month - 1) / 3) + (timeRange === "thisQuarter" ? 1 : 0);
+        return {
+          current: `Chi phí quý ${quarter} năm ${year}`,
+          previous: `Chi phí quý ${quarter - 1 || 4} năm ${quarter === 1 ? year - 1 : year}`,
+        };
+      case "Q1":
+      case "Q2":
+      case "Q3":
+      case "Q4":
+        const selectedQuarter = parseInt(timeRange.replace("Q", ""), 10);
+        return {
+          current: `Chi phí quý ${selectedQuarter} năm ${year}`,
+          previous: `Chi phí quý ${selectedQuarter} năm ${year - 1}`,
+        };
+      default:
+        return {
+          current: "Chi phí kỳ này",
+          previous: "Chi phí kỳ trước",
+        };
+    }
+  };
+  
+
+  const { current: currentLabel, previous: previousLabel } = getCostLabels();
 
   return (
     <div className="ml-5 mb-5 mt-5">
@@ -185,12 +231,7 @@ const TongQuan = () => {
 
       <Flex vertical gap={50} className="mt-5 w-full">
         <ResponsiveContainer className="!w-[900px] !h-[300px] border border-gray-300 shadow-xl rounded-lg p-5 mt-3">
-          <LineChart
-            width={500}
-            height={300}
-            data={dataVenue}
-            margin={{ top: 5, right: 30, left: 30, bottom: 5 }}
-          >
+          <LineChart data={dataVenue} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" type="category" />
             <YAxis type="number" domain={["auto", "auto"]} tickFormatter={DataFormater} />
@@ -199,25 +240,22 @@ const TongQuan = () => {
               onClick={(e) => {
                 if (e.dataKey === "Doanh thu") {
                   setHideRevenue(!hideRevenue);
-                } else if (e.dataKey === "Chi phí kỳ này") {
+                } else if (e.dataKey === currentLabel) {
                   setHideCostThisPeriod(!hideCostThisPeriod);
-                } else if (e.dataKey === "Chi phí kỳ trước") {
+                } else if (e.dataKey === previousLabel) {
                   setHideCostLastPeriod(!hideCostLastPeriod);
                 }
               }}
             />
             <Line dataKey="Doanh thu" stroke="#4B8AF1" strokeOpacity={hideRevenue ? 0 : 1} />
-            <Line dataKey="Chi phí kỳ này" stroke="#E76F51" strokeOpacity={hideCostThisPeriod ? 0 : 1} />
-            <Line dataKey="Chi phí kỳ trước" stroke="#82ca9d" strokeOpacity={hideCostLastPeriod ? 0 : 1} />
+            <Line dataKey={currentLabel} stroke="#E76F51" strokeOpacity={hideCostThisPeriod ? 0 : 1} />
+            <Line dataKey={previousLabel} stroke="#82ca9d" strokeOpacity={hideCostLastPeriod ? 0 : 1} />
           </LineChart>
         </ResponsiveContainer>
 
         <div>
           <p className="font-bold text-xl mb-2">Nợ</p>
-          <Flex
-            gap={100}
-            className="border border-gray-300 shadow-md rounded-lg p-5  w-[500px]"
-          >
+          <Flex gap={100} className="border border-gray-300 shadow-md rounded-lg p-5 w-[500px]">
             <div>
               <p className="text-xl">Tổng nợ phải thu</p>
               <p>
@@ -236,7 +274,7 @@ const TongQuan = () => {
               <Flex justify="space-between">
                 <Flex vertical>
                   <p className="text-orange-500">
-                    <strong className="fon-bold text-2xl">
+                    <strong className="font-bold text-2xl">
                       {VND.format(
                         reportTHCNData
                           ?.map((pt) => pt.outOfDate)
@@ -244,11 +282,11 @@ const TongQuan = () => {
                       )}
                     </strong>
                   </p>
-                  <p className="text-gray-500 ">QUÁ HẠN</p>
+                  <p className="text-gray-500">QUÁ HẠN</p>
                 </Flex>
                 <Flex vertical align="flex-end">
                   <p>
-                    <strong className="fon-bold text-2xl">
+                    <strong className="font-bold text-2xl">
                       {VND.format(
                         reportTHCNData
                           ?.map((pt) => pt.inOfDate)
@@ -256,11 +294,11 @@ const TongQuan = () => {
                       )}
                     </strong>
                   </p>
-                  <p className="text-gray-500 ">TRONG HẠN</p>
+                  <p className="text-gray-500">TRONG HẠN</p>
                 </Flex>
               </Flex>
               <Progress
-                percent={
+                percent={(
                   (reportTHCNData
                     ?.map((pt) => pt.outOfDate)
                     .reduce((total, currentValue) => total + currentValue, 0) *
@@ -271,7 +309,7 @@ const TongQuan = () => {
                     reportTHCNData
                       ?.map((pt) => pt.inOfDate)
                       .reduce((total, currentValue) => total + currentValue, 0))
-                }
+                )}
                 showInfo={false}
                 strokeColor="#f00732"
                 trailColor="blue"
@@ -282,13 +320,9 @@ const TongQuan = () => {
         </div>
       </Flex>
 
-      {/* <Flex gap={0} className="mt-4 !max-w-[90%]">
-        <ChartNhanvien timeRange={timeRange} />
-        <ChartSanpham timeRange={timeRange} />
-      </Flex> */}
       <Flex gap={40}>
-      <TinhHinhTaiChinh timeRange={timeRange} />
-      <TinhHinhTaiChinhMua timeRange={timeRange} />
+        <TinhHinhTaiChinh timeRange={timeRange} />
+        <TinhHinhTaiChinhMua timeRange={timeRange} />
       </Flex>
     </div>
   );

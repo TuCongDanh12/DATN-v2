@@ -201,7 +201,7 @@ const Sidebar = ({
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
+            {/* <Item
               title="Tiền mặt"
               to="/tien-mat"
               icon={<ReceiptOutlinedIcon size={20} />}
@@ -214,7 +214,7 @@ const Sidebar = ({
               icon={<AccountBalanceIcon size={20} />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <Item
               title="Nợ"
               to="/cong-no/chi-tiet-no-phai-thu"
