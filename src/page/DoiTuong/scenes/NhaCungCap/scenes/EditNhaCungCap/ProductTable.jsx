@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Checkbox, message, Input, Select } from 'antd';
+import { Table, Button, Modal, Checkbox, message, Input, Select, Form } from 'antd';
 import doiTuongService from '../../../../../../services/doiTuong.service';
 import copy from 'copy-to-clipboard';
 
 const { Search } = Input;
 const { Option } = Select;
 
-const ProductTable = ({ products, onAddProducts, supplierId }) => {
+const ProductTable = ({ products, onAddProducts, supplierId, disabled, navigate }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [allProducts, setAllProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -192,6 +192,32 @@ const ProductTable = ({ products, onAddProducts, supplierId }) => {
                     pagination={false}
                 />
             </Modal>
+            {disabled ?
+                    <div className='w-full flex justify-end mt-6 mb-0'>
+                        <Button
+                            className='!bg-[#FF7742] font-bold text-white'
+                            type='link'
+                            onClick={() => navigate(-1)}
+                        >
+                            Thoát
+                        </Button>
+                    </div> :
+                    <Form.Item className='flex justify-end gap-2 mt-6 mb-0'>
+                        <Button
+                            className='!bg-[#FF7742] font-bold text-white mr-2'
+                            htmlType="reset"
+                            onClick={() => navigate(-1)}
+                        >
+                            Hủy
+                        </Button>
+                        <Button
+                            className='!bg-[#67CDBB] font-bold text-white'
+                            htmlType="submit"
+                        >
+                            Xác nhận
+                        </Button>
+                    </Form.Item>
+                }
         </>
     );
 };

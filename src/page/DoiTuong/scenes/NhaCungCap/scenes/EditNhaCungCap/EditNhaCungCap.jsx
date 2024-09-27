@@ -165,7 +165,9 @@ const EditNhaCungCap = ({ disabled = false }) => {
                     <ProductTable
                         products={products}
                         onAddProducts={handleAddProducts}
+                        disabled={disabled}
                         supplierId={params.id}
+                        navigate={navigate}
                     />
                 </TabPane>
             </Tabs>

@@ -178,11 +178,11 @@ const InPhieuNhap = React.forwardRef(({ chungtumua }, ref) => {
     <div ref={ref} className="max-w-3xl mx-auto p-6 bg-white rounded shadow-sm my-6" id="invoice">
       <div className="flex justify-center items-center">
         <div className="w-[100%] text-left">
-          <h2>Tên: {infoCompany.companyName}</h2>
-          <p>Địa chỉ: {infoCompany.companyAddress}</p>
-          <p>Mã số thuế: {infoCompany.companyTaxCode}</p>
-          <p>Email: {infoCompany.companyEmail}</p>
-          <p>Số điện thoại: {infoCompany.companyPhone}</p>
+          <h2>Tên: {infoCompany?.companyName}</h2>
+          <p>Địa chỉ: {infoCompany?.companyAddress}</p>
+          <p>Mã số thuế: {infoCompany?.companyTaxCode}</p>
+          <p>Email: {infoCompany?.companyEmail}</p>
+          <p>Số điện thoại: {infoCompany?.companyPhone}</p>
         </div>
       </div>
 

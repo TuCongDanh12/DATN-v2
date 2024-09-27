@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message as msg, notification } from "antd";
+import { Table, Button,message as msg, notification } from "antd";
+import { FileExcelOutlined } from '@ant-design/icons';
 import muahangService from './../../../../services/muahang.service';
+import * as XLSX from 'xlsx';
 import getColumns from './columns'; // Import từ file columns.js
 
 const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, setPaginationParam, searchParams }) => {
@@ -28,6 +30,7 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
 
     try {
       const response = await muahangService.getListDonMuahang({ requestParam: requestParams });
+      console.log('Đơn mua hàng', response.data.result.data)
       if (Array.isArray(response.data.result.data)) {
         setListdonmuahang(response.data.result.data);
         setPaginationParam(prev => ({
@@ -92,10 +95,42 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
     onChange: (selectedRowKeys, selectedRows) => {},
   };
 
+   // Hàm xuất file Excel
+   const exportToExcel = () => {
+    // Định dạng dữ liệu cho file Excel
+    const dataToExport = filteredData.map(item => ({
+      'Ngày đơn hàng': item.purchasingDate,
+      'Số đơn hàng': item.id,
+      'Mã nhà cung cấp': item.supplier.id,
+      'Tên nhà cung cấp': item.supplier.name,
+      'Trạng thái chứng từ': item.documentStatus,
+      'Sản phẩm': item.productOfDonMuaHangs.map(p => p.product.name).join(', '), // Danh sách sản phẩm
+      'Tổng tiền': item.productOfDonMuaHangs.reduce((total, p) => total + (p.price * p.count), 0) - item.discount // Tính tổng tiền sau khi giảm giá
+    }));
+
+    // Tạo workbook và worksheet
+    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Đơn mua hàng");
+
+    // Xuất file
+    XLSX.writeFile(wb, 'DonMuaHang.xlsx');
+  };
+
+
   return (
     <div>
       {contextHolderMes}
       {contextHolder}
+      <Button
+        type="primary"
+        icon={<FileExcelOutlined />}
+        onClick={exportToExcel}
+        style={{ marginBottom: '16px' }}
+      >
+        Xuất file Excel
+      </Button>
+
       <Table
         rowKey={record => record.id} // Ensure each row has a unique key
         rowSelection={{ type: "checkbox", ...rowSelection }}
