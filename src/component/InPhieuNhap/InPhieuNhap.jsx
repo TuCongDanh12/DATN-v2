@@ -109,8 +109,8 @@ const InPhieuNhap = React.forwardRef(({ chungtumua }, ref) => {
       const getInfo = async() =>{
         try {
           const res = await authService.getProfile()
-          console.log('Công ty', res.data.result.data)
-          setInfoCompany(res.data.result.data)
+          // console.log('Công ty', res.data.result.data.company)
+          setInfoCompany(res.data.result.data.company)
         } catch (error) {
           
         }
@@ -178,11 +178,11 @@ const InPhieuNhap = React.forwardRef(({ chungtumua }, ref) => {
     <div ref={ref} className="max-w-3xl mx-auto p-6 bg-white rounded shadow-sm my-6" id="invoice">
       <div className="flex justify-center items-center">
         <div className="w-[100%] text-left">
-          <h2>CÔNG TY CỔ PHẦN SAIGONSKY</h2>
-          <p>Địa chỉ: 208/18/55/42 đường 138, phường Tân Phú, quận 9, HCM</p>
-          <p>Mã số thuế: 1234567889</p>
-          <p>Email: saigonsky@gmail.com</p>
-          <p>Số điện thoại: +41-442341232</p>
+          <h2>Tên: {infoCompany.companyName}</h2>
+          <p>Địa chỉ: {infoCompany.companyAddress}</p>
+          <p>Mã số thuế: {infoCompany.companyTaxCode}</p>
+          <p>Email: {infoCompany.companyEmail}</p>
+          <p>Số điện thoại: {infoCompany.companyPhone}</p>
         </div>
       </div>
 
