@@ -97,16 +97,27 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
 
    // Hàm xuất file Excel
    const exportToExcel = () => {
-    // Định dạng dữ liệu cho file Excel
-    const dataToExport = filteredData.map(item => ({
-      'Ngày đơn hàng': item.purchasingDate,
-      'Số đơn hàng': item.id,
-      'Mã nhà cung cấp': item.supplier.id,
-      'Tên nhà cung cấp': item.supplier.name,
-      'Trạng thái chứng từ': item.documentStatus,
-      'Sản phẩm': item.productOfDonMuaHangs.map(p => p.product.name).join(', '), // Danh sách sản phẩm
-      'Tổng tiền': item.productOfDonMuaHangs.reduce((total, p) => total + (p.price * p.count), 0) - item.discount // Tính tổng tiền sau khi giảm giá
-    }));
+    // Chuyển đổi dữ liệu từ listdonmuahang sang dạng làm phẳng
+    const dataToExport = filteredData.flatMap(item => 
+      item.productOfDonMuaHangs.map(product => ({
+        'Ngày đơn hàng': item.purchasingDate,
+        'Số đơn hàng': item.id,
+        'Mã nhà cung cấp': item.supplier.id,
+        'Tên nhà cung cấp': item.supplier.name,
+        'Địa chỉ': item.supplier.address,
+        'Người liên hệ': item.supplier.representative,
+        'Mã hàng': product.product.id,
+        'Tên hàng': product.product.name,
+        'ĐVT': product.product.unit,
+        'Số lượng': product.count,
+        'Đơn giá': product.price,
+        'Thành tiền': product.price * product.count,
+        'Tỷ lệ CK (%)': item.discountRate,
+        'Tiền chiết khấu': (product.price * product.count * item.discountRate) / 100,
+        'Tổng tiền sau CK': product.price * product.count - (product.price * product.count * item.discountRate) / 100
+      }))
+    );
+  
 
     // Tạo workbook và worksheet
     const ws = XLSX.utils.json_to_sheet(dataToExport);

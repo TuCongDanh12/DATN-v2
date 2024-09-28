@@ -26,7 +26,7 @@ const TableBaoCao = ({ reports }) => {
             title: "Hành động",
             key: "action",
             render: (_, record) => (
-                <Button type="link" onClick={() => navigate(`/bao-cao/bao-cao-mua-hang/${record.id}`)}>
+                <Button className='!text-white-500' type="primary" onClick={() => navigate(`/bao-cao/bao-cao-mua-hang/${record.id}`)}>
                     Xem chi tiết
                 </Button>
             ),

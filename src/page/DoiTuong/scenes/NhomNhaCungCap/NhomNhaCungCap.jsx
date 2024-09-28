@@ -221,7 +221,7 @@ const NhomNhaCungCap = () => {
             <Form.Item name="keyword" className="w-[300px] !me-0">
               <Input
                 className="rounded-tr-none rounded-br-none"
-                placeholder="Nhập từ khóa"
+                placeholder="Nhập tên nhóm nhà cung cấp"
                 value={searchText}
                 onChange={(e) => handleSearch(e.target.value)}
               />

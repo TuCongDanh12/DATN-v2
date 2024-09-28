@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, Table, Select, Card, Typography, notification, Button, Form, Input, Modal, Checkbox } from 'antd';
+import { Tabs, Table, Select, Card, Typography, notification, Button, Form, Input, Modal, Popconfirm } from 'antd';
 import doiTuongService from '../../../services/doiTuong.service';
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
 const { Option } = Select;
+const { useForm } = Form; // Thêm useForm từ Form của antd
 
 const ThemNhanVien = () => {
   const [accountants, setAccountants] = useState([]);
@@ -13,10 +14,9 @@ const ThemNhanVien = () => {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAccountantModalVisible, setIsAccountantModalVisible] = useState(false);
-  const [form] = Form.useForm();
-  const [accountantForm] = Form.useForm();
+  const [form] = useForm(); // Sử dụng useForm từ Form của antd
+  const [accountantForm] = useForm(); // Sử dụng useForm từ Form của antd
 
-  // Hàm để lấy danh sách kế toán
   const fetchAccountants = async () => {
     try {
       const response = await doiTuongService.getListAccountant();
@@ -29,7 +29,6 @@ const ThemNhanVien = () => {
     }
   };
 
-  // Hàm để lấy danh sách nhân viên khác
   const fetchOtherEmployees = async () => {
     setLoading(true);
     try {
@@ -45,7 +44,7 @@ const ThemNhanVien = () => {
           response = await doiTuongService.getListWarehouseKeeper();
           break;
         default:
-          response = { data: { result: { data: [] } } }; // Đặt giá trị mặc định
+          response = { data: { result: { data: [] } } };
           break;
       }
       setOtherEmployees(response.data.result.data);
@@ -71,7 +70,7 @@ const ThemNhanVien = () => {
     try {
       await doiTuongService.postEmployee({
         ...values,
-        role: selectedType.toUpperCase(), // Chuyển đổi loại nhân viên thành uppercase
+        role: selectedType.toUpperCase(),
       });
       notification.success({
         message: 'Thành công',
@@ -79,7 +78,7 @@ const ThemNhanVien = () => {
       });
       setIsModalVisible(false);
       form.resetFields();
-      fetchOtherEmployees(); // Cập nhật danh sách nhân viên sau khi thêm mới
+      fetchOtherEmployees();
     } catch (error) {
       notification.error({
         message: 'Lỗi',
@@ -90,18 +89,50 @@ const ThemNhanVien = () => {
 
   const handleAddAccountant = async (values) => {
     try {
-      await doiTuongService.postAccountant({...values, isAdmin: false});
+      await doiTuongService.postAccountant({ ...values, isAdmin: false });
       notification.success({
         message: 'Thành công',
         description: 'Kế toán đã được thêm thành công.',
       });
       setIsAccountantModalVisible(false);
       accountantForm.resetFields();
-      fetchAccountants(); // Cập nhật danh sách kế toán sau khi thêm mới
+      fetchAccountants();
     } catch (error) {
       notification.error({
         message: 'Lỗi',
         description: 'Không thể thêm kế toán.',
+      });
+    }
+  };
+
+  const handleDeleteEmployee = async (id) => {
+    try {
+      await doiTuongService.deleteEmployee(id);
+      notification.success({
+        message: 'Thành công',
+        description: 'Nhân viên đã được xóa thành công.',
+      });
+      fetchOtherEmployees();
+    } catch (error) {
+      notification.error({
+        message: 'Lỗi',
+        description: 'Không thể xóa nhân viên.',
+      });
+    }
+  };
+
+  const handleDeleteAccountant = async (id) => {
+    try {
+      await doiTuongService.deleteEmployee(id);
+      notification.success({
+        message: 'Thành công',
+        description: 'Kế toán đã được xóa thành công.',
+      });
+      fetchAccountants();
+    } catch (error) {
+      notification.error({
+        message: 'Lỗi',
+        description: 'Không thể xóa kế toán.',
       });
     }
   };
@@ -111,6 +142,20 @@ const ThemNhanVien = () => {
     { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },
     { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },
+    {
+      title: 'Hành động',
+      key: 'action',
+      render: (_, record) => (
+        <Popconfirm
+          title="Bạn có chắc chắn muốn xóa nhân viên này không?"
+          onConfirm={() => handleDeleteAccountant(record.id)}
+          okText="Có"
+          cancelText="Không"
+        >
+          <Button type="link" danger>Xóa</Button>
+        </Popconfirm>
+      ),
+    },
   ];
 
   const otherEmployeeColumns = [
@@ -118,6 +163,20 @@ const ThemNhanVien = () => {
     { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },
     { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },
+    {
+      title: 'Hành động',
+      key: 'action',
+      render: (_, record) => (
+        <Popconfirm
+          title="Bạn có chắc chắn muốn xóa nhân viên này không?"
+          onConfirm={() => handleDeleteEmployee(record.id)}
+          okText="Có"
+          cancelText="Không"
+        >
+          <Button type="link" danger>Xóa</Button>
+        </Popconfirm>
+      ),
+    },
   ];
 
   return (
@@ -201,7 +260,6 @@ const ThemNhanVien = () => {
           >
             <Input />
           </Form.Item>
-          {/* Lưu ý: Không cần thêm trường role vào form vì nó được xác định từ selectedType */}
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Thêm Nhân Viên
@@ -255,14 +313,6 @@ const ThemNhanVien = () => {
           >
             <Input.Password />
           </Form.Item>
-          {/* <Form.Item
-            name="isAdmin"
-            label="Quyền Admin"
-            valuePropName="checked"
-            initialValue={false}
-          >
-            <Checkbox>Admin</Checkbox>
-          </Form.Item> */}
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Thêm Kế Toán

@@ -230,7 +230,9 @@ const TongQuan = () => {
       </Flex>
 
       <Flex vertical gap={50} className="mt-5 w-full">
+      
         <ResponsiveContainer className="!w-[900px] !h-[300px] border border-gray-300 shadow-xl rounded-lg p-5 mt-3">
+        <p className="font-bold text-xl">Chi phí, doanh thu</p>
           <LineChart data={dataVenue} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" type="category" />

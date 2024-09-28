@@ -81,6 +81,7 @@ const useColumns = (sortedInfo, handlePaymentChange) => {
                         <Button
                             type="link"
                             onClick={() => handleMaxPayment(record.id, chuaChi)}
+                            className='!bg-slate-50'
                         >
                             Trả hết
                         </Button>
