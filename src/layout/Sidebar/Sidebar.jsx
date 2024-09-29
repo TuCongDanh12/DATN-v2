@@ -248,13 +248,13 @@ const Sidebar = ({
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
+            {/* <Item
               title="Hỗ trợ"
               to="/ho-tro"
               icon={<HelpOutlineOutlinedIcon size={20} />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <Item
               onClick={handleLogout} // Gọi hàm logout
               title="Đăng xuất"
