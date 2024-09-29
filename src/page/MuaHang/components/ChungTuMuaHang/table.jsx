@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message as msg, notification } from "antd";
+import { Table, message as msg, notification, Button } from "antd";
 import muahangService from './../../../../services/muahang.service';
 import getColumns from './columns'; // Import từ file columns.js
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+import { FileExcelOutlined } from '@ant-design/icons';
 
 const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
   const navigate = useNavigate();
@@ -75,8 +77,49 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
     });
   };
 
+  const exportToExcel = () => {
+    // Chuyển đổi dữ liệu từ filteredData sang dạng làm phẳng
+    const dataToExport = filteredData.flatMap(item => 
+      item.productOfCtmua.map(product => ({
+        'Ngày hoạch toán': item.createdAt,
+        'Ngày chứng từ': item.donMuaHang.createdAt,  // Sử dụng ngày chứng từ từ đối tượng donMuaHang
+        'Số phiếu nhập': item.id,
+        'Mã nhà cung cấp': item.donMuaHang.supplier.id,
+        'Tên nhà cung cấp': item.donMuaHang.supplier.name,
+        'Địa chỉ': item.donMuaHang.supplier.address,
+        'Người giao hàng': item.shipper,
+        'Diễn giải': item.content,
+        'Hạn thanh toán': item.paymentTerm,
+        'Mã hàng': product.product.id,
+        'Tên hàng': product.product.name,
+        'ĐVT': product.product.unit,
+        'Số lượng': product.count,
+        'Đơn giá': product.price,
+        'Thành tiền': product.price * product.count,
+        'Tỷ lệ CK (%)': item.donMuaHang.discountRate,
+        'Tiền chiết khấu': (product.price * product.count * item.donMuaHang.discountRate) / 100,
+      }))
+    );
+  
+    // Tạo workbook và worksheet
+    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Chứng từ mua");
+  
+    // Xuất file
+    XLSX.writeFile(wb, 'ChungTuMua.xlsx');
+  };
+  
   return (
     <div>
+      <Button
+        type="primary"
+        icon={<FileExcelOutlined />}
+        onClick={exportToExcel}
+        style={{ marginBottom: '16px' }}
+      >
+        Xuất file Excel
+      </Button>
       <Table
         rowKey={record => record.id} // Ensure each row has a unique key
         rowSelection={{ type: "checkbox", ...rowSelection }}

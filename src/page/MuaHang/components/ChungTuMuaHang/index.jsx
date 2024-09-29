@@ -22,7 +22,7 @@ const Chungtu = () => {
         <RangePicker onChange={handleDateRangeChange} />
         <Input
           className='rounded-tr-none rounded-br-none max-w-[500px]'
-          placeholder="Tìm kiếm tên khách hàng"
+          placeholder="Tìm kiếm tên nhà cung cấp"
           onChange={handleFilterChange}
         />
       </div>
