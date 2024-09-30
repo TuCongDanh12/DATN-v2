@@ -62,7 +62,7 @@ const TongQuan = () => {
       const costLastPeriod = responseLastPeriod.data.result.data.map((item) => ({ cost: item.finalValue }));
 
       setCostData({ thisPeriod: costThisPeriod, lastPeriod: costLastPeriod });
-      console.log('Tiền', costData, year, month)
+      // console.log('Tiền', costData, year, month)
     } catch (error) {
       console.error("Error fetching cost data:", error);
     }
@@ -139,7 +139,7 @@ const TongQuan = () => {
         [currentLabel]: costData.thisPeriod[index]?.cost || 0,
         [previousLabel]: costData.lastPeriod[index]?.cost || 0,
       }));
-      console.log('Biểu đồ', combinedData)
+      // console.log('Biểu đồ', combinedData)
       setDataVenue(combinedData);
       dispatch(clearState());
     }

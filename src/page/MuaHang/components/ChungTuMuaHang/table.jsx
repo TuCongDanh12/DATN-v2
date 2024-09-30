@@ -81,8 +81,9 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
     // Chuyển đổi dữ liệu từ filteredData sang dạng làm phẳng
     const dataToExport = filteredData.flatMap(item => 
       item.productOfCtmua.map(product => ({
-        'Ngày hoạch toán': item.createdAt,
-        'Ngày chứng từ': item.donMuaHang.createdAt,  // Sử dụng ngày chứng từ từ đối tượng donMuaHang
+        
+        'Ngày hoạch toán': item.createdAt.split('T')[0],
+        'Ngày chứng từ': item.donMuaHang.createdAt.split('T')[0], // Sử dụng ngày chứng từ từ đối tượng donMuaHang
         'Số phiếu nhập': item.id,
         'Mã nhà cung cấp': item.donMuaHang.supplier.id,
         'Tên nhà cung cấp': item.donMuaHang.supplier.name,
@@ -90,6 +91,8 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
         'Người giao hàng': item.shipper,
         'Diễn giải': item.content,
         'Hạn thanh toán': item.paymentTerm,
+        'Mã kho': 1,
+        'Số đơn mua hàng': item.donMuaHang.id,
         'Mã hàng': product.product.id,
         'Tên hàng': product.product.name,
         'ĐVT': product.product.unit,
@@ -98,6 +101,12 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
         'Thành tiền': product.price * product.count,
         'Tỷ lệ CK (%)': item.donMuaHang.discountRate,
         'Tiền chiết khấu': (product.price * product.count * item.donMuaHang.discountRate) / 100,
+        '% thuế GTGT': 0,
+        'Tiền thuế GTGT': 0,
+        'Số hóa đơn': item.donMuaHang.id,
+        'Số chứng từ ghi nợ/Số chứng từ thanh toán': item.id,
+        'Hình thức mua hàng': 'Mua hàng trong nước nhập kho',
+        'Phương thức thanh toán':'Chưa thanh toán'
       }))
     );
   
