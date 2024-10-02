@@ -100,6 +100,9 @@ const ProductTable = ({ products, onAddProducts, supplierId, disabled, navigate 
             title: 'Tên sản phẩm',
             dataIndex: 'name',
             key: 'name',
+            render: (text) => (
+                <a onClick={() => copyToClipboard(text)}>{text}</a>
+            ),
         },
         {
             title: 'Mô tả',
