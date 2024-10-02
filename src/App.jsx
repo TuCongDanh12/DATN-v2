@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
 import Sidebar from "./layout/Sidebar/Sidebar";
 import { useEffect, useState } from "react";
@@ -98,6 +98,16 @@ function App() {
   const [isLogin, setIsLogin] = useState(true);
 
   const location = useLocation();
+  const navigate = useNavigate(); // Sử dụng useNavigate để chuyển hướng
+
+  // Kiểm tra nếu không có key user thì chuyển hướng về trang /dang-nhap
+  useEffect(() => {
+    const user = localStorage.getItem("user"); // Kiểm tra key 'user' trong localStorage
+    if (!user && location.pathname !== "/dang-nhap") {
+      navigate("/dang-nhap"); // Chuyển hướng nếu không có user
+    }
+  }, [location.pathname, navigate]); // Chạy lại effect khi location thay đổi
+
 
   useEffect(() => {
     if (

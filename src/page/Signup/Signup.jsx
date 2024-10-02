@@ -261,9 +261,9 @@ const Signup = () => {
 
                             <div className="line">
                             </div>
-                            <div className="navigator">
+                            {/* <div className="navigator">
                                 Chưa có tài khoản? <Link to="/dang-nhap">Đăng nhập</Link>
-                            </div>
+                            </div> */}
                         </form>
                     </div>
                 </div>

@@ -174,9 +174,9 @@ const Login = () => {
                             <div className="line">
                             </div>
 
-                            <div className="navigator">
+                            {/* <div className="navigator">
                                 Chưa có tài khoản? <Link to="/dang-ky">Đăng ký</Link>
-                            </div>
+                            </div> */}
 
                         </form>
                     </div>
