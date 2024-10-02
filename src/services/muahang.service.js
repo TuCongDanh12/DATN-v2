@@ -8,15 +8,11 @@ const getListDonMuahang = ({ requestParam }) => {
   //console.log("requestParam", requestParam)
   if(requestParam.sorts!=='undefined%3AASC'){
     return axios.get(`${API_URL}/don-mua-hang?currentPage=${requestParam.currentPage}&pageSize=${requestParam.pageSize}&sorts=${requestParam.sorts}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: authHeader(),
     });
   }
   return axios.get(`${API_URL}/don-mua-hang?currentPage=${requestParam.currentPage}&pageSize=${requestParam.pageSize}`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: authHeader(),
   });
 };
 

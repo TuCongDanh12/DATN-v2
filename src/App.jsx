@@ -90,6 +90,7 @@ import ThemNhanVien from "./page/CaiDat/scenes/ThemNhanVien";
 import ThongBaoDenHan from "./page/CaiDat/scenes/ThongBaoDenHan";
 import BaoCaoChiPhi from "./page/BaoCao/scenes/BaoCaoChiPhi/BaoCaoChiPhi";
 import ChiTietBaoCaoChiPhi from "./page/BaoCao/scenes/BaoCaoChiPhi/ChiTietBaoCaoChiPhi/ChiTietBaoCaoChiPhi";
+import NhanVien from "./page/DoiTuong/scenes/Nhanvien/Nhanvien";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -173,6 +174,11 @@ function App() {
                   <Route
                     path="tai-khoan-ngan-hang"
                     element={<TaiKhoanNganHang />}
+                  />
+
+                  <Route
+                    path="nhan-vien"
+                    element={<NhanVien/>}
                   />
                 </Route>
                 <Route

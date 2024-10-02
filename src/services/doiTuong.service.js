@@ -202,9 +202,13 @@ const updateProduct = ({ values }) => {
 
 const addProductForSup = ({ values }) => {
   const { id, productIds } = values;
-  return axios.patch(`${API_URL}/supplier/${id}/add-product`, {
-    productIds,
-  });
+  return axios.patch(
+    `${API_URL}/supplier/${id}/add-product`,
+    {
+      productIds,
+    },
+    { headers: authHeader() }
+  );
 };
 
 const getListBankAccount = () => {
@@ -405,12 +409,9 @@ const postAccountant = (values) => {
 };
 
 const deleteEmployee = (id) => {
-  return axios.delete(
-    `${API_URL}/employee/${id}`,
-    {
-      headers: authHeader()
-    }
-  );
+  return axios.delete(`${API_URL}/employee/${id}`, {
+    headers: authHeader(),
+  });
 };
 const doiTuongService = {
   getListSupplier,
