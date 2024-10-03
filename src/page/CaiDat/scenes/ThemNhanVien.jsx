@@ -107,12 +107,26 @@ const ThemNhanVien = () => {
 
   const handleDeleteEmployee = async (id) => {
     try {
-      await doiTuongService.deleteEmployee(id);
+      let deleteResponse;
+      switch (selectedType) {
+        case 'salesperson':
+          deleteResponse = await doiTuongService.deleteSales(id);
+          break;
+        case 'purcharsing_Officer':
+          deleteResponse = await doiTuongService.deletePurchasing(id);
+          break;
+        case 'warehouse_Keep':
+          deleteResponse = await doiTuongService.deleteWarehouseKeeper(id);
+          break;
+        default:
+          throw new Error('Loại nhân viên không hợp lệ');
+      }
+      
       notification.success({
         message: 'Thành công',
         description: 'Nhân viên đã được xóa thành công.',
       });
-      fetchOtherEmployees();
+      fetchOtherEmployees(); // Tải lại danh sách nhân viên
     } catch (error) {
       notification.error({
         message: 'Lỗi',
@@ -120,6 +134,7 @@ const ThemNhanVien = () => {
       });
     }
   };
+  
 
   const handleDeleteAccountant = async (id) => {
     try {

@@ -272,6 +272,9 @@ const getListSalesperson = () => {
   });
 };
 
+
+
+
 const getDieuKhoanThanhToanCustomer = ({ id }) => {
   return axios.get(`${API_URL}/dieu-khoan/customer/${id}`, {
     headers: authHeader(),
@@ -413,6 +416,28 @@ const deleteEmployee = (id) => {
     headers: authHeader(),
   });
 };
+
+const deleteWarehouseKeeper = (id) => {
+  return axios.delete(`${API_URL}/employee/warehouse-keeper/${id}`, {
+    headers: authHeader(),
+  });
+};
+
+const deletePurchasing = (id) => {
+  return axios.delete(`${API_URL}/employee/purchasing-officer/${id}`, {
+    headers: authHeader(),
+  });
+};
+
+
+const deleteSales = (id) => {
+  return axios.delete(`${API_URL}/employee/salesperson/${id}`, {
+    headers: authHeader(),
+  });
+};
+
+
+
 const doiTuongService = {
   getListSupplier,
   getSupplier,
@@ -456,6 +481,9 @@ const doiTuongService = {
   postEmployee,
   postAccountant,
   deleteEmployee,
+  deleteSales,
+  deletePurchasing,
+  deleteWarehouseKeeper,
 
   getDieuKhoanThanhToanCustomer,
   getListDieuKhoanThanhToan,
