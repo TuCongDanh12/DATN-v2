@@ -22,22 +22,14 @@ const EditableCell = ({
 
   const toggleEdit = () => {
     setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+    form.setFieldsValue({ [dataIndex]: record.count || record.originalCount }); // Hiển thị originalCount nếu không có count
   };
 
   const save = async () => {
     try {
       const values = await form.validateFields();
-      if (values[dataIndex] === undefined || values[dataIndex] === '') {
-        form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-        toggleEdit();
-      } else if (dataIndex === 'count' && values[dataIndex] > record.originalCount) {
-        message.error('Số lượng không được lớn hơn số lượng cần thiết');
-        form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-      } else {
-        toggleEdit();
-        handleSave({ ...record, ...values });
-      }
+      toggleEdit();
+      handleSave({ ...record, count: values[dataIndex] }); // Lưu giá trị count mới
     } catch (errInfo) {
       console.log('Save failed:', errInfo);
     }
@@ -51,12 +43,7 @@ const EditableCell = ({
         <Form.Item
           style={{ margin: 0 }}
           name={dataIndex}
-          rules={[
-            {
-              required: true,
-              message: `${title} is required.`,
-            },
-          ]}
+          rules={[{ required: true, message: `${title} is required.` }]}
         >
           <Input ref={inputRef} onPressEnter={save} onBlur={save} />
         </Form.Item>
@@ -71,9 +58,11 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>;
 };
 
+
+
 const OrderTable = ({ dataSource, handleSave, discount, discountRate }) => {
   const calculateAmount = (record) => {
-    const thanhTien = (record.count - record.delivered) * record.price;
+    const thanhTien = record.originalCount * record.price; // Tính thành tiền theo count mới
     const tienChietKhau = (thanhTien * discountRate) / 100;
     const total = thanhTien - tienChietKhau;
 
@@ -108,7 +97,9 @@ const OrderTable = ({ dataSource, handleSave, discount, discountRate }) => {
       dataIndex: 'count',
       key: 'count',
       editable: true,
-      render: (_, record) => record.count - record.delivered,
+      render: (_, record) => (
+        <span>{record.count !== undefined ? record.originalCount : record.originalCount}</span>
+      ),
     },
     {
       title: 'Đơn giá',
@@ -176,5 +167,6 @@ const OrderTable = ({ dataSource, handleSave, discount, discountRate }) => {
     />
   );
 };
+
 
 export default OrderTable;

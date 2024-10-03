@@ -2,7 +2,7 @@ import React from 'react';
 
 
 const calculateTotal = (products) => {
-  return products.reduce((acc, product) => acc + (product.price * product.count), 0);
+  return products.reduce((acc, product) => acc + (product.price * (product.originalCount)), 0);
 };
 
 const OrderSummary = ({ discount, discountRate, data }) => {

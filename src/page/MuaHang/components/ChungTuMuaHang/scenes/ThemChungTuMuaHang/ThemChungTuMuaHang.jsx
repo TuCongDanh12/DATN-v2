@@ -40,7 +40,7 @@ const DonMuaHang = ({ disabled }) => {
       setProductData(data.productOfDonMuaHangs.map(item => ({
         ...item,
         key: item.id,
-        originalCount: item.count,
+        originalCount: item.count - item.delivered,
       })));
       setFormData({
         ngayHoachToan: moment(),
@@ -61,15 +61,35 @@ const DonMuaHang = ({ disabled }) => {
     }
   };
 
+  // const handleSave = (row) => {
+  //   const newData = [...productData];
+  //   console.log('newData',newData)
+  //   const index = newData.findIndex((item) => item.id === row.id);
+  //   console.log('index',index)
+  //   if (index > -1) {
+  //     const item = newData[index];
+  //     newData.splice(index, 1, { ...item, ...row });
+  //     console.log('newData2',newData)
+  //     setProductData(newData);
+  //   }
+  // };
+
   const handleSave = (row) => {
     const newData = [...productData];
     const index = newData.findIndex((item) => item.id === row.id);
     if (index > -1) {
       const item = newData[index];
-      newData.splice(index, 1, { ...item, ...row });
+      // Cập nhật giá trị count và originalCount bằng giá trị mới nhập vào
+      newData.splice(index, 1, {
+        ...item,
+        count: row.count, // Cập nhật giá trị count
+        originalCount: row.count, // Cập nhật originalCount bằng giá trị mới nhập
+      });
       setProductData(newData);
     }
   };
+  
+  
 
   const handleSubmit = async () => {
     setLoading(true);
