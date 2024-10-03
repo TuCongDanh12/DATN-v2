@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import OrderTable from "./table";
 import OrderSummary from "../../../../../../component/orderSumary";
 import OrderActions from "../../../../../../component/actionButton";
+import OrderSummaryDonmuahang from "../../../../../../component/orderSumaryDonhang";
 
 const DonMuaHang = ({ disabled }) => {
   const [donmuahang, setDonmuahang] = useState(null); // Initialize as null to handle loading state
@@ -183,7 +184,7 @@ const DonMuaHang = ({ disabled }) => {
         </div>
       </Form>
       <OrderTable discount={donmuahang.discount} discountRate={donmuahang.discountRate} data={donmuahang.productOfDonMuaHangs} />
-      <OrderSummary discount={donmuahang.discount} discountRate={donmuahang.discountRate} data={donmuahang.productOfDonMuaHangs}  />
+      <OrderSummaryDonmuahang discount={donmuahang.discount} discountRate={donmuahang.discountRate} data={donmuahang.productOfDonMuaHangs}  />
       <OrderActions disabled={disabled} />
     </div>
   );

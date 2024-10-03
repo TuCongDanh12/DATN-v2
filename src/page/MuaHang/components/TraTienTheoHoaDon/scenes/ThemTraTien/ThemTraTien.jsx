@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import muahangService from "../../../../../../services/muahang.service";
 import doiTuongService from "../../../../../../services/doiTuong.service";
+import { FaCommentsDollar } from "react-icons/fa";
 dayjs.extend(customParseFormat);
 
 const { Text } = Typography;
@@ -48,6 +49,7 @@ const ThemTraTien = ({ disabled = false }) => {
   useEffect(() => {
     if (listChungtumua.length > 0) {
       const supplier = listChungtumua[0]?.donMuaHang?.supplier;
+      // console.log("Nhà cung cấp",supplier)
 
       form.setFieldsValue({
         nameCustomer: supplier?.accountName,
@@ -259,7 +261,7 @@ const ThemTraTien = ({ disabled = false }) => {
           <Flex vertical gap={5} className="w-[50%]">
             {Form.useWatch("paymentMethod", form) === "TRANSFER" && (
               <>
-                <Form.Item
+                {/* <Form.Item
                   label="Chi nhánh"
                   name="branch"
                   rules={[
@@ -267,7 +269,7 @@ const ThemTraTien = ({ disabled = false }) => {
                   ]}
                 >
                   <Input disabled />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item
                   label="Chủ tài khoản"
                   name="accountName"
