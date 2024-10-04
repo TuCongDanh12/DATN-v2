@@ -70,7 +70,7 @@ const ThongBaoDenHan = () => {
           <Text strong>Thông báo lần 1:</Text> Trước <strong>{firstAnnounce}</strong> ngày
         </div>
         <div>
-          <Text strong>Thông báo lần 2:</Text> Trước <strong>{secondAnnounce}</strong> ngày
+          <Text strong>Thông báo lần 2:</Text> Trước <strong>{secondAnnounce}</strong> ngày <strong>(kèm thêm gửi mail)</strong>
         </div>
         <Button type="primary" onClick={handleEditClick} style={{ marginTop: 16 }}>
           Chỉnh sửa

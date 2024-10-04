@@ -44,59 +44,64 @@ const ThongBao = () => {
     <div className="ml-5 mt-5">
       <h1 className="font-bold text-3xl mb-3">Thông báo</h1>
       <Flex gap={30} className="mb-5">
-        <Select
-          value={type}
-          style={{
-            width: 120,
-          }}
-          onChange={(value) => setType(value)}
-          options={[
-            {
-              value: null,
-              label: "Tất cả",
-            },
-            {
-              value: "THU",
-              label: "Hóa đơn",
-            },
-            {
-              value: "BAN_HANG",
-              label: "Đơn đặt hàng",
-            },
-            // {
-            //   value: "CHI",
-            //   label: "Chi",
-            // },
-            {
-              value: "MUA_HANG",
-              label: "Mua hàng",
-            },
-          ]}
-        />
-
-        <Select
-          value={isResolved}
-          defaultValue={false}
-          style={{
-            width: 120,
-          }}
-          onChange={(value) => setIsResolved(value)}
-          options={[
-            {
-              value: null,
-              label: "Tất cả",
-            },
-            {
-              value: false,
-              label: "Chưa xử lý",
-            },
-            {
-              value: true,
-              label: "Đã xử lý",
-            },
-          ]}
-        />
-        <Select
+        <Flex gap={10} justify="center" align="center">
+          <p className="!mb-0">Đối tượng:</p>
+          <Select
+            value={type}
+            style={{
+              width: 120,
+            }}
+            onChange={(value) => setType(value)}
+            options={[
+              {
+                value: null,
+                label: "Tất cả",
+              },
+              {
+                value: "THU",
+                label: "Hóa đơn",
+              },
+              {
+                value: "BAN_HANG",
+                label: "Đơn đặt hàng",
+              },
+              // {
+              //   value: "CHI",
+              //   label: "Chi",
+              // },
+              {
+                value: "MUA_HANG",
+                label: "Mua hàng",
+              },
+            ]}
+          />
+        </Flex>
+        <Flex gap={10} justify="center" align="center">
+          <p className="!mb-0">Tình trạng xử lý: </p>
+          <Select
+            value={isResolved}
+            defaultValue={false}
+            style={{
+              width: 120,
+            }}
+            onChange={(value) => setIsResolved(value)}
+            options={[
+              {
+                value: null,
+                label: "Tất cả",
+              },
+              {
+                value: false,
+                label: "Chưa xử lý",
+              },
+              {
+                value: true,
+                label: "Đã xử lý",
+              },
+            ]}
+          />
+        </Flex>
+        {/* <Select
           value={isRead}
           style={{
             width: 120,
@@ -116,7 +121,7 @@ const ThongBao = () => {
               label: "Đã đọc",
             },
           ]}
-        />
+        /> */}
       </Flex>
       <Flex vertical gap={20}>
         {notificationAll.map((notification, index) => {

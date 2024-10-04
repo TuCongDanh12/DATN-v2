@@ -9,7 +9,7 @@ function NotificationComponent(props) {
   const updateStatusRead = async (id) => {
     try {
       const res = await notification.updateReadStatus(props.id);
-      console.log(res);
+      // console.log(res);
       // message.success("Cập nhật thành công");
     } catch (err) {
       console.error(err);
