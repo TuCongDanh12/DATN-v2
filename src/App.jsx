@@ -95,6 +95,8 @@ import DoiChieuCongNo from "./page/BaoCao/scenes/DoiChieuCongNo/DoiChieuCongNo";
 import TongHopCongNo from './page/BaoCao/scenes/TongHopCongNo/TongHopCongNo';
 import ChiTietTongHopCongNo from "./page/BaoCao/scenes/TongHopCongNo/ChiTietTongHopCongNo/ChiTietTongHopCongNo";
 import ChiTietDoiChieuCongNo from "./page/BaoCao/scenes/DoiChieuCongNo/ChiTietDoiChieuCongNo/ChiTietDoiChieuCongNo";
+import NoPhaiTra from "./page/CongNo/scenes/Nophaitra/NoPhaiTra";
+import NoPhaiThu from "./page/CongNo/scenes/Nophaithu/NoPhaiThu";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -377,6 +379,14 @@ function App() {
                   <Route
                     path="bao-cao-no-phai-tra"
                     element={<BaoCaoNoPhaiTra />}
+                  />
+                  <Route
+                    path="no-phai-tra"
+                    element={<NoPhaiTra/>}
+                  />
+                  <Route
+                    path="no-phai-thu"
+                    element={<NoPhaiThu/>}
                   />
                   <Route
                     path="doi-chieu-cong-no"

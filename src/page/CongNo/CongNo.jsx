@@ -33,6 +33,14 @@ const CongNo = () => {
         url: 'tong-hop-cong-no',
         content: "Tổng hợp công nợ"
       },
+      {
+        url: 'no-phai-tra',
+        content: "Nợ phải trả"
+      },
+      {
+        url: 'no-phai-thu',
+        content: "Nợ phải thu"
+      },
     ]
   return (
     <div>
