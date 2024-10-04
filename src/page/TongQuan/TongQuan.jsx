@@ -7,6 +7,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  Bar,
+  BarChart,
   ResponsiveContainer,
 } from "recharts";
 import { Select, Flex, Progress } from "antd";
@@ -138,8 +140,9 @@ const TongQuan = () => {
         "Doanh thu": item["Doanh thu năm nay"],
         [currentLabel]: costData.thisPeriod[index]?.cost || 0,
         [previousLabel]: costData.lastPeriod[index]?.cost || 0,
+        "Lợi nhuận": Number(item["Doanh thu năm nay"]) - costData.thisPeriod[index]?.cost,
       }));
-      // console.log('Biểu đồ', combinedData)
+      console.log('Biểu đồ', combinedData)
       setDataVenue(combinedData);
       dispatch(clearState());
     }
@@ -255,6 +258,19 @@ const TongQuan = () => {
             <Line dataKey={currentLabel} stroke="#E76F51" strokeOpacity={hideCostThisPeriod ? 0 : 1} />
             <Line dataKey={previousLabel} stroke="#82ca9d" strokeOpacity={hideCostLastPeriod ? 0 : 1} />
           </LineChart>
+        </ResponsiveContainer>
+
+
+        <ResponsiveContainer className="!w-[900px] !h-[300px] border border-gray-300 shadow-xl rounded-lg p-5 mt-5">
+          <p className="font-bold text-xl">Lợi nhuận</p>
+          <BarChart data={dataVenue} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Lợi nhuận" fill="#82ca9d" />
+          </BarChart>
         </ResponsiveContainer>
 
         <div>
