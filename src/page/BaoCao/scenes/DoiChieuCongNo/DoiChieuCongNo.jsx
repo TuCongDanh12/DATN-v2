@@ -87,7 +87,7 @@ const DoiChieuCongNo = () => {
   const columns = getColumns(navigate);
 
   return (
-    <div>
+    <div className='mx-5 mt-5'>
       <Button type="primary" onClick={showModal} style={{ marginBottom: 16 }}>
         Tạo Báo Cáo Mới
       </Button>

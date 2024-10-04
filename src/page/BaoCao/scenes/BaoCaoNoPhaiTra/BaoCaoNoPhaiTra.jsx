@@ -66,8 +66,8 @@ const BaoCaoNoPhaiTra = () => {
   };
 
   return (
-    <div>
-      <div className="mt-5 ml-5" style={{ marginBottom: "16px" }}>
+    <div className='mx-5'>
+      <div className="mt-5 " style={{ marginBottom: "16px" }}>
         <Button type="primary" onClick={showModal}>
           Tạo báo cáo
         </Button>

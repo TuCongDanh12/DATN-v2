@@ -98,7 +98,7 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
       </Button> */}
       <Table
         rowKey={record => record.id} // Ensure each row has a unique key
-        rowSelection={{ type: "checkbox", ...rowSelection }}
+        // rowSelection={{ type: "checkbox", ...rowSelection }}
         columns={getColumns(navigate)}
         dataSource={filteredData}
         pagination={{
