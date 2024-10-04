@@ -31,7 +31,8 @@ import NoPhaiTra from "../../component/Chart/NoChuaTra";
 
 const TongQuan = () => {
   const dispatch = useDispatch();
-  const { isSuccessGetChartRevenue, chartRevenueData } = useSelector(tongQuanSelector);
+  const { isSuccessGetChartRevenue, chartRevenueData } =
+    useSelector(tongQuanSelector);
   const { reportTHCNData } = useSelector(congNoSelector);
 
   const [dataVenue, setDataVenue] = useState([]);
@@ -46,22 +47,42 @@ const TongQuan = () => {
     try {
       let responseThisPeriod, responseLastPeriod;
       if (month) {
-        responseThisPeriod = await tongQuanService.getMuaHangChartRevenueMonth({ values: { year, month } });
+        responseThisPeriod = await tongQuanService.getMuaHangChartRevenueMonth({
+          values: { year, month },
+        });
         responseLastPeriod = await tongQuanService.getMuaHangChartRevenueMonth({
-          values: { year: month === 1 ? year - 1 : year, month: month === 1 ? 12 : month - 1 },
+          values: {
+            year: month === 1 ? year - 1 : year,
+            month: month === 1 ? 12 : month - 1,
+          },
         });
       } else if (quarter) {
-        responseThisPeriod = await tongQuanService.getMuaHangChartRevenueQuarter({ values: { year, quarter } });
-        responseLastPeriod = await tongQuanService.getMuaHangChartRevenueQuarter({
-          values: { year: quarter === 1 ? year - 1 : year, quarter: quarter === 1 ? 4 : quarter - 1 },
-        });
+        responseThisPeriod =
+          await tongQuanService.getMuaHangChartRevenueQuarter({
+            values: { year, quarter },
+          });
+        responseLastPeriod =
+          await tongQuanService.getMuaHangChartRevenueQuarter({
+            values: {
+              year: quarter === 1 ? year - 1 : year,
+              quarter: quarter === 1 ? 4 : quarter - 1,
+            },
+          });
       } else {
-        responseThisPeriod = await tongQuanService.getMuaHangChartRevenueYear({ values: { year } });
-        responseLastPeriod = await tongQuanService.getMuaHangChartRevenueYear({ values: { year: year - 1 } });
+        responseThisPeriod = await tongQuanService.getMuaHangChartRevenueYear({
+          values: { year },
+        });
+        responseLastPeriod = await tongQuanService.getMuaHangChartRevenueYear({
+          values: { year: year - 1 },
+        });
       }
 
-      const costThisPeriod = responseThisPeriod.data.result.data.map((item) => ({ cost: item.finalValue }));
-      const costLastPeriod = responseLastPeriod.data.result.data.map((item) => ({ cost: item.finalValue }));
+      const costThisPeriod = responseThisPeriod.data.result.data.map(
+        (item) => ({ cost: item.finalValue })
+      );
+      const costLastPeriod = responseLastPeriod.data.result.data.map(
+        (item) => ({ cost: item.finalValue })
+      );
 
       setCostData({ thisPeriod: costThisPeriod, lastPeriod: costLastPeriod });
       // console.log('Tiền', costData, year, month)
@@ -134,15 +155,20 @@ const TongQuan = () => {
   }, []);
 
   useEffect(() => {
-    if (isSuccessGetChartRevenue && costData.thisPeriod && costData.lastPeriod) {
+    if (
+      isSuccessGetChartRevenue &&
+      costData.thisPeriod &&
+      costData.lastPeriod
+    ) {
       const combinedData = chartRevenueData.map((item, index) => ({
         name: item.name,
         "Doanh thu": item["Doanh thu năm nay"],
         [currentLabel]: costData.thisPeriod[index]?.cost || 0,
         [previousLabel]: costData.lastPeriod[index]?.cost || 0,
-        "Lợi nhuận": Number(item["Doanh thu năm nay"]) - costData.thisPeriod[index]?.cost,
+        "Lợi nhuận":
+          Number(item["Doanh thu năm nay"]) - costData.thisPeriod[index]?.cost,
       }));
-      console.log('Biểu đồ', combinedData)
+      console.log("Biểu đồ", combinedData);
       setDataVenue(combinedData);
       dispatch(clearState());
     }
@@ -163,7 +189,7 @@ const TongQuan = () => {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
-  
+
     switch (timeRange) {
       case "thisYear":
         return {
@@ -173,19 +199,28 @@ const TongQuan = () => {
       case "thisMonth":
         return {
           current: `Chi phí tháng ${month}/${year}`,
-          previous: `Chi phí tháng ${month - 1 || 12}/${month === 1 ? year - 1 : year}`,
+          previous: `Chi phí tháng ${month - 1 || 12}/${
+            month === 1 ? year - 1 : year
+          }`,
         };
       case "lastMonth":
         return {
-          current: `Chi phí tháng ${month - 1 || 12}/${month === 1 ? year - 1 : year}`,
-          previous: `Chi phí tháng ${month - 2 || 12}/${month === 1 ? year - 1 : year}`,
+          current: `Chi phí tháng ${month - 1 || 12}/${
+            month === 1 ? year - 1 : year
+          }`,
+          previous: `Chi phí tháng ${month - 2 || 12}/${
+            month === 1 ? year - 1 : year
+          }`,
         };
       case "thisQuarter":
       case "lastQuarter":
-        const quarter = Math.floor((month - 1) / 3) + (timeRange === "thisQuarter" ? 1 : 0);
+        const quarter =
+          Math.floor((month - 1) / 3) + (timeRange === "thisQuarter" ? 1 : 0);
         return {
           current: `Chi phí quý ${quarter} năm ${year}`,
-          previous: `Chi phí quý ${quarter - 1 || 4} năm ${quarter === 1 ? year - 1 : year}`,
+          previous: `Chi phí quý ${quarter - 1 || 4} năm ${
+            quarter === 1 ? year - 1 : year
+          }`,
         };
       case "Q1":
       case "Q2":
@@ -203,7 +238,6 @@ const TongQuan = () => {
         };
     }
   };
-  
 
   const { current: currentLabel, previous: previousLabel } = getCostLabels();
 
@@ -230,18 +264,96 @@ const TongQuan = () => {
       />
 
       <Flex vertical gap={30}>
-        <Countdocument timeRange={timeRange} />
-        <CountdocumentMua timeRange={timeRange} />
+        <Flex gap={50}>
+          <Countdocument timeRange={timeRange} />
+          <div className='border border-gray-300 shadow-md rounded-lg p-5 w-[500px] mr-3'>
+            <p className="text-xl">Tổng nợ phải thu</p>
+            <p>
+              <strong className="font-bold text-2xl ">
+                {VND.format(
+                  reportTHCNData
+                    ?.map((pt) => pt.inOfDate)
+                    .reduce((total, currentValue) => total + currentValue, 0) +
+                    reportTHCNData
+                      ?.map((pt) => pt.outOfDate)
+                      .reduce((total, currentValue) => total + currentValue, 0)
+                )}
+              </strong>
+            </p>
+            <p className="text-gray-500 mb-8">TỔNG</p>
+            <Flex justify="space-between">
+              <Flex vertical>
+                <p className="text-orange-500">
+                  <strong className="font-bold text-2xl">
+                    {VND.format(
+                      reportTHCNData
+                        ?.map((pt) => pt.outOfDate)
+                        .reduce(
+                          (total, currentValue) => total + currentValue,
+                          0
+                        )
+                    )}
+                  </strong>
+                </p>
+                <p className="text-gray-500">QUÁ HẠN</p>
+              </Flex>
+              <Flex vertical align="flex-end">
+                <p>
+                  <strong className="font-bold text-2xl">
+                    {VND.format(
+                      reportTHCNData
+                        ?.map((pt) => pt.inOfDate)
+                        .reduce(
+                          (total, currentValue) => total + currentValue,
+                          0
+                        )
+                    )}
+                  </strong>
+                </p>
+                <p className="text-gray-500">TRONG HẠN</p>
+              </Flex>
+            </Flex>
+            <Progress
+              percent={
+                (reportTHCNData
+                  ?.map((pt) => pt.outOfDate)
+                  .reduce((total, currentValue) => total + currentValue, 0) *
+                  100) /
+                (reportTHCNData
+                  ?.map((pt) => pt.outOfDate)
+                  .reduce((total, currentValue) => total + currentValue, 0) +
+                  reportTHCNData
+                    ?.map((pt) => pt.inOfDate)
+                    .reduce((total, currentValue) => total + currentValue, 0))
+              }
+              showInfo={false}
+              strokeColor="#f00732"
+              trailColor="blue"
+            />
+          </div>
+        </Flex>
+        <Flex gap={50}>
+          <CountdocumentMua timeRange={timeRange} />
+          <div className='border border-gray-300 shadow-md rounded-lg p-5 w-[500px] mr-3'>
+          <NoPhaiTra />
+          </div>
+        </Flex>
       </Flex>
 
       <Flex vertical gap={50} className="mt-5 w-full">
-      
         <ResponsiveContainer className="!w-[900px] !h-[300px] border border-gray-300 shadow-xl rounded-lg p-5 mt-3">
-        <p className="font-bold text-xl">Chi phí, doanh thu</p>
-          <LineChart data={dataVenue} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
+          <p className="font-bold text-xl">Chi phí, doanh thu</p>
+          <LineChart
+            data={dataVenue}
+            margin={{ top: 5, right: 30, left: 30, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" type="category" />
-            <YAxis type="number" domain={["auto", "auto"]} tickFormatter={DataFormater} />
+            <YAxis
+              type="number"
+              domain={["auto", "auto"]}
+              tickFormatter={DataFormater}
+            />
             <Tooltip />
             <Legend
               onClick={(e) => {
@@ -254,16 +366,30 @@ const TongQuan = () => {
                 }
               }}
             />
-            <Line dataKey="Doanh thu" stroke="#4B8AF1" strokeOpacity={hideRevenue ? 0 : 1} />
-            <Line dataKey={currentLabel} stroke="#E76F51" strokeOpacity={hideCostThisPeriod ? 0 : 1} />
-            <Line dataKey={previousLabel} stroke="#82ca9d" strokeOpacity={hideCostLastPeriod ? 0 : 1} />
+            <Line
+              dataKey="Doanh thu"
+              stroke="#4B8AF1"
+              strokeOpacity={hideRevenue ? 0 : 1}
+            />
+            <Line
+              dataKey={currentLabel}
+              stroke="#E76F51"
+              strokeOpacity={hideCostThisPeriod ? 0 : 1}
+            />
+            <Line
+              dataKey={previousLabel}
+              stroke="#82ca9d"
+              strokeOpacity={hideCostLastPeriod ? 0 : 1}
+            />
           </LineChart>
         </ResponsiveContainer>
 
-
         <ResponsiveContainer className="!w-[900px] !h-[300px] border border-gray-300 shadow-xl rounded-lg p-5 mt-5">
           <p className="font-bold text-xl">Lợi nhuận</p>
-          <BarChart data={dataVenue} margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
+          <BarChart
+            data={dataVenue}
+            margin={{ top: 5, right: 30, left: 30, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
@@ -273,71 +399,7 @@ const TongQuan = () => {
           </BarChart>
         </ResponsiveContainer>
 
-        <div>
-          <p className="font-bold text-xl mb-2">Nợ</p>
-          <Flex gap={100} className="border border-gray-300 shadow-md rounded-lg p-5 w-[500px]">
-            <div>
-              <p className="text-xl">Tổng nợ phải thu</p>
-              <p>
-                <strong className="font-bold text-2xl ">
-                  {VND.format(
-                    reportTHCNData
-                      ?.map((pt) => pt.inOfDate)
-                      .reduce((total, currentValue) => total + currentValue, 0) +
-                    reportTHCNData
-                      ?.map((pt) => pt.outOfDate)
-                      .reduce((total, currentValue) => total + currentValue, 0)
-                  )}
-                </strong>
-              </p>
-              <p className="text-gray-500 mb-8">TỔNG</p>
-              <Flex justify="space-between">
-                <Flex vertical>
-                  <p className="text-orange-500">
-                    <strong className="font-bold text-2xl">
-                      {VND.format(
-                        reportTHCNData
-                          ?.map((pt) => pt.outOfDate)
-                          .reduce((total, currentValue) => total + currentValue, 0)
-                      )}
-                    </strong>
-                  </p>
-                  <p className="text-gray-500">QUÁ HẠN</p>
-                </Flex>
-                <Flex vertical align="flex-end">
-                  <p>
-                    <strong className="font-bold text-2xl">
-                      {VND.format(
-                        reportTHCNData
-                          ?.map((pt) => pt.inOfDate)
-                          .reduce((total, currentValue) => total + currentValue, 0)
-                      )}
-                    </strong>
-                  </p>
-                  <p className="text-gray-500">TRONG HẠN</p>
-                </Flex>
-              </Flex>
-              <Progress
-                percent={(
-                  (reportTHCNData
-                    ?.map((pt) => pt.outOfDate)
-                    .reduce((total, currentValue) => total + currentValue, 0) *
-                    100) /
-                  (reportTHCNData
-                    ?.map((pt) => pt.outOfDate)
-                    .reduce((total, currentValue) => total + currentValue, 0) +
-                    reportTHCNData
-                      ?.map((pt) => pt.inOfDate)
-                      .reduce((total, currentValue) => total + currentValue, 0))
-                )}
-                showInfo={false}
-                strokeColor="#f00732"
-                trailColor="blue"
-              />
-            </div>
-            <NoPhaiTra />
-          </Flex>
-        </div>
+        
       </Flex>
 
       <Flex gap={40}>

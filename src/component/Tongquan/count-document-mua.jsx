@@ -118,7 +118,7 @@ const CountdocumentMua = ({ timeRange }) => {
   };
 
   return (
-    <Flex gap={50}>
+    <Flex gap={50} className='h-[200px]'>
       <Flex gap={20} className="p-5 rounded-md" style={{ backgroundColor: "#D4EAC7" }}>
         <div>
           <DiffTwoTone style={{ fontSize: "30px" }} />
