@@ -136,13 +136,17 @@ const TransactionDetails = ({ bankAccountId }) => {
       dataIndex: 'description',
       key: 'description',
     },
-    // {
-    //   title: 'ID tài khoản ngân hàng',
-    //   dataIndex: 'bankAccountId',
-    //   key: 'bankAccountId',
-    // },
+    {
+      title: 'Trạng thái',
+      key: 'status',
+      render: (_, record) => (
+        <span style={{ color: record.reconciled ? 'green' : 'red' }}>
+          {record.reconciled ? 'Đã đối chiếu' : 'Chưa đối chiếu'}
+        </span>
+      ),
+    },
   ];
-
+  
   return (
     <div>
       <Upload 
@@ -152,7 +156,7 @@ const TransactionDetails = ({ bankAccountId }) => {
       >
         <Button className='my-5' icon={<UploadOutlined />}>Tải lên file Excel</Button>
       </Upload>
-      <Table dataSource={dataSource} columns={columns} />
+      <Table dataSource={dataSource} columns={columns} pagination={{ pageSize: 10 }} />
     </div>
   );
 };

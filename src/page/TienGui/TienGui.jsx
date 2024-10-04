@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Table, DatePicker, Space, Button, Modal, Upload, Select, message } from "antd";
+import {
+  Table,
+  DatePicker,
+  Space,
+  Button,
+  Modal,
+  Upload,
+  Select,
+  message,
+} from "antd";
 import { Flex } from "antd";
 import * as XLSX from "xlsx";
 import { FileExcelOutlined } from "@ant-design/icons";
@@ -20,7 +29,7 @@ const TienGui = () => {
   const [selectedBank, setSelectedBank] = useState(null);
   const [phieuChiData, setPhieuChiData] = useState([]);
   const [receiptType, setReceiptType] = useState(null);
-  const [postfinal, setPostfinal] = useState(null)
+  const [postfinal, setPostfinal] = useState(null);
   const fetchListBankAccount = async () => {
     try {
       const res = await doiTuongService.getListBankAccount();
@@ -34,9 +43,11 @@ const TienGui = () => {
   const fetchTransactionsForBankAccount = async (bankAccountId) => {
     try {
       const response = await congNoService.getAllTransactionBank(bankAccountId);
-      const data = response.data.result.data.filter(item=> item.reconciled === false);
-      console.log('table2', response.data.result.data)
-      const formattedData = data.map(transaction => ({
+      const data = response.data.result.data.filter(
+        (item) => item.reconciled === false
+      );
+      console.log("table2", response.data.result.data);
+      const formattedData = data.map((transaction) => ({
         key: transaction.id, // Assuming transaction has an id
         giaoDich: transaction.transactionNumber, // Adjust based on your transaction structure
         ngayGiaoDich: transaction.date, // Adjust based on your transaction structure
@@ -45,10 +56,10 @@ const TienGui = () => {
         noiDung: transaction.description, // Adjust as needed
       }));
 
-      console.log("table2",formattedData)
+      console.log("table2", formattedData);
 
       setTable2Data(formattedData); // Set the retrieved data into table 2
-      console.log('table2', formattedData)
+      console.log("table2", formattedData);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -60,8 +71,11 @@ const TienGui = () => {
       const data = response.data.result.data;
 
       const filteredData = data
-        .filter(receipt => receipt.bankAccount.id === bankAccountId && !receipt.isTienMat)
-        .map(receipt => ({
+        .filter(
+          (receipt) =>
+            receipt.bankAccount.id === bankAccountId && !receipt.isTienMat
+        )
+        .map((receipt) => ({
           key: receipt.id,
           chungTu: receipt.id,
           ngayHoachToan: receipt.paymentDate,
@@ -81,10 +95,10 @@ const TienGui = () => {
     try {
       const response = await muahangService.getListPhieuChiTienGui();
       const data = response.data.result.data;
-      console.log('table1',response.data.result.data)
+      console.log("table1", response.data.result.data);
       const filteredData = data
-        .filter(receipt => receipt.bankAccount.id === bankAccountId)
-        .map(receipt => ({
+        .filter((receipt) => receipt.bankAccount.id === bankAccountId)
+        .map((receipt) => ({
           key: receipt.id,
           chungTu: receipt.id,
           ngayHoachToan: receipt.paymentDate,
@@ -95,7 +109,7 @@ const TienGui = () => {
 
       setPhieuChiData(filteredData);
       setTable1Data(filteredData);
-      console.log('table1', filteredData )
+      console.log("table1", filteredData);
     } catch (error) {
       console.error("Error fetching receipt data:", error);
     }
@@ -132,7 +146,11 @@ const TienGui = () => {
 
   const columns1 = [
     { title: "Chứng từ", dataIndex: "chungTu", key: "chungTu" },
-    { title: "Ngày hoạch toán", dataIndex: "ngayHoachToan", key: "ngayHoachToan" },
+    {
+      title: "Ngày hoạch toán",
+      dataIndex: "ngayHoachToan",
+      key: "ngayHoachToan",
+    },
     { title: "Số tiền thu", dataIndex: "soTienThu", key: "soTienThu" },
     { title: "Số tiền chi", dataIndex: "soTienChi", key: "soTienChi" },
     { title: "Nội dung", dataIndex: "noiDung", key: "noiDung" },
@@ -148,12 +166,15 @@ const TienGui = () => {
 
   const combinedColumns = [
     { title: "Chứng từ", dataIndex: "chungTu", key: "chungTu" },
-    { title: "Ngày hoạch toán", dataIndex: "ngayHoachToan", key: "ngayHoachToan" },
+    {
+      title: "Ngày hoạch toán",
+      dataIndex: "ngayHoachToan",
+      key: "ngayHoachToan",
+    },
     { title: "Mã giao dịch", dataIndex: "Magiaodich", key: "Magiaodich" },
     { title: "Số tiền thu", dataIndex: "soTienThu", key: "soTienThu" },
     { title: "Ngày giao dịch", dataIndex: "ngayGiaoDich", key: "ngayGiaoDich" },
   ];
-  
 
   // Handle file upload and read Excel data
   const handleFileChange = (file) => {
@@ -193,9 +214,9 @@ const TienGui = () => {
   };
   const handleOk = () => {
     // Combine selected rows from both tables
-    const combined = selectedRows1.map(row1 => {
-      const row2 = selectedRows2// Ensure you are finding the row based on the correct key
-      console.log('row2', row2)
+    const combined = selectedRows1.map((row1) => {
+      const row2 = selectedRows2; // Ensure you are finding the row based on the correct key
+      console.log("row2", row2);
       return {
         ...row1,
         id: row2 ? row2[0].key : null,
@@ -203,39 +224,50 @@ const TienGui = () => {
         ngayGiaoDich: row2 ? row2[0].ngayGiaoDich : null, // Get transaction date from table 2 if row2 exists
       };
     });
-    console.log('combined',combined)
-    setPostfinal(combined)
+    console.log("combined", combined);
+    setPostfinal(combined);
     // Update combinedData
-    setCombinedData(prevCombinedData => [...prevCombinedData, ...combined]);
-    
+    setCombinedData((prevCombinedData) => [...prevCombinedData, ...combined]);
+
     // Filter out selected rows from table1Data and table2Data
-    const newTable1Data = table1Data.filter(row => !selectedRows1.includes(row));
-    const newTable2Data = table2Data.filter(row => !selectedRows2.includes(row));
-  
+    const newTable1Data = table1Data.filter(
+      (row) => !selectedRows1.includes(row)
+    );
+    const newTable2Data = table2Data.filter(
+      (row) => !selectedRows2.includes(row)
+    );
+
     setTable1Data(newTable1Data);
     setTable2Data(newTable2Data);
-  
+
     // Close modal and reset selections
     setIsModalVisible(false);
     setSelectedRows1([]);
     setSelectedRows2([]);
   };
-  
+
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-  
+
   const handleCreate = async () => {
     try {
-      
-        // Lặp qua từng hàng trong bảng tổng hợp
-        console.log('combined', postfinal)
-        const transactionId = postfinal[0].id
-        const id = postfinal[0].chungTu
-        console.log(transactionId, ' ', id)
-        await congNoService.combinedTransaction(transactionId, id);
-        message.success('Đối chiếu thành công')
-        window.location.reload()
+      // Lặp qua từng hàng trong bảng tổng hợp
+      console.log("combined", postfinal);
+      const transactionId = postfinal[0].id;
+      const id = postfinal[0].chungTu;
+      console.log(transactionId, " ", id);
+      await congNoService.combinedTransaction(transactionId, id);
+      message.success("Đối chiếu thành công");
+      setTable1Data([]);
+      setTable2Data([]);
+      setSelectedRows1([]);
+      setSelectedRows2([]);
+      setCombinedData([]);
+      setPostfinal(null);
+      setIsModalVisible(false);
+
+      // window.location.reload()
       // Hiển thị thông báo thành công
       console.log("Transactions created successfully.");
       // Bạn có thể thêm thông báo cho người dùng ở đây nếu cần
@@ -244,7 +276,7 @@ const TienGui = () => {
       // Hiển thị thông báo lỗi nếu cần
     }
   };
-  
+
   return (
     <div>
       <Flex gap={30}>
@@ -279,7 +311,8 @@ const TienGui = () => {
           <Table
             rowSelection={{
               type: "checkbox",
-              onChange: (selectedRowKeys, selectedRows) => setSelectedRows1(selectedRows),
+              onChange: (selectedRowKeys, selectedRows) =>
+                setSelectedRows1(selectedRows),
             }}
             columns={columns1}
             dataSource={table1Data}
@@ -299,7 +332,8 @@ const TienGui = () => {
           <Table
             rowSelection={{
               type: "checkbox",
-              onChange: (selectedRowKeys, selectedRows) => setSelectedRows2(selectedRows),
+              onChange: (selectedRowKeys, selectedRows) =>
+                setSelectedRows2(selectedRows),
             }}
             columns={columns2}
             dataSource={table2Data}
