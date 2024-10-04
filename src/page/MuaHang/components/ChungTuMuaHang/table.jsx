@@ -120,7 +120,7 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
   };
   
   return (
-    <div>
+    <div className='mx-5'>
       <Button
         type="primary"
         icon={<FileExcelOutlined />}

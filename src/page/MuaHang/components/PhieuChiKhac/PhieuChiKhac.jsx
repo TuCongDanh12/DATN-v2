@@ -143,7 +143,7 @@ const PhieuChiKhac = () => {
   };
 
   return (
-    <div className='mt-5'>
+    <div className='mt-5 mx-5'>
       {/* Phần lọc ở trên bảng */}
       <Space style={{ marginBottom: 16 }}>
         <RangePicker

@@ -27,7 +27,7 @@ const BaoCao = () => {
       },
       {
         url: 'bao-cao-chi-phi',
-        content: "Báo cáo chi phí"
+        content: "Báo cáo kết quả kinh doanh"
       },
       // {
       //   url: 'bao-cao-da-luu',
