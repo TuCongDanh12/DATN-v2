@@ -207,14 +207,14 @@ const Sidebar = ({
               icon={<ReceiptOutlinedIcon size={20} />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <Item
               title="Tiền gửi"
               to="/tien-gui"
               icon={<AccountBalanceIcon size={20} />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
             <Item
               title="Nợ"
               to="/cong-no/bao-cao-no-phai-tra"

@@ -3,7 +3,7 @@ import Header from '../../component/Header/Header'
 import { Outlet } from 'react-router-dom';
 
 const CongNo = () => {
-  const titlez = "Nợ";
+  const titlez = "Công nợ";
     const process = [
       // {
       //   url: 'quy-trinh',
