@@ -3,6 +3,8 @@ import authHeader from "./auth-header";
 
 const API_URL = `${process.env.REACT_APP_SERVER_URL}`;
 
+const user = JSON.parse(localStorage.getItem('user'));
+  
 const getListChungTuBan = () => {
     return axios.get(`${API_URL}/ctban`,
         {
@@ -112,6 +114,41 @@ const deleteReportTHCN = (values) => {
     );
 };
 
+const postTransaction = (values) => {
+    return axios.post(`${API_URL}/transaction`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
+
+
+const getAllTransactionBank = (id) => {
+    return axios.get(`${API_URL}/transaction/bank/all/${id}`,
+        {
+            headers: authHeader()
+        });
+};
+
+
+const combinedTransaction = (transactionId, id) => {
+    return axios.patch(
+      `${API_URL}/transaction/chi/${transactionId}/${id}`,
+      {
+        headers: {
+          Authorization: 'Bearer ' + user.accessToken, // Cấu hình header đúng
+        },
+      },
+      {
+        headers: {
+          Authorization: 'Bearer ' + user.accessToken, // Cấu hình header đúng
+        },
+      }
+    );
+  };
+  
 
 const congNoService = {
     getListChungTuBan,
@@ -126,7 +163,11 @@ const congNoService = {
     getReportTHCN,
     postReportTHCN,
     postReportTHCNRaw,
-    deleteReportTHCN
+    deleteReportTHCN,
+
+    postTransaction,
+    getAllTransactionBank,
+    combinedTransaction,
 };
 
 export default congNoService;

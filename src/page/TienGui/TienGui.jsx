@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Table, DatePicker, Space, Button, Modal, Upload, Select } from "antd";
+import { Table, DatePicker, Space, Button, Modal, Upload, Select, message } from "antd";
 import { Flex } from "antd";
 import * as XLSX from "xlsx";
 import { FileExcelOutlined } from "@ant-design/icons";
 import doiTuongService from "../../services/doiTuong.service";
 import muahangService from "../../services/muahang.service";
+import congNoService from "../../services/congNo.service"; // Make sure to import your service
+
 const { RangePicker } = DatePicker;
-
-const exportToExcel = (data, fileName) => {
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-  // Create Excel file
-  XLSX.writeFile(workbook, `${fileName}.xlsx`);
-};
-
-// Fake API to fetch data for table 1
-
-
 
 const TienGui = () => {
   const [table1Data, setTable1Data] = useState([]);
@@ -31,7 +20,7 @@ const TienGui = () => {
   const [selectedBank, setSelectedBank] = useState(null);
   const [phieuChiData, setPhieuChiData] = useState([]);
   const [receiptType, setReceiptType] = useState(null);
-
+  const [postfinal, setPostfinal] = useState(null)
   const fetchListBankAccount = async () => {
     try {
       const res = await doiTuongService.getListBankAccount();
@@ -42,93 +31,108 @@ const TienGui = () => {
     }
   };
 
+  const fetchTransactionsForBankAccount = async (bankAccountId) => {
+    try {
+      const response = await congNoService.getAllTransactionBank(bankAccountId);
+      const data = response.data.result.data.filter(item=> item.reconciled === false);
+      console.log('table2', response.data.result.data)
+      const formattedData = data.map(transaction => ({
+        key: transaction.id, // Assuming transaction has an id
+        giaoDich: transaction.transactionNumber, // Adjust based on your transaction structure
+        ngayGiaoDich: transaction.date, // Adjust based on your transaction structure
+        soTienThu: transaction.credit, // Assuming credit represents the amount received
+        soTienChi: transaction.debit, // Assuming debit represents the amount spent
+        noiDung: transaction.description, // Adjust as needed
+      }));
+
+      console.log("table2",formattedData)
+
+      setTable2Data(formattedData); // Set the retrieved data into table 2
+      console.log('table2', formattedData)
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
   const fetchPhieuChiKhacData = async (bankAccountId) => {
     try {
-      const response = await muahangService.getListPhieuChiKhac(); // Call the new API for "Phiếu Chi Khác"
+      const response = await muahangService.getListPhieuChiKhac();
       const data = response.data.result.data;
 
-      // Filter data by bank account ID and isTienMat
       const filteredData = data
-        .filter((receipt) => 
-          receipt.bankAccount.id === bankAccountId && !receipt.isTienMat // Filter logic
-        )
-        .map((receipt) => ({
+        .filter(receipt => receipt.bankAccount.id === bankAccountId && !receipt.isTienMat)
+        .map(receipt => ({
           key: receipt.id,
           chungTu: receipt.id,
           ngayHoachToan: receipt.paymentDate,
-          soTienThu: receipt.money, // Assuming you want to show the money here
+          soTienThu: receipt.money,
           soTienChi: 0,
           noiDung: receipt.content,
         }));
 
       setPhieuChiData(filteredData);
-      setTable1Data(filteredData); // Update table1Data to display the filtered receipts
+      setTable1Data(filteredData);
     } catch (error) {
       console.error("Error fetching 'Phiếu Chi Khác' data:", error);
     }
   };
 
-
   const fetchPhieuChiData = async (bankAccountId) => {
     try {
       const response = await muahangService.getListPhieuChiTienGui();
       const data = response.data.result.data;
-
-      // Filter data by bank account ID
+      console.log('table1',response.data.result.data)
       const filteredData = data
-        .filter((receipt) => receipt.bankAccount.id === bankAccountId)
-        .map((receipt) => ({
+        .filter(receipt => receipt.bankAccount.id === bankAccountId)
+        .map(receipt => ({
           key: receipt.id,
-          chungTu: receipt.id, // Concatenate content of chungTu
-          ngayHoachToan: receipt.paymentDate, // Adjust to your desired field
-          soTienThu: receipt.chungTu.reduce((total, ch) => total + ch.money, 0), // Sum money from all chungTu
-          soTienChi: 0, // Set to 0 or your desired logic
-          noiDung: receipt.content, // Example content from the receipt
+          chungTu: receipt.id,
+          ngayHoachToan: receipt.paymentDate,
+          soTienThu: receipt.chungTu.reduce((total, ch) => total + ch.money, 0),
+          soTienChi: 0,
+          noiDung: receipt.content,
         }));
 
       setPhieuChiData(filteredData);
-      setTable1Data(filteredData); // Update table1Data to display the filtered receipts
+      setTable1Data(filteredData);
+      console.log('table1', filteredData )
     } catch (error) {
       console.error("Error fetching receipt data:", error);
     }
   };
 
-  // Modify handleBankChange to pass the selected bank ID to fetchPhieuChiData
   const handleBankChange = (value) => {
+    // console.log('nganhang', value)
     setSelectedBank(value);
-
-    // Check if the selected receipt type is "Phiếu Chi"
     if (receiptType === "Phiếu Chi") {
-      fetchPhieuChiData(value); // Fetch and filter the receipts based on the selected bank account
+      fetchPhieuChiData(value);
+    } else if (receiptType === "Phiếu Chi Khác") {
+      fetchPhieuChiKhacData(value);
     }
+
+    // Fetch transactions for the selected bank account
+    fetchTransactionsForBankAccount(value);
   };
 
-  // Adjust handleReceiptTypeChange to reset table1Data when changing types
   const handleReceiptTypeChange = (value) => {
     setReceiptType(value);
-
     if (value === "Phiếu Chi" && selectedBank) {
-      fetchPhieuChiData(selectedBank); // Fetch filtered receipts based on selected bank
+      fetchPhieuChiData(selectedBank);
     } else if (value === "Phiếu Chi Khác" && selectedBank) {
-      fetchPhieuChiKhacData(selectedBank); // Fetch filtered "Phiếu Chi Khác" receipts based on selected bank
+      fetchPhieuChiKhacData(selectedBank);
     } else {
-      setTable1Data([]); // Clear table data if another receipt type is selected
+      setTable1Data([]);
+      setTable2Data([]); // Clear table 2 data when changing receipt type
     }
   };
 
   useEffect(() => {
-    // fetchTable1Data().then((data) => setTable1Data(data));
     fetchListBankAccount();
-    // fetchTable2Data().then((data) => setTable2Data(data));
   }, []);
 
   const columns1 = [
     { title: "Chứng từ", dataIndex: "chungTu", key: "chungTu" },
-    {
-      title: "Ngày hoạch toán",
-      dataIndex: "ngayHoachToan",
-      key: "ngayHoachToan",
-    },
+    { title: "Ngày hoạch toán", dataIndex: "ngayHoachToan", key: "ngayHoachToan" },
     { title: "Số tiền thu", dataIndex: "soTienThu", key: "soTienThu" },
     { title: "Số tiền chi", dataIndex: "soTienChi", key: "soTienChi" },
     { title: "Nội dung", dataIndex: "noiDung", key: "noiDung" },
@@ -144,74 +148,12 @@ const TienGui = () => {
 
   const combinedColumns = [
     { title: "Chứng từ", dataIndex: "chungTu", key: "chungTu" },
-    {
-      title: "Ngày hoạch toán",
-      dataIndex: "ngayHoachToan",
-      key: "ngayHoachToan",
-    },
+    { title: "Ngày hoạch toán", dataIndex: "ngayHoachToan", key: "ngayHoachToan" },
+    { title: "Mã giao dịch", dataIndex: "Magiaodich", key: "Magiaodich" },
     { title: "Số tiền thu", dataIndex: "soTienThu", key: "soTienThu" },
-    { title: "Giao dịch", dataIndex: "giaoDich", key: "giaoDich" },
     { title: "Ngày giao dịch", dataIndex: "ngayGiaoDich", key: "ngayGiaoDich" },
-    {
-      title: "Số tiền giao dịch",
-      dataIndex: "soTienGiaoDich",
-      key: "soTienGiaoDich",
-    },
   ];
-
-  const onTable1RangeChange = (dates) => {
-    if (dates) {
-      const [start, end] = dates;
-      const filteredData = table1Data.filter((record) => {
-        const date = new Date(record.ngayHoachToan);
-        return date >= start && date <= end;
-      });
-      setTable1Data(filteredData);
-    } else {
-     
-    }
-  };
-
-  const onTable2RangeChange = (dates) => {
-    if (dates) {
-      const [start, end] = dates;
-      const filteredData = table2Data.filter((record) => {
-        const date = new Date(record.ngayGiaoDich);
-        return date >= start && date <= end;
-      });
-      setTable2Data(filteredData);
-    } else {
-    
-    }
-  };
-
-  // Combine data from both tables on OK click
-  const handleOk = () => {
-    const combined = selectedRows1.map((row1, index) => ({
-      chungTu: row1.chungTu,
-      ngayHoachToan: row1.ngayHoachToan,
-      soTienThu: row1.soTienThu,
-      giaoDich: selectedRows2[index]?.giaoDich,
-      ngayGiaoDich: selectedRows2[index]?.ngayGiaoDich,
-      soTienGiaoDich: selectedRows2[index]?.soTienThu,
-    }));
-
-    setCombinedData([...combinedData, ...combined]);
-
-    // Remove selected rows from table 1 and table 2
-    setTable1Data(table1Data.filter((item) => !selectedRows1.includes(item)));
-    setTable2Data(table2Data.filter((item) => !selectedRows2.includes(item)));
-
-    // Reset selections
-    setSelectedRows1([]);
-    setSelectedRows2([]);
-
-    setIsModalVisible(false); // Close modal
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
+  
 
   // Handle file upload and read Excel data
   const handleFileChange = (file) => {
@@ -222,14 +164,13 @@ const TienGui = () => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-      // Process the data, starting from row 2 (index 1)
       const newData = [];
       for (let i = 1; i < jsonData.length; i++) {
         const row = jsonData[i];
-        if (!row[0]) break; // Stop if the first cell (Giao dịch) is empty
+        if (!row[0]) break;
 
         newData.push({
-          key: i, // Generate a unique key
+          key: i,
           giaoDich: row[0],
           ngayGiaoDich: row[1],
           soTienThu: row[2],
@@ -238,19 +179,72 @@ const TienGui = () => {
         });
       }
 
-      setTable2Data([...table2Data, ...newData]); // Update table 2 data
+      setTable2Data([...table2Data, ...newData]);
     };
-    reader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
+    reader.readAsArrayBuffer(file);
   };
 
   const uploadProps = {
     beforeUpload: (file) => {
       handleFileChange(file);
-      return false; // Prevent automatic upload
+      return false;
     },
     showUploadList: false,
   };
-
+  const handleOk = () => {
+    // Combine selected rows from both tables
+    const combined = selectedRows1.map(row1 => {
+      const row2 = selectedRows2// Ensure you are finding the row based on the correct key
+      console.log('row2', row2)
+      return {
+        ...row1,
+        id: row2 ? row2[0].key : null,
+        Magiaodich: row2 ? row2[0].giaoDich : null, // Get transaction code from table 2 if row2 exists
+        ngayGiaoDich: row2 ? row2[0].ngayGiaoDich : null, // Get transaction date from table 2 if row2 exists
+      };
+    });
+    console.log('combined',combined)
+    setPostfinal(combined)
+    // Update combinedData
+    setCombinedData(prevCombinedData => [...prevCombinedData, ...combined]);
+    
+    // Filter out selected rows from table1Data and table2Data
+    const newTable1Data = table1Data.filter(row => !selectedRows1.includes(row));
+    const newTable2Data = table2Data.filter(row => !selectedRows2.includes(row));
+  
+    setTable1Data(newTable1Data);
+    setTable2Data(newTable2Data);
+  
+    // Close modal and reset selections
+    setIsModalVisible(false);
+    setSelectedRows1([]);
+    setSelectedRows2([]);
+  };
+  
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+  
+  const handleCreate = async () => {
+    try {
+      
+        // Lặp qua từng hàng trong bảng tổng hợp
+        console.log('combined', postfinal)
+        const transactionId = postfinal[0].id
+        const id = postfinal[0].chungTu
+        console.log(transactionId, ' ', id)
+        await congNoService.combinedTransaction(transactionId, id);
+        message.success('Đối chiếu thành công')
+        window.location.reload()
+      // Hiển thị thông báo thành công
+      console.log("Transactions created successfully.");
+      // Bạn có thể thêm thông báo cho người dùng ở đây nếu cần
+    } catch (error) {
+      console.error("Error creating transactions:", error);
+      // Hiển thị thông báo lỗi nếu cần
+    }
+  };
+  
   return (
     <div>
       <Flex gap={30}>
@@ -258,7 +252,7 @@ const TienGui = () => {
           placeholder="Chọn ngân hàng"
           style={{ width: "100%" }}
           value={selectedBank}
-          onChange={handleBankChange} // Cập nhật ngân hàng
+          onChange={handleBankChange}
           className="mx-5 mt-5 !w-[250px]"
         >
           {listBankAccount.map((bank) => (
@@ -270,7 +264,7 @@ const TienGui = () => {
         <Select
           className="mt-5 !w-[200px]"
           placeholder="Chọn loại phiếu"
-          onChange={handleReceiptTypeChange} // Kết nối hàm xử lý
+          onChange={handleReceiptTypeChange}
         >
           <Select.Option value="Phiếu Chi">Phiếu Chi</Select.Option>
           <Select.Option value="Phiếu Chi Khác">Phiếu Chi Khác</Select.Option>
@@ -280,19 +274,12 @@ const TienGui = () => {
         <div>
           <h3 className="text-xl font-bold">Sổ kế toán tiền gửi</h3>
           <Space style={{ marginBottom: 16 }}>
-            <RangePicker onChange={onTable1RangeChange} />
-            {/* <Button
-              icon={<FileExcelOutlined />}
-              onClick={() => exportToExcel(selectedRows1, 'SoKeToanTienGui')}
-            >
-              Xuất Excel
-            </Button> */}
+            <RangePicker />
           </Space>
           <Table
             rowSelection={{
               type: "checkbox",
-              onChange: (selectedRowKeys, selectedRows) =>
-                setSelectedRows1(selectedRows),
+              onChange: (selectedRowKeys, selectedRows) => setSelectedRows1(selectedRows),
             }}
             columns={columns1}
             dataSource={table1Data}
@@ -301,26 +288,18 @@ const TienGui = () => {
             className="!w-[620px]"
           />
         </div>
-
         <div>
           <h3 className="text-xl font-bold">Sổ phụ ngân hàng</h3>
           <Space style={{ marginBottom: 16 }}>
-            <RangePicker onChange={onTable2RangeChange} />
+            <RangePicker />
             <Upload {...uploadProps}>
               <Button icon={<FileExcelOutlined />}>Nhập Excel</Button>
             </Upload>
-            {/* <Button
-              icon={<FileExcelOutlined />}
-              onClick={() => exportToExcel(selectedRows2, 'SoPhuNganHang')}
-            >
-              Xuất Excel
-            </Button> */}
           </Space>
           <Table
             rowSelection={{
               type: "checkbox",
-              onChange: (selectedRowKeys, selectedRows) =>
-                setSelectedRows2(selectedRows),
+              onChange: (selectedRowKeys, selectedRows) => setSelectedRows2(selectedRows),
             }}
             columns={columns2}
             dataSource={table2Data}
@@ -356,8 +335,8 @@ const TienGui = () => {
         />
       </div>
 
-      <Button className="ml-5 mt-5" type="primary">
-        Xác nhận
+      <Button className="ml-5 mt-5" type="primary" onClick={handleCreate}>
+        Tạo
       </Button>
     </div>
   );
