@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import * as XLSX from "xlsx";
+import { Link } from 'react-router-dom';
 import congNoService from "../../../../../../services/congNo.service";
 
 const TransactionDetails = ({ bankAccountId }) => {
@@ -140,8 +141,15 @@ const TransactionDetails = ({ bankAccountId }) => {
       title: 'Trạng thái',
       key: 'status',
       render: (_, record) => (
-        <span style={{ color: record.reconciled ? 'green' : 'red' }}>
-          {record.reconciled ? 'Đã đối chiếu' : 'Chưa đối chiếu'}
+        <span>
+          <span style={{ color: record.reconciled ? 'green' : 'red' }}>
+            {record.reconciled ? 'Đã đối chiếu' : 'Chưa đối chiếu'}
+          </span>
+          {record.reconciled && (
+            <Link to={`/mua-hang/phieu-chi/tiengui/${record?.phieuChi?.id}`} style={{ marginLeft: '8px' }}>
+              <Button type="link" className="!bg-[#ffff]">Xem</Button>
+            </Link>
+          )}
         </span>
       ),
     },
