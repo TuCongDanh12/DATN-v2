@@ -285,7 +285,7 @@ const Sidebar = ({
             <Box paddingLeft={isCollapsed ? undefined : "10%"}>
               <div className="side-menu-footer">
                 <div className="avatar">
-                  <img src={profile?.avatar} alt="user" />
+                  <img src='/assets/user.jpg' alt="user" />
                 </div>
                 <div className="user-info">
                   <Typography
