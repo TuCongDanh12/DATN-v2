@@ -68,12 +68,16 @@ const postReportCPMH = ( values ) => {
         });
 };
 
+
+
 const getReportCPMH = (  ) => {
     return axios.get(`${API_URL}/report-cpmh`,
         {
             headers: authHeader()
         });
 };
+
+
 
 const getDetailReportCPMH = ( id ) => {
     return axios.get(`${API_URL}/report-cpmh/${id}`,
@@ -82,6 +86,41 @@ const getDetailReportCPMH = ( id ) => {
         });
 };
 
+const getReportDCCN = () => {
+    return axios.get(`${API_URL}/report-dccn`,
+        {
+            headers: authHeader()
+        });
+}
+
+const postReportDCCNRaw = ( values ) => {
+    return axios.post(`${API_URL}/report-dccn/raw`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
+
+const postReportDCCN = ( values ) => {
+    return axios.post(`${API_URL}/report-dccn`,
+        {
+            ...values
+        },
+        {
+            headers: authHeader()
+        });
+};
+
+
+
+const getDetailReportDCCN = ( id ) => {
+    return axios.get(`${API_URL}/report-dccn/${id}`,
+        {
+            headers: authHeader()
+        });
+};
 const getReportNoPhaiTra = (  ) => {
     return axios.get(`${API_URL}/report-no-phai-tra`,
         {
@@ -168,7 +207,13 @@ const baoCaoService = {
     getReportChiPhi,
     getDetailChiPhi,
     postReportChiPhi,
-    postReportChiPhiRaw
+    postReportChiPhiRaw,
+
+    getDetailReportDCCN,
+    postReportDCCN,
+    postReportDCCNRaw,
+    getReportDCCN,
+
 };
 
 export default baoCaoService;

@@ -73,14 +73,14 @@ const getListReportTHCN = () => {
         });
 };
 
-const getReportTHCN = ({ id }) => {
+const getReportTHCN = (id) => {
     return axios.get(`${API_URL}/report-thcn/${id}`,
         {
             headers: authHeader()
         });
 };
 
-const postReportTHCN = ({ values }) => {
+const postReportTHCN = (values) => {
     return axios.post(`${API_URL}/report-thcn`,
         {
             ...values
@@ -90,7 +90,7 @@ const postReportTHCN = ({ values }) => {
         });
 };
 
-const postReportTHCNRaw = ({ values }) => {
+const postReportTHCNRaw = (values) => {
     return axios.post(`${API_URL}/report-thcn/raw`,
         {
             ...values
@@ -100,7 +100,7 @@ const postReportTHCNRaw = ({ values }) => {
         });
 };
 
-const deleteReportTHCN = ({ values }) => {
+const deleteReportTHCN = (values) => {
     let { id, ...newObj } = values;
     return axios.delete(`${API_URL}/report-thcn/${id}`,
         {

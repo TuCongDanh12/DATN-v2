@@ -91,6 +91,10 @@ import ThongBaoDenHan from "./page/CaiDat/scenes/ThongBaoDenHan";
 import BaoCaoChiPhi from "./page/BaoCao/scenes/BaoCaoChiPhi/BaoCaoChiPhi";
 import ChiTietBaoCaoChiPhi from "./page/BaoCao/scenes/BaoCaoChiPhi/ChiTietBaoCaoChiPhi/ChiTietBaoCaoChiPhi";
 import NhanVien from "./page/DoiTuong/scenes/Nhanvien/Nhanvien";
+import DoiChieuCongNo from "./page/BaoCao/scenes/DoiChieuCongNo/DoiChieuCongNo";
+import TongHopCongNo from './page/BaoCao/scenes/TongHopCongNo/TongHopCongNo';
+import ChiTietTongHopCongNo from "./page/BaoCao/scenes/TongHopCongNo/ChiTietTongHopCongNo/ChiTietTongHopCongNo";
+import ChiTietDoiChieuCongNo from "./page/BaoCao/scenes/DoiChieuCongNo/ChiTietDoiChieuCongNo/ChiTietDoiChieuCongNo";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -108,7 +112,6 @@ function App() {
       navigate("/dang-nhap"); // Chuyển hướng nếu không có user
     }
   }, [location.pathname, navigate]); // Chạy lại effect khi location thay đổi
-
 
   useEffect(() => {
     if (
@@ -176,10 +179,7 @@ function App() {
                     element={<TaiKhoanNganHang />}
                   />
 
-                  <Route
-                    path="nhan-vien"
-                    element={<NhanVien/>}
-                  />
+                  <Route path="nhan-vien" element={<NhanVien />} />
                 </Route>
                 <Route
                   path="doi-tuong/nha-cung-cap/them"
@@ -378,6 +378,15 @@ function App() {
                     path="bao-cao-no-phai-tra"
                     element={<BaoCaoNoPhaiTra />}
                   />
+                  <Route
+                    path="doi-chieu-cong-no"
+                    element={<DoiChieuCongNo />}
+                  />
+
+                  <Route
+                    path="tong-hop-cong-no"
+                    element={<TongHopCongNo />}
+                  />
 
                   <Route
                     path="bao-cao-da-luu/DCCN/:id"
@@ -391,6 +400,16 @@ function App() {
                 <Route
                   path="/cong-no/bao-cao-no-phai-tra/:id"
                   element={<ChiTietBaoCaoNoPhaiTra />}
+                />
+
+                <Route
+                  path="/cong-no/tong-hop-cong-no/:id"
+                  element={<ChiTietTongHopCongNo />}
+                />
+
+                <Route
+                  path="/cong-no/doi-chieu-cong-no/:id"
+                  element={<ChiTietDoiChieuCongNo />}
                 />
 
                 <Route path="/bao-cao" element={<BaoCao />}>
@@ -425,7 +444,7 @@ function App() {
                   element={<ChiTietBaoCaoMuaHang />}
                 />
 
-<Route
+                <Route
                   path="bao-cao/bao-cao-chi-phi/:id"
                   element={<ChiTietBaoCaoChiPhi />}
                 />
@@ -435,15 +454,12 @@ function App() {
                 <Route path="/cai-dat" element={<CaiDat />}>
                   <Route
                     path="thong-tin-cong-ty"
-                    element={<ThongTinCongTy/>}
+                    element={<ThongTinCongTy />}
                   />
+                  <Route path="them-nhan-vien" element={<ThemNhanVien />} />
                   <Route
-                    path="them-nhan-vien"
-                    element={<ThemNhanVien />}
-                  />
-                   <Route
                     path="thong-bao-den-han"
-                    element={<ThongBaoDenHan/>}
+                    element={<ThongBaoDenHan />}
                   />
                 </Route>
 

@@ -217,7 +217,7 @@ const Sidebar = ({
             /> */}
             <Item
               title="Nợ"
-              to="/cong-no/chi-tiet-no-phai-thu"
+              to="/cong-no/bao-cao-no-phai-tra"
               icon={<FaCoins size={20} />}
               selected={selected}
               setSelected={setSelected}
