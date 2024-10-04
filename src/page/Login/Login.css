@@ -176,6 +176,7 @@
 }
 
 .container .container_right .form .form-inner .form-group2 .pass-box {
+    background-color: var(--main-2);
     padding: 15px;
     border: 1px solid transparent;
     display: flex;
