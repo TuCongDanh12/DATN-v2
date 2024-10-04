@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button,message as msg, notification } from "antd";
+import { Table, Button, message as msg, notification } from "antd";
 import { FileExcelOutlined } from '@ant-design/icons';
 import muahangService from './../../../../services/muahang.service';
 import * as XLSX from 'xlsx';
@@ -8,13 +8,13 @@ import getColumns from './columns'; // Import từ file columns.js
 const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, setPaginationParam, searchParams }) => {
   const [listdonmuahang, setListdonmuahang] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]); // Lưu trữ các hàng đã chọn
 
   const [messageApi, contextHolderMes] = msg.useMessage();
   const [api, contextHolder] = notification.useNotification();
 
   useEffect(() => {
     fetchListDonMuahang();
-    // console.log('List mua hang',filteredData)
   }, []); // Chỉ chạy một lần khi component mount
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
 
     try {
       const response = await muahangService.getListDonMuahang({ requestParam: requestParams });
-      console.log('Đơn mua hàng', response.data.result.data)
+      console.log('Đơn mua hàng', response.data.result.data);
       if (Array.isArray(response.data.result.data)) {
         setListdonmuahang(response.data.result.data);
         setPaginationParam(prev => ({
@@ -91,14 +91,13 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
     return record.documentStatus === 'UNDOCUMENTED' ? 'text-red-500 font-medium' : '';
   };
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {},
-  };
+  // Hàm xuất file Excel
+  const exportToExcel = () => {
+    // Nếu không có dòng nào được chọn, xuất toàn bộ dữ liệu lọc
+    const dataToExport = selectedRows.length > 0 ? selectedRows : filteredData;
 
-   // Hàm xuất file Excel
-   const exportToExcel = () => {
-    // Chuyển đổi dữ liệu từ listdonmuahang sang dạng làm phẳng
-    const dataToExport = filteredData.flatMap(item => 
+    // Chuyển đổi dữ liệu từ danh sách đã chọn sang dạng làm phẳng
+    const flattenedData = dataToExport.flatMap(item =>
       item.productOfDonMuaHangs.map(product => ({
         'Ngày đơn hàng': item.purchasingDate,
         'Số đơn hàng': item.id,
@@ -114,13 +113,12 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
         'Thành tiền': product.price * product.count,
         'Tỷ lệ CK (%)': item.discountRate,
         'Tiền chiết khấu': (product.price * product.count * item.discountRate) / 100,
-        'Tổng tiền sau CK': product.price * product.count - (product.price * product.count * item.discountRate) / 100
+        'Tổng tiền sau CK': product.price * product.count - (product.price * product.count * item.discountRate) / 100,
       }))
     );
-  
 
     // Tạo workbook và worksheet
-    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const ws = XLSX.utils.json_to_sheet(flattenedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Đơn mua hàng");
 
@@ -128,6 +126,11 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
     XLSX.writeFile(wb, 'DonMuaHang.xlsx');
   };
 
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRows(selectedRows); // Lưu trữ các hàng đã chọn
+    },
+  };
 
   return (
     <div>

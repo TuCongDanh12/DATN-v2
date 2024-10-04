@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message as msg, notification, Button } from "antd";
+import { Table, Button } from "antd";
 import muahangService from './../../../../services/muahang.service';
 import getColumns from './columns'; // Import từ file columns.js
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { FileExcelOutlined } from '@ant-design/icons';
 
-const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
+const ChungTuMuaTable = ({ filter, dateRange }) => {
   const navigate = useNavigate();
   const [listchungtumua, setListchungtumua] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -14,6 +14,7 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
     current: 1,
     pageSize: 10,
   });
+  const [selectedRows, setSelectedRows] = useState([]); // Lưu trữ các hàng đã chọn
 
   useEffect(() => {
     fetchListChungtumua();
@@ -66,7 +67,7 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
 
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
-      setDataSelected(selectedRows);
+      setSelectedRows(selectedRows); // Lưu các hàng đã chọn
     },
   };
 
@@ -78,10 +79,12 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
   };
 
   const exportToExcel = () => {
-    // Chuyển đổi dữ liệu từ filteredData sang dạng làm phẳng
-    const dataToExport = filteredData.flatMap(item => 
+    // Sử dụng dữ liệu đã chọn, nếu không có dữ liệu nào được chọn thì xuất toàn bộ filteredData
+    const dataToExport = selectedRows.length > 0 ? selectedRows : filteredData;
+
+    // Chuyển đổi dữ liệu từ danh sách đã chọn sang dạng làm phẳng
+    const flattenedData = dataToExport.flatMap(item => 
       item.productOfCtmua.map(product => ({
-        
         'Ngày hoạch toán': item.createdAt.split('T')[0],
         'Ngày chứng từ': item.donMuaHang.createdAt.split('T')[0], // Sử dụng ngày chứng từ từ đối tượng donMuaHang
         'Số phiếu nhập': item.id,
@@ -106,19 +109,19 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
         'Số hóa đơn': item.donMuaHang.id,
         'Số chứng từ ghi nợ/Số chứng từ thanh toán': item.id,
         'Hình thức mua hàng': 'Mua hàng trong nước nhập kho',
-        'Phương thức thanh toán':'Chưa thanh toán'
+        'Phương thức thanh toán': 'Chưa thanh toán',
       }))
     );
-  
+
     // Tạo workbook và worksheet
-    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const ws = XLSX.utils.json_to_sheet(flattenedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Chứng từ mua");
-  
+
     // Xuất file
     XLSX.writeFile(wb, 'ChungTuMua.xlsx');
   };
-  
+
   return (
     <div className='mx-5'>
       <Button
@@ -131,7 +134,7 @@ const ChungTuMuaTable = ({ filter, dateRange, setDataSelected }) => {
       </Button>
       <Table
         rowKey={record => record.id} // Ensure each row has a unique key
-        rowSelection={{ type: "checkbox", ...rowSelection }}
+        rowSelection={{ type: "checkbox", ...rowSelection }} // Sử dụng rowSelection để lưu hàng đã chọn
         columns={getColumns(navigate)}
         dataSource={filteredData}
         pagination={{
