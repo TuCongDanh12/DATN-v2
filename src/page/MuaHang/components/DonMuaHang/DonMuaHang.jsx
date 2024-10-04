@@ -10,7 +10,7 @@ import axios from 'axios';
 import moment from 'moment';
 import DonMuaHangTable from './table'; // Đảm bảo rằng bạn đã tạo và import thành phần này
 import authService from '../../../../services/auth.service';
-
+import authHeader from '../../../../services/auth-header';
 const { RangePicker } = DatePicker;
 
 const DonMuaHang = () => {
@@ -115,19 +115,19 @@ const DonMuaHang = () => {
       console.log('Sheet Names:', workbook.SheetNames);
   
       const sheetTongQuan = workbook.Sheets['tổng quan'];
-      const sheetKhachHang = workbook.Sheets['khách hàng'];
+      const sheetSanpham = workbook.Sheets['sản phẩm'];
   
       // Kiểm tra nếu sheet tồn tại
-      if (!sheetTongQuan || !sheetKhachHang) {
+      if (!sheetTongQuan || !sheetSanpham) {
         console.error('Tên sheet không chính xác hoặc sheet không tồn tại.');
         return;
       }
   
       const dataTongQuan = XLSX.utils.sheet_to_json(sheetTongQuan, { header: 1 });
-      const dataKhachHang = XLSX.utils.sheet_to_json(sheetKhachHang, { header: 1 });
+      const dataKhachHang = XLSX.utils.sheet_to_json(sheetSanpham, { header: 1 });
   
       console.log('Sheet Tổng quan:', dataTongQuan);
-      console.log('Sheet Khách hàng:', dataKhachHang);
+      console.log('Sheet sản phẩm:', dataKhachHang);
   
       // Kiểm tra nếu dữ liệu bị rỗng
       if (dataTongQuan.length === 0 || dataKhachHang.length === 0) {
@@ -163,10 +163,12 @@ const DonMuaHang = () => {
       // Lấy dữ liệu từ sheet khách hàng
       const discount = dataKhachHang[0][1]; // Giảm giá
       const discountRate = dataKhachHang[1][1]; // Chiết khấu(%)
-      const products = dataKhachHang.slice(5).map(row => ({
+      const products = dataKhachHang.slice(5)
+      .filter(row => row[0] !== null && row[0] !== undefined) // Filter out rows where productId is null or undefined
+      .map(row => ({
         productId: Number(row[0]),
-        count: Number(row[1]),
-        price: Number(row[2]),
+        count: Number(row[2]),
+        price: Number(row[3]),
       }));
   
       // Kiểm tra dữ liệu sản phẩm
@@ -188,9 +190,10 @@ const DonMuaHang = () => {
 
   const processExcelData = async (data) => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/don-mua-hang`, data);
+      const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/don-mua-hang`, data, {headers:authHeader()});
       if (response.status === 201) {
         messageApi.success("Đăng đơn mua hàng thành công!");
+        window.location.reload()
       }
     } catch (error) {
       messageApi.error("Đăng đơn mua hàng thất bại!");
