@@ -5,6 +5,8 @@ import jsPDF from "jspdf";
 import { useParams } from "react-router-dom";
 import congNoService from "../../../../../services/congNo.service";
 import moment from "moment";
+import CompanyInfo from "../../../../../component/HeaderCompany";
+import DirectorSignature from "../../../../../component/Sign";
 
 const ChiTietTongHopCongNo = ({ hasButton = true }) => {
   const [tongHopCongNo, setTongHopCongNo] = useState(null);
@@ -105,8 +107,9 @@ const ChiTietTongHopCongNo = ({ hasButton = true }) => {
   ];
 
   return (
-    <div>
+    <div  className='mx-5 my-5'>
       <div ref={reportRef}>
+        <CompanyInfo/>
         <h2 className="text-xl font-bold mt-5" style={{ textAlign: "center" }}>
           {tongHopCongNo?.name}
         </h2>
@@ -121,7 +124,8 @@ const ChiTietTongHopCongNo = ({ hasButton = true }) => {
         <Table
           dataSource={tongHopCongNo?.reportThcnDetails || []}
           columns={columns}
-          pagination={{ pageSize: 10 }}
+          pagination={false}
+          className="mx-5"
           rowKey="id"
           bordered
           summary={() => (
@@ -141,6 +145,7 @@ const ChiTietTongHopCongNo = ({ hasButton = true }) => {
             </Table.Summary.Row>
           )}
         />
+        <DirectorSignature/>
       </div>
 
       {hasButton && (

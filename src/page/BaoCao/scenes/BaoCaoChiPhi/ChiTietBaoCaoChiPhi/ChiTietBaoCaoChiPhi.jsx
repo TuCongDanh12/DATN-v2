@@ -5,6 +5,8 @@ import baoCaoService from "../../../../../services/baoCao.service";
 import moment from "moment";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import CompanyInfo from "../../../../../component/HeaderCompany";
+import DirectorSignature from "../../../../../component/Sign";
 
 const ChiTietBaoCaoChiPhi = ({ hasButton = true }) => {
   const [chiPhi, setChiPhi] = useState({});
@@ -70,8 +72,9 @@ const ChiTietBaoCaoChiPhi = ({ hasButton = true }) => {
   ];
 
   return (
-    <div>
+    <div  className='mx-5 my-5'>
       <div ref={reportRef}>
+        <CompanyInfo/>
         <h2 className="text-xl font-bold mt-5" style={{ textAlign: "center" }}>
           {chiPhi?.name}
         </h2>
@@ -105,10 +108,12 @@ const ChiTietBaoCaoChiPhi = ({ hasButton = true }) => {
               )
             },
           ]}
+          className="mx-5"
           pagination={false}
           rowKey="key"
           bordered
         />
+        <DirectorSignature/>
       </div>
 
       {hasButton && (

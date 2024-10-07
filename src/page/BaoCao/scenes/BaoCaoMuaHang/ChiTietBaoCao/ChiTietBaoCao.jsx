@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import baoCaoService from "../../../../../services/baoCao.service";
+import CompanyInfo from "../../../../../component/HeaderCompany";
+import DirectorSignature from "../../../../../component/Sign";
 
 const { Title } = Typography;
 
@@ -129,8 +131,9 @@ const ChiTietBaoCaoMuaHang = () => {
     };
 
     return (
-        <div>
+        <div  className='mx-5 my-5'>
             <div ref={reportRef}>
+                <CompanyInfo/>
                 <Title className="mt-5" level={2} style={{ textAlign: "center" }}>
                     {reportDetails?.name || "Chi Tiết Báo Cáo Mua Hàng"}
                 </Title>
@@ -150,6 +153,7 @@ const ChiTietBaoCaoMuaHang = () => {
                         bordered
                         pagination={false}
                         style={{ marginTop: "20px" }}
+                        className='mx-5'
                         summary={() => (
                             <Table.Summary.Row>
                                 <Table.Summary.Cell index={0} colSpan={4}>
@@ -165,6 +169,7 @@ const ChiTietBaoCaoMuaHang = () => {
                         )}
                     />
                 )}
+                <DirectorSignature/>
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
                 <Button type="primary" onClick={handleExportPdf}>

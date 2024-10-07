@@ -5,7 +5,8 @@ import baoCaoService from "../../../../../services/baoCao.service";
 import moment from "moment";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-
+import CompanyInfo from "../../../../../component/HeaderCompany";
+import DirectorSignature from "../../../../../component/Sign";
 const ChiTietBaoCaoNoPhaiTra = ({ hasButton = true }) => {
   const [noPhaiTra, setNoPhaiTra] = useState([]);
   const { id } = useParams(); // Lấy id từ URL
@@ -133,9 +134,11 @@ const ChiTietBaoCaoNoPhaiTra = ({ hasButton = true }) => {
   };
 
   return (
-    <div>
+    <div className='mx-5 my-5'>
       {/* Phần cần xuất PDF */}
+      
       <div ref={reportRef}>
+      <CompanyInfo/>
         <h2 className="text-xl font-bold mt-5" style={{ textAlign: "center" }}>
           {noPhaiTra.name}
         </h2>
@@ -151,10 +154,11 @@ const ChiTietBaoCaoNoPhaiTra = ({ hasButton = true }) => {
         <Table
           dataSource={getDataSource()}
           columns={columns}
-          pagination={{ pageSize: 10 }}
           rowKey="key" // Sử dụng key duy nhất
           bordered
+          pagination={false}
         />
+        <DirectorSignature/>
       </div>
 
       {/* Chỉ hiển thị nút nếu hasButton là true */}

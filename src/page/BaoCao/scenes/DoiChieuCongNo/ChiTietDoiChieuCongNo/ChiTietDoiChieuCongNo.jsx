@@ -5,6 +5,8 @@ import jsPDF from "jspdf";
 import baoCaoService from "../../../../../services/baoCao.service";
 import moment from "moment";
 import { useParams } from "react-router-dom";
+import CompanyInfo from "../../../../../component/HeaderCompany";
+import DirectorSignature from "../../../../../component/Sign";
 
 const ChiTietDoiChieuCongNo = () => {
   const [doiChieuCongNo, setDoiChieuCongNo] = useState(null);
@@ -143,8 +145,9 @@ const ChiTietDoiChieuCongNo = () => {
 
 
   return (
-    <div>
+    <div  className='mx-5 my-5'>
       <div ref={reportRef}>
+        <CompanyInfo/>
         <h2 className="text-xl font-bold mt-5" style={{ textAlign: "center" }}>
           {doiChieuCongNo?.name}
         </h2>
@@ -157,12 +160,14 @@ const ChiTietDoiChieuCongNo = () => {
           <Typography.Text>{doiChieuCongNo?.description}</Typography.Text>
         </div>
         <Table
+          className="mx-5"
           dataSource={getDataSource()}
           columns={columns}
-          pagination={{ pageSize: 10 }}
+          pagination={false}
           rowKey="key"
           bordered
         />
+        <DirectorSignature/>
       </div>
 
       <div className='mr-5' style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
