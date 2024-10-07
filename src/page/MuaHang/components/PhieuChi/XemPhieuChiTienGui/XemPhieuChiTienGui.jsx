@@ -177,6 +177,20 @@ const XemPhieuChiTienGui = () => {
           </div>
         </div>
 
+        <p>
+          Tham chiếu đến chứng từ mua:{" "}
+          {phieuchi?.chungTu?.map((item) => (
+            <a
+              href={`/mua-hang/chung-tu-mua-hang/xem/${item.ctmua.id}`}
+              key={item.ctmua.id}
+              style={{ marginRight: "10px" }}
+              className='text-blue-500'
+            >
+              {item.ctmua.id}
+            </a>
+          ))}
+        </p>
+
         <div>
           <Table
             rowClassName={() => "editable-row"}

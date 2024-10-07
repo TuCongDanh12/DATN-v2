@@ -68,7 +68,9 @@ const TienGui = () => {
   const fetchPhieuChiKhacData = async (bankAccountId) => {
     try {
       const response = await muahangService.getListPhieuChiKhac();
-      const data = response.data.result.data;
+      const data = response.data.result.data.filter(
+        (item) => item.reconciled === false
+      );
 
       const filteredData = data
         .filter(
@@ -94,7 +96,9 @@ const TienGui = () => {
   const fetchPhieuChiData = async (bankAccountId) => {
     try {
       const response = await muahangService.getListPhieuChiTienGui();
-      const data = response.data.result.data;
+      const data = response.data.result.data.filter(
+        (item) => item.reconciled === false
+      );
       console.log("table1", response.data.result.data);
       const filteredData = data
         .filter((receipt) => receipt.bankAccount.id === bankAccountId)
