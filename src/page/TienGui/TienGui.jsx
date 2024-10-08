@@ -337,9 +337,9 @@ const TienGui = () => {
           <h3 className="text-xl font-bold">Sổ phụ ngân hàng</h3>
           <Space style={{ marginBottom: 16 }}>
             <RangePicker />
-            <Upload {...uploadProps}>
+            {/* <Upload {...uploadProps}>
               <Button icon={<FileExcelOutlined />}>Nhập Excel</Button>
-            </Upload>
+            </Upload> */}
           </Space>
           <Table
             rowSelection={{
