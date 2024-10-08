@@ -1,13 +1,19 @@
 // TransactionDetails.js
 import React, { useEffect, useState } from "react";
-import { Table, Button, Upload, message } from "antd";
+import { Table, Button, Upload, message, DatePicker, Select } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import * as XLSX from "xlsx";
 import { Link } from 'react-router-dom';
 import congNoService from "../../../../../../services/congNo.service";
 
+const { RangePicker } = DatePicker;
+const { Option } = Select;
+
 const TransactionDetails = ({ bankAccountId }) => {
   const [dataSource, setDataSource] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [statusFilter, setStatusFilter] = useState(null);
+  const [dateRange, setDateRange] = useState([]);
 
   useEffect(() => {
     if (bankAccountId) {
@@ -18,8 +24,8 @@ const TransactionDetails = ({ bankAccountId }) => {
   const fetchTransactions = async (id) => {
     try {
       const response = await congNoService.getAllTransactionBank(id);
-      console.log('Đối chiếu', response.data.result.data)
-      setDataSource(response.data.result.data); // Adjust according to your response structure
+      setDataSource(response.data.result.data);
+      setFilteredData(response.data.result.data); // Cập nhật filteredData cùng với dataSource
     } catch (error) {
       console.error(error);
       message.error("Có lỗi xảy ra khi lấy dữ liệu giao dịch.");
@@ -44,9 +50,11 @@ const TransactionDetails = ({ bankAccountId }) => {
         credit: Number(row[6]) || 0,
         description: String(row[7] || ''),
         bankAccountId: Number(row[8]) || null,
+        // reconciled: Boolean(row[9]), // Giả định rằng trạng thái đã đối chiếu nằm ở cột 10
       }));
 
       setDataSource(transactions);
+      setFilteredData(transactions); // Cập nhật filteredData
       postTransactions(transactions);
     };
 
@@ -58,26 +66,60 @@ const TransactionDetails = ({ bankAccountId }) => {
     if (!dateValue) {
       return null;
     }
-
+  
     if (typeof dateValue === 'number') {
-      const excelEpoch = new Date(1899, 11, 30);
-      const daysSinceEpoch = dateValue - 1;
-      const date = new Date(excelEpoch.getTime() + daysSinceEpoch * 24 * 60 * 60 * 1000);
-      return formatAsString(date);
+      const excelEpoch = new Date(1900, 0, 1);
+      const daysSinceEpoch = dateValue; 
+      const date = new Date(excelEpoch.getTime() + (daysSinceEpoch - 2) * 24 * 60 * 60 * 1000 + 24 * 60 * 60 * 1000); 
+      return formatAsString(date); // Trả về định dạng yyyy-mm-dd
     }
-
+  
     const date = new Date(dateValue);
     if (isNaN(date.getTime())) {
-      message.error(`Ngày không hợp lệ: ${dateValue}`);
+      console.error(`Ngày không hợp lệ: ${dateValue}`);
       return null;
     }
-
-    return formatAsString(date);
+  
+    return formatAsString(date); // Trả về định dạng yyyy-mm-dd
   };
+  
+  
 
   const formatAsString = (date) => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // Định dạng yyyy-mm-dd
   };
+  
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+    filterData(dates, statusFilter);
+  };
+
+  const handleStatusChange = (value) => {
+    setStatusFilter(value);
+    filterData(dateRange, value);
+  };
+
+  const filterData = (dates, status) => {
+    let filtered = [...dataSource];
+  
+    if (dates && dates.length === 2) {
+      const [start, end] = dates.map(date => date.format('YYYY-MM-DD')); // Đảm bảo định dạng ngày đúng
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.date);
+        return !isNaN(itemDate.getTime()) && itemDate >= new Date(start) && itemDate <= new Date(end);
+      });
+    }
+  
+    if (status) {
+      filtered = filtered.filter(item => (status === 'reconciled' ? item.reconciled : !item.reconciled));
+    }
+  
+    setFilteredData(filtered);
+  };
+  
 
   const postTransactions = async (transactions) => {
     const validTransactions = transactions.filter(tx => tx.date && tx.transactionNumber);
@@ -88,6 +130,7 @@ const TransactionDetails = ({ bankAccountId }) => {
 
     try {
       const values = { transactions: validTransactions };
+      console.log('values', values);
       await congNoService.postTransaction(values);
       message.success("Dữ liệu đã được gửi thành công!");
     } catch (error) {
@@ -101,6 +144,7 @@ const TransactionDetails = ({ bankAccountId }) => {
       title: 'Ngày',
       dataIndex: 'date',
       key: 'date',
+      render: (text) => <span>{text}</span>,
     },
     {
       title: 'Mã giao dịch',
@@ -163,9 +207,8 @@ const TransactionDetails = ({ bankAccountId }) => {
         </span>
       ),
     }
-    
   ];
-  
+
   return (
     <div>
       <Upload 
@@ -175,7 +218,19 @@ const TransactionDetails = ({ bankAccountId }) => {
       >
         <Button className='my-5' icon={<UploadOutlined />}>Tải lên file Excel</Button>
       </Upload>
-      <Table dataSource={dataSource} columns={columns} pagination={{ pageSize: 10 }} />
+
+      <RangePicker onChange={handleDateRangeChange} style={{ marginBottom: 16 }} />
+      <Select 
+        placeholder="Lọc theo trạng thái"
+        onChange={handleStatusChange}
+        style={{ marginBottom: 16, width: 200 }}
+      >
+        <Option value={null}>Tất cả</Option>
+        <Option value="reconciled">Đã đối chiếu</Option>
+        <Option value="notReconciled">Chưa đối chiếu</Option>
+      </Select>
+
+      <Table dataSource={filteredData} columns={columns} pagination={{ pageSize: 10 }} />
     </div>
   );
 };
