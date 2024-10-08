@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Upload, message, DatePicker, Select } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import * as XLSX from "xlsx";
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import congNoService from "../../../../../../services/congNo.service";
 import moment from "moment";
 
@@ -10,6 +10,8 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 const TransactionDetails = ({ bankAccountId }) => {
+  const params = useParams()
+  // console.log('id',params?.id)
   const [dataSource, setDataSource] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [statusFilter, setStatusFilter] = useState(null); // Mặc định là Tất cả
@@ -59,7 +61,7 @@ const TransactionDetails = ({ bankAccountId }) => {
         debit: Number(row[5]) || 0,
         credit: Number(row[6]) || 0,
         description: String(row[7] || ''),
-        bankAccountId: Number(row[8]) || null,
+        bankAccountId: Number(params.id) || null,
       }));
 
       setDataSource(transactions);
