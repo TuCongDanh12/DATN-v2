@@ -150,6 +150,22 @@ const combinedTransaction = (transactionId, id) => {
   };
   
 
+  const combinedOtherTransaction = (transactionId, id) => {
+    return axios.patch(
+      `${API_URL}/transaction/chi-khac/${transactionId}/${id}`,
+      {
+        headers: {
+          Authorization: 'Bearer ' + user.accessToken, // Cấu hình header đúng
+        },
+      },
+      {
+        headers: {
+          Authorization: 'Bearer ' + user.accessToken, // Cấu hình header đúng
+        },
+      }
+    );
+  };
+
 const congNoService = {
     getListChungTuBan,
 
@@ -168,6 +184,7 @@ const congNoService = {
     postTransaction,
     getAllTransactionBank,
     combinedTransaction,
+    combinedOtherTransaction,
 };
 
 export default congNoService;

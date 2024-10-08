@@ -146,13 +146,24 @@ const TransactionDetails = ({ bankAccountId }) => {
             {record.reconciled ? 'Đã đối chiếu' : 'Chưa đối chiếu'}
           </span>
           {record.reconciled && (
-            <Link to={`/mua-hang/phieu-chi/tiengui/${record?.phieuChi?.id}`} style={{ marginLeft: '8px' }}>
-              <Button type="link" className="!bg-[#ffff]">Xem</Button>
-            </Link>
+            <>
+              {record.phieuChi ? (
+                <Link to={`/mua-hang/phieu-chi/tiengui/${record.phieuChi.id}`} style={{ marginLeft: '8px' }}>
+                  <Button type="link" className="!bg-[#ffff]">Xem</Button>
+                </Link>
+              ) : (
+                record.phieuChiKhac && (
+                  <Link to={`/mua-hang/phieu-chi-khac`} style={{ marginLeft: '8px' }}>
+                    <Button type="link" className="!bg-[#ffff]">Xem</Button>
+                  </Link>
+                )
+              )}
+            </>
           )}
         </span>
       ),
-    },
+    }
+    
   ];
   
   return (

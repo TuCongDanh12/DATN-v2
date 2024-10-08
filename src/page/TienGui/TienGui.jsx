@@ -72,10 +72,12 @@ const TienGui = () => {
         (item) => item.reconciled === false
       );
 
+      console.log('Phiếu chi khác',data)
+
       const filteredData = data
         .filter(
           (receipt) =>
-            receipt.bankAccount.id === bankAccountId && !receipt.isTienMat
+            receipt?.bankAccount?.id === bankAccountId && !receipt.isTienMat
         )
         .map((receipt) => ({
           key: receipt.id,
@@ -256,13 +258,23 @@ const TienGui = () => {
 
   const handleCreate = async () => {
     try {
-      // Lặp qua từng hàng trong bảng tổng hợp
-      console.log("combined", postfinal);
+      if (!postfinal || postfinal.length === 0) {
+        message.error("No data to create transactions.");
+        return;
+      }
+  
       const transactionId = postfinal[0].id;
       const id = postfinal[0].chungTu;
-      console.log(transactionId, " ", id);
-      await congNoService.combinedTransaction(transactionId, id);
+  
+      // Check the receipt type and call the appropriate API
+      if (receiptType === "Phiếu Chi") {
+        await congNoService.combinedTransaction(transactionId, id);
+      } else if (receiptType === "Phiếu Chi Khác") {
+        await congNoService.combinedOtherTransaction(transactionId, id);
+      }
+  
       message.success("Đối chiếu thành công");
+      // Reset states after successful transaction
       setTable1Data([]);
       setTable2Data([]);
       setSelectedRows1([]);
@@ -270,16 +282,12 @@ const TienGui = () => {
       setCombinedData([]);
       setPostfinal(null);
       setIsModalVisible(false);
-
-      // window.location.reload()
-      // Hiển thị thông báo thành công
-      console.log("Transactions created successfully.");
-      // Bạn có thể thêm thông báo cho người dùng ở đây nếu cần
     } catch (error) {
       console.error("Error creating transactions:", error);
-      // Hiển thị thông báo lỗi nếu cần
+      message.error("Có lỗi xảy ra khi tạo giao dịch.");
     }
   };
+  
 
   return (
     <div>
