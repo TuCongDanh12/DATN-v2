@@ -156,7 +156,7 @@ const DonMuaHangTable = ({ navigate, setDataSelected, setOpen, paginationParam, 
         )}
         pagination={{
           current: paginationParam.current,
-          pageSize: paginationParam.pageSize,
+          pageSize: 10,
           total: filteredData.length,
           position: ['bottomRight'],
           showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
