@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Form, Input, DatePicker, Button, Select, Table, Typography } from "antd";
 import muahangService from "../../../../../services/muahang.service";
 import dayjs from "dayjs";
@@ -47,8 +47,13 @@ const XemPhieuChiTienGui = () => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
+      dataIndex: "ctmua",
       key: "id",
+      render: (ctmua) => (
+        <Link to={`/mua-hang/chung-tu-mua-hang/xem/${ctmua.id}`}>
+          {ctmua.id}
+        </Link>
+      ),
     },
     {
       title: "Số tiền",
