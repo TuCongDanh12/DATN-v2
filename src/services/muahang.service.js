@@ -55,9 +55,9 @@ const getChungTuMua = ({ id }) => {
 
 
 const postPhieuChiTienGui = (values) => {
-  const value = values.filter(item => item.chungTu.money !== 0)
+  // const value = values.filter(item => item.chungTu.money !== 0)
   return axios.post(`${API_URL}/phieu-chi-tien-gui`,
-      value
+      values
       ,
       {
           headers: authHeader()
@@ -65,9 +65,9 @@ const postPhieuChiTienGui = (values) => {
 };
 
 const postPhieuChiTienMat = (values) => {
-  const value = values.filter(item => item.chungTu.money !== 0)
+  // const value = values.filter(item => item.chungTu.money !== 0)
   return axios.post(`${API_URL}/phieu-chi-tien-mat`,
-      value
+      values
       ,
       {
           headers: authHeader()
