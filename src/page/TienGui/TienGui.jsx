@@ -312,6 +312,7 @@ const TienGui = () => {
         >
           <Select.Option value="Phiếu Chi">Phiếu Chi</Select.Option>
           <Select.Option value="Phiếu Chi Khác">Phiếu Chi Khác</Select.Option>
+          <Select.Option value="Phiếu Thu">Phiếu Thu</Select.Option>
         </Select>
       </Flex>
       <Flex justify="space-between" className="mx-5 mt-5">
@@ -357,8 +358,9 @@ const TienGui = () => {
       <Button
         className="ml-5"
         type="primary"
-        onClick={() => setIsModalVisible(true)}
+        // onClick={() => setIsModalVisible(true)}
         disabled={selectedRows1.length === 0 || selectedRows2.length === 0}
+        onClick={handleOk}
       >
         Thêm
       </Button>
@@ -366,7 +368,7 @@ const TienGui = () => {
       <Modal
         title="Xác nhận"
         visible={isModalVisible}
-        onOk={handleOk}
+        onOk={handleCreate}
         onCancel={handleCancel}
       >
         <p>Bạn có chắc chắn muốn tổng hợp và xóa dữ liệu đã chọn không?</p>
@@ -381,7 +383,7 @@ const TienGui = () => {
         />
       </div>
 
-      <Button className="ml-5 mt-5" type="primary" onClick={handleCreate}>
+      <Button className="ml-5 mt-5" type="primary"  onClick={() => setIsModalVisible(true)}>
         Tạo
       </Button>
     </div>
