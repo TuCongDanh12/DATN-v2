@@ -138,7 +138,7 @@ const DonMuaHang = () => {
       // Hàm xử lý định dạng ngày
       const parseExcelDate = (excelDate) => {
         if (typeof excelDate === 'number') {
-          const date = moment(new Date((excelDate - (25567 + 1)) * 86400 * 1000));
+          const date = moment(new Date((excelDate - (25567 + 1)) * 86400 * 1000)-24 * 60 * 60 * 1000);
           return date.isValid() ? date.format('YYYY-MM-DD') : null;
         } else if (typeof excelDate === 'string') {
           const date = moment(excelDate, ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD']);
