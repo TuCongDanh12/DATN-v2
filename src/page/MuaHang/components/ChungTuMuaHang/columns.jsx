@@ -45,10 +45,12 @@ const getColumns = (navigate) => [
     title: "ID chứng từ",
     dataIndex: "id",
     sorter: (a, b) => a.id - b.id,
+    
   },
   {
     title: "Ngày hoạch toán",
     dataIndex: "createdAt",
+    defaultSortOrder: 'descend',
     sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
     render: (text) => new Date(text).toLocaleDateString("vi-VN"),
   },

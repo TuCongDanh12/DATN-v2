@@ -87,6 +87,7 @@ const getColumns = (navigate, setDataSelected, setOpen) => [
   {
     title: "Ngày mua",
     dataIndex: "purchasingDate",
+    defaultSortOrder: 'descend',
     sorter: (a, b) => new Date(a.purchasingDate) - new Date(b.purchasingDate),
   },
   {
